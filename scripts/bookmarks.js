@@ -13,6 +13,10 @@ class BookmarkData {
         this.manual = [];
     }
     
+    static fromBaseUrl(base_url) {
+        return new BookmarkData(base_url, base_url);
+    }
+    
     get valid() {
         return ((this.base_url !== "invalid") && (this.label !== "invalid"));
     }
@@ -99,4 +103,12 @@ class Bookmark {
     }
 }
 
-export {Bookmark, BookmarkData, BookmarkDataDummy}
+function getBaseUrl(url) {
+    let currentUrl = new URL(url);
+    if (currentUrl.origin == "null") {
+        return;
+    }
+    return currentUrl.origin;
+}
+
+export {Bookmark, BookmarkData, BookmarkDataDummy, getBaseUrl}

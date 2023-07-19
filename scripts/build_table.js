@@ -26,6 +26,16 @@ function addComicToList(newList, comic) {
     makeInteractive(bookmarkList);
 }
 
+function appendComicToPanel(container, bookmarkData) {
+    let shortList = [];
+    addComicToList(shortList, bookmarkData);
+    if (shortList.length == 0) {
+        console.log("Could not build new list entry. Might be bad!");
+        return;
+    }
+    container.appendChild(shortList[0]);
+}
+
 function createSubList(parentElement, myId) {
     if (!(typeof myId === "string"))
         return;
@@ -79,4 +89,4 @@ function createClickField(myHref, myInnerText) {
     return listEntry;
 }
 
-export {buildComicLists, updateComicList}
+export {buildComicLists, updateComicList, appendComicToPanel}

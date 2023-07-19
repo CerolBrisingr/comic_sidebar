@@ -1,7 +1,7 @@
-import {Bookmark, BookmarkData, BookmarkDataDummy} from "./bookmarks.js";
+import {Bookmark, BookmarkData, BookmarkDataDummy, getBaseUrl} from "./bookmarks.js";
 import {saveBackup} from "./backup_export.js";
 import {importBackup} from "./backup_import.js";
-import {buildComicLists, updateComicList} from "./build_table.js";
+import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
 
 // My be a good idea to use a map of base-urls for 2-stage differentiation
 // E.g. keeping all "gocomics" entries among a "gocomics.com" list
@@ -34,8 +34,8 @@ function wireButtons() {
     const exportTrigger = document.getElementById('export_trigger');
     exportTrigger.onclick = function() {triggerExport()};
     
-    const addXkcd = document.getElementById('add_xkcd');
-    addXkcd.onclick = function () {addAutoBookmark("https://xkcd.com/1337/")};
+    const addPage = document.getElementById('add_page');
+    addPage.onclick = function () {addCurrentPage()};
 }
 
 function dropdownExtension() {
@@ -74,6 +74,20 @@ function addAutoBookmark(url) {
     updateComicList(unorderedList, comicBookmarkBundle);
 }
 
+function addUrlToList(url) {
+    let comicBookmarkBundle = findCorrectBookmark(url);
+    if (comicBookmarkBundle.valid) {
+        console.log("Page already registered");
+        return;
+    }
+    let base_url = getBaseUrl(url);
+    let bookmarkData = BookmarkData.fromBaseUrl(base_url);
+    comicData.push(bookmarkData);
+    const container = document.getElementById('container');
+    appendComicToPanel(container, bookmarkData);
+    addAutoBookmark(url);
+}
+
 function findCorrectBookmark(url) {
     if (currentBookmark.urlIsCompatible(url))
         return currentBookmark;
@@ -87,19 +101,16 @@ function findCorrectBookmark(url) {
     return currentBookmark;
 }
 
-/*
-Update the sidebar's content.
-*/
-function updateContent() {
+// Add current page to list
+function addCurrentPage() {
   browser.tabs.query({windowId: myWindowId, active: true})
-    .then(addCurrentTabs, onError)
+    .then((tabs) => addUrlToList(tabs[0].url), onError)
 }
 
-function addCurrentTabs(tabs) {
-    let data = []
-    for (const tab of tabs) {
-        data = addAutoBookmark(tab.url);
-    }
+// Update the sidebar's content.
+function updateContent() {
+  browser.tabs.query({windowId: myWindowId, active: true})
+    .then((tabs) => addAutoBookmark(tabs[0].url), onError)
 }
 
 // Display error for failed promises
@@ -107,16 +118,10 @@ function onError(error) {
   contentBox.textContent ="Error: ${error}";
 }
 
-/*
-Update content when a new tab becomes active.
-*/
+// Update content when a new tab becomes active.
 browser.tabs.onActivated.addListener(updateContent);
-
-/*
-Update content when a new page is loaded into a tab.
-*/
+// Update content when a new page is loaded into a tab.
 browser.tabs.onUpdated.addListener(updateContent);
-
 /*
 When the sidebar loads, get the ID of its window,
 and update its content.
