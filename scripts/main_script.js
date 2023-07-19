@@ -97,9 +97,11 @@ function addUrlToList(url) {
         return;
     }
     let urlPieces = dissectUrl(url);
-    if (urlPieces === undefined)
+    if (urlPieces === undefined) {
+        console.log("Cannot interpret this link to form a new entry")
         return;
-    let bookmarkData = BookmarkData.fromBaseUrl(urlPieces.base_url);
+    }
+    let bookmarkData = new BookmarkData(urlPieces.base_url, urlPieces.host);
     comicData.push(bookmarkData);
     const container = document.getElementById('container');
     appendComicToPanel(container, bookmarkData);

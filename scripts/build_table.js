@@ -78,14 +78,29 @@ function buildBookmarkObject(bookmark, strMeta) {
         return;
     if (!(typeof strMeta === "string"))
         return;
-    let myHref = encodeURI(bookmark.href);
+    let myLink = buildLink(bookmark.href, strMeta);
+    if (myLink === undefined)
+        return;
     let listEntry = document.createElement("li");
-    let myStrMeta = encodeURI(strMeta);
-    let linkPieces = dissectUrl(myHref);
-    let myLink = Object.assign(document.createElement("a"), {href:myHref, innerText:linkPieces.tail});
-    myLink.classList.add(myStrMeta)
     listEntry.appendChild(myLink);
     return listEntry;
+}
+
+function buildLink(href, strMeta) {
+    let myHref = encodeURI(href);
+    let linkPieces = dissectUrl(myHref);
+    if (linkPieces === undefined)
+        return;
+    let myStrMeta = encodeURI(strMeta);
+    let myLink = document.createElement("a")
+    myLink.href = myHref;
+    myLink.innerText = linkPieces.tail;
+    myLink.classList.add(myStrMeta);
+    myLink.onclick = function() {
+        openUrlInMyTab(myHref);
+        return false;
+    }
+    return myLink;
 }
 
 function createClickField(myHref, myInnerText) {

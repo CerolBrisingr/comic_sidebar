@@ -13,11 +13,6 @@ class BookmarkData {
         this.manual = [];
     }
     
-    static fromBaseUrl(base_url) {
-        let urlPieces = dissectUrl(base_url);
-        return new BookmarkData(base_url, urlPieces.host);
-    }
-    
     get valid() {
         return ((this.base_url !== "invalid") && (this.label !== "invalid"));
     }
@@ -112,6 +107,8 @@ function dissectUrl(url) {
         console.error(error);
         return;
     }
+    if (currentUrl.origin === "null")
+        return;
     let tail = currentUrl.pathname + currentUrl.search;
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
