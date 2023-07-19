@@ -34,6 +34,11 @@ function wireButtons() {
     const exportTrigger = document.getElementById('export_trigger');
     exportTrigger.onclick = function() {triggerExport()};
     
+    const inputElement = document.getElementById('file-selector');
+    inputElement.style.display = 'none';
+    const inputTrigger = document.getElementById('import_trigger');
+    inputTrigger.onclick = function () {inputElement.click()};
+    
     const addPage = document.getElementById('add_page');
     addPage.onclick = function () {addCurrentPage()};
 }
@@ -122,10 +127,8 @@ function onError(error) {
 browser.tabs.onActivated.addListener(updateContent);
 // Update content when a new page is loaded into a tab.
 browser.tabs.onUpdated.addListener(updateContent);
-/*
-When the sidebar loads, get the ID of its window,
-and update its content.
-*/
+// When the sidebar loads, get the ID of its window,
+// and update its content.
 browser.windows.getCurrent({populate: true}).then((windowInfo) => {
   myWindowId = windowInfo.id;
   updateContent();

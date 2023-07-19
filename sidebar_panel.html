@@ -6,9 +6,18 @@
         <script type="module" src="scripts/main_script.js"></script>
     </head>
 <body>
-    <button id="add_page">Add page</button>
-    Load backup: <input type="file" id="file-selector"><br>
-    Save backup: <button id="export_trigger">Select File ...</button>
+    <div>
+        Backup:</br>
+        <button id="import_trigger">Load</button>
+        <button id="export_trigger">Save</button>
+    </div>
+    <div>
+        Current Setup:</br>
+        <button id="load_dummy">Load</button>
+        <button id="add_page">Add page</button>
+        <button id="save_dummy">Save</button>
+    </div>
+    <input type="file" id="file-selector"><br>
     <nav>
         <ul id="container">
         </ul>
