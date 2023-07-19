@@ -41,6 +41,17 @@ function wireButtons() {
     
     const addPage = document.getElementById('add_page');
     addPage.onclick = function () {addCurrentPage()};
+    
+    const saveButton = document.getElementById('save_dummy');
+    saveButton.onclick = function() {saveDataToStorage()};
+    const loadButton = document.getElementById('load_dummy');
+    loadButton.onclick = function() {loadDataFromStorage()};
+}
+
+function saveDataToStorage() {
+}
+
+function loadDataFromStorage() {
 }
 
 function dropdownExtension() {
@@ -86,6 +97,8 @@ function addUrlToList(url) {
         return;
     }
     let urlPieces = dissectUrl(url);
+    if (urlPieces === undefined)
+        return;
     let bookmarkData = BookmarkData.fromBaseUrl(urlPieces.base_url);
     comicData.push(bookmarkData);
     const container = document.getElementById('container');
@@ -108,19 +121,19 @@ function findCorrectBookmark(url) {
 
 // Add current page to list
 function addCurrentPage() {
-  browser.tabs.query({windowId: myWindowId, active: true})
-    .then((tabs) => addUrlToList(tabs[0].url), onError)
+    browser.tabs.query({windowId: myWindowId, active: true})
+        .then((tabs) => addUrlToList(tabs[0].url), onError)
 }
 
 // Update the sidebar's content.
 function updateContent() {
-  browser.tabs.query({windowId: myWindowId, active: true})
-    .then((tabs) => addAutoBookmark(tabs[0].url), onError)
+    browser.tabs.query({windowId: myWindowId, active: true})
+        .then((tabs) => addAutoBookmark(tabs[0].url), onError)
 }
 
 // Display error for failed promises
 function onError(error) {
-  contentBox.textContent ="Error: ${error}";
+    contentBox.textContent ="Error: ${error}";
 }
 
 // Update content when a new tab becomes active.
@@ -130,6 +143,6 @@ browser.tabs.onUpdated.addListener(updateContent);
 // When the sidebar loads, get the ID of its window,
 // and update its content.
 browser.windows.getCurrent({populate: true}).then((windowInfo) => {
-  myWindowId = windowInfo.id;
-  updateContent();
+    myWindowId = windowInfo.id;
+    updateContent();
 });

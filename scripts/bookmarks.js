@@ -105,10 +105,12 @@ class Bookmark {
 }
 
 function dissectUrl(url) {
-    let currentUrl = new URL(url);
-    if (currentUrl.origin == "null") {
-        console.log("Failed to dissect URL, returning full URL for each entry!")
-        return {host: url, tail: url};
+    let currentUrl
+    try {
+        currentUrl = new URL(url);
+    } catch (error) {
+        console.error(error);
+        return;
     }
     let tail = currentUrl.pathname + currentUrl.search;
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};

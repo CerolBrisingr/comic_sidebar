@@ -36,6 +36,13 @@ function appendComicToPanel(container, bookmarkData) {
     container.appendChild(shortList[0]);
 }
 
+function openUrlInMyTab(url) {
+    let test = dissectUrl(url);
+    if (test === undefined)
+        return;
+    browser.tabs.update({url: url});
+}
+
 function createSubList(parentElement, myId) {
     if (!(typeof myId === "string"))
         return;
