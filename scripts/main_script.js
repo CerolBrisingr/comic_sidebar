@@ -1,4 +1,4 @@
-import {Bookmark, BookmarkData, BookmarkDataDummy, getBaseUrl} from "./bookmarks.js";
+import {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl} from "./bookmarks.js";
 import {saveBackup} from "./backup_export.js";
 import {importBackup} from "./backup_import.js";
 import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
@@ -80,8 +80,8 @@ function addUrlToList(url) {
         console.log("Page already registered");
         return;
     }
-    let base_url = getBaseUrl(url);
-    let bookmarkData = BookmarkData.fromBaseUrl(base_url);
+    let urlPieces = dissectUrl(url);
+    let bookmarkData = BookmarkData.fromBaseUrl(urlPieces.base_url);
     comicData.push(bookmarkData);
     const container = document.getElementById('container');
     appendComicToPanel(container, bookmarkData);

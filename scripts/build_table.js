@@ -1,4 +1,4 @@
-import {Bookmark, BookmarkData} from "./bookmarks.js"
+import {Bookmark, BookmarkData, dissectUrl} from "./bookmarks.js"
 
 function buildComicLists(data, container) {
     let newList = [];
@@ -74,7 +74,8 @@ function buildBookmarkObject(bookmark, strMeta) {
     let myHref = encodeURI(bookmark.href);
     let listEntry = document.createElement("li");
     let myStrMeta = encodeURI(strMeta);
-    let myLink = Object.assign(document.createElement("a"), {href:myHref, innerText:myHref});
+    let linkPieces = dissectUrl(myHref);
+    let myLink = Object.assign(document.createElement("a"), {href:myHref, innerText:linkPieces.tail});
     myLink.classList.add(myStrMeta)
     listEntry.appendChild(myLink);
     return listEntry;

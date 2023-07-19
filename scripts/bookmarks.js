@@ -14,7 +14,8 @@ class BookmarkData {
     }
     
     static fromBaseUrl(base_url) {
-        return new BookmarkData(base_url, base_url);
+        let urlPieces = dissectUrl(base_url);
+        return new BookmarkData(base_url, urlPieces.host);
     }
     
     get valid() {
@@ -103,12 +104,14 @@ class Bookmark {
     }
 }
 
-function getBaseUrl(url) {
+function dissectUrl(url) {
     let currentUrl = new URL(url);
     if (currentUrl.origin == "null") {
-        return;
+        console.log("Failed to dissect URL, returning full URL for each entry!")
+        return {host: url, tail: url};
     }
-    return currentUrl.origin;
+    let tail = currentUrl.pathname + currentUrl.search;
+    return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {Bookmark, BookmarkData, BookmarkDataDummy, getBaseUrl}
+export {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl}
