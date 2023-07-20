@@ -10,8 +10,8 @@ function buildComicLists(data, container) {
 
 function updateComicList(unorderedList, comicBookmark) {
     unorderedList.replaceChildren();
-    addBookmarks(unorderedList, comicBookmark.automatic, "auto");
-    addBookmarks(unorderedList, comicBookmark.manual, "manual");
+    addBookmarks(unorderedList, comicBookmark, comicBookmark.automatic, "auto");
+    addBookmarks(unorderedList, comicBookmark, comicBookmark.manual, "manual");
 }
 
 function addComicToList(newList, comic) {
@@ -64,21 +64,22 @@ function makeInteractive(obj) {
     `);
 }
 
-function addBookmarks(parentElement, bookmarkList, strMeta) {
+function addBookmarks(parentElement, bookmarkParent, bookmarkList, strMeta) {
     for (let bookmark of bookmarkList) {
-        let bookmarkObject = buildBookmarkObject(bookmark, strMeta);
+        let prefix = bookmarkParent.base_url;
+        let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
         if (bookmarkObject === undefined)
             continue;
         parentElement.appendChild(bookmarkObject);
     }
 }
 
-function buildBookmarkObject(bookmark, strMeta) {
+function buildBookmarkObject(bookmark, prefix, strMeta) {
     if (!(typeof bookmark.href === "string"))
         return;
     if (!(typeof strMeta === "string"))
         return;
-    let myLink = buildLink(bookmark.href, strMeta);
+    let myLink = buildLink(bookmark.href, prefix, strMeta);
     if (myLink === undefined)
         return;
     let listEntry = document.createElement("li");
@@ -86,9 +87,9 @@ function buildBookmarkObject(bookmark, strMeta) {
     return listEntry;
 }
 
-function buildLink(href, strMeta) {
+function buildLink(href, prefix, strMeta) {
     let myHref = encodeURI(href);
-    let linkPieces = dissectUrl(myHref);
+    let linkPieces = dissectUrl(href, prefix);
     if (linkPieces === undefined)
         return;
     let myStrMeta = encodeURI(strMeta);
@@ -107,7 +108,7 @@ function createClickField(myHref, myInnerText) {
     if (!(typeof myHref === "string") || !(typeof myInnerText === "string"))
         return;
     let listEntry = document.createElement("li");
-    let myLink = Object.assign(document.createElement("a"), {href:encodeURI(myHref), innerText:encodeURI(myInnerText)});
+    let myLink = Object.assign(document.createElement("a"), {href:encodeURI(myHref), innerText:myInnerText});
     listEntry.appendChild(myLink);
     return listEntry;
 }

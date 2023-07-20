@@ -99,7 +99,7 @@ class Bookmark {
     }
 }
 
-function dissectUrl(url) {
+function dissectUrl(url, prefix) {
     let currentUrl
     try {
         currentUrl = new URL(url);
@@ -109,7 +109,12 @@ function dissectUrl(url) {
     }
     if (currentUrl.origin === "null")
         return;
-    let tail = currentUrl.pathname + currentUrl.search;
+    let tail;
+    if (url.startsWith(prefix)) {
+        tail = url.slice(prefix.length);
+    } else {
+        tail = url.slice(currentUrl.origin.length);
+    }
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
