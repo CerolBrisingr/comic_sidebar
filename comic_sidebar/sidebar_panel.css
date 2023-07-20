@@ -10,7 +10,7 @@ nav > ul {
 }
 
 nav li {
-	margin: 0.05em;
+	margin: 1px;
 	padding: 0;
 	font-size: 1.5rem;
 	flex: 1 1 0%;
@@ -146,4 +146,29 @@ nav li:focus [aria-expanded] svg {
 	--accent1-color: gold;
 	--accent2-color: darkred;
 	--text-color: black;
+}
+
+div.input_frame {
+	margin: 6px;
+    border: 2px solid black;
+}
+
+input.td {
+    width: 100%
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
 }
