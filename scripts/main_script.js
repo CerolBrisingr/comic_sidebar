@@ -3,6 +3,15 @@ import {saveBackup, buildComicObject} from "./backup_export.js";
 import {importBackup, readComicObject} from "./backup_import.js";
 import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
 
+/* 
+Browser modified during development:
+about:config
+    extensions.webextensions.keepStorageOnUninstall -> true (was false)
+    extensions.webextensions.keepUuidOnUninstall    -> true (was false)
+  Not yet: xpinstall.signatures.required            -> false (still is true)
+Source: https://extensionworkshop.com/documentation/develop/testing-persistent-and-restart-features/#what-do-i-do-to-ensure-i-can-test-my-extension
+*/
+
 // My be a good idea to use a map of base-urls for 2-stage differentiation
 // E.g. keeping all "gocomics" entries among a "gocomics.com" list
 let comicData = [];
@@ -24,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const file = event.target.files[0];
             const uiUpdateFkt = function(data, container) {
                 comicData = data;
+                saveDataToStorage(comicData);
                 buildComicLists(data, container);
             }
             importBackup(file, container, uiUpdateFkt);
@@ -55,11 +65,15 @@ function saveDataToStorage() {
 function loadDataFromStorage() {
     let gettingItem = browser.storage.local.get("comicData");
     gettingItem.then((storageResult) => {
+        if (!storageResult.hasOwnProperty("comicData")) {
+            console.log("No data stored locally, aborting loading sequence! (2)");
+            return;
+        }
         let importData = readComicObject(storageResult.comicData);
         comicData = importData;
         buildComicLists(importData, container);
         }, 
-        () => {console.log("No data stored locally, aborting loading sequence!")});
+        () => {console.log("No data stored locally, aborting loading sequence! (1)")});
 }
 
 function clearComicData() {
