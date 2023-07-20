@@ -14,7 +14,7 @@ async function importBackup(file, container, uiUpdateFkt) {
             console.log("Invalid source file, could not parse as JSON!")
             return;
         }
-        let importData = importStructure(data);
+        let importData = readComicObject(data);
         if (importData.length > 0)
             uiUpdateFkt(importData, container);
             return;
@@ -28,7 +28,7 @@ function fileHasJsonExtension(file) {
     return (fileExt === "json")
 }
 
-function importStructure(data) {
+function readComicObject(data) {
     let importData = [];
     if (!(data.hasOwnProperty("data") && data.hasOwnProperty("type")))
         return undefined;
@@ -63,4 +63,4 @@ function tryAddBookmarks(importCall, source) {
     }
 }
 
-export {importBackup}
+export {importBackup, readComicObject}

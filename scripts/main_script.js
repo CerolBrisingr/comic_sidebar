@@ -1,6 +1,6 @@
 import {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl} from "./bookmarks.js";
-import {saveBackup} from "./backup_export.js";
-import {importBackup} from "./backup_import.js";
+import {saveBackup, buildComicObject} from "./backup_export.js";
+import {importBackup, readComicObject} from "./backup_import.js";
 import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
 
 // My be a good idea to use a map of base-urls for 2-stage differentiation
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     wireButtons();
     dropdownExtension();
     addConsoleOutputToFileSelector();
+    loadDataFromStorage();
     
     function addConsoleOutputToFileSelector() {
         const fileSelector = document.getElementById('file-selector');
@@ -42,16 +43,29 @@ function wireButtons() {
     const addPage = document.getElementById('add_page');
     addPage.onclick = function () {addCurrentPage()};
     
-    const saveButton = document.getElementById('save_dummy');
-    saveButton.onclick = function() {saveDataToStorage()};
-    const loadButton = document.getElementById('load_dummy');
-    loadButton.onclick = function() {loadDataFromStorage()};
+    const saveButton = document.getElementById('clear_data');
+    saveButton.onclick = function() {clearComicData()};
 }
 
 function saveDataToStorage() {
+    let comicDataObject = buildComicObject(comicData);
+    browser.storage.local.set({comicData: comicDataObject});
 }
 
 function loadDataFromStorage() {
+    let gettingItem = browser.storage.local.get("comicData");
+    gettingItem.then((storageResult) => {
+        let importData = readComicObject(storageResult.comicData);
+        comicData = importData;
+        buildComicLists(importData, container);
+        }, 
+        () => {console.log("No data stored locally, aborting loading sequence!")});
+}
+
+function clearComicData() {
+    comicData = [];
+    saveDataToStorage();
+    loadDataFromStorage();
 }
 
 function dropdownExtension() {
@@ -88,6 +102,7 @@ function addAutoBookmark(url) {
         }
     comicBookmarkBundle.addAutomatic(url);
     updateComicList(unorderedList, comicBookmarkBundle);
+    saveDataToStorage();
 }
 
 function addUrlToList(url) {
@@ -105,7 +120,7 @@ function addUrlToList(url) {
     comicData.push(bookmarkData);
     const container = document.getElementById('container');
     appendComicToPanel(container, bookmarkData);
-    addAutoBookmark(url);
+    addAutoBookmark(url); // This also updates storage
 }
 
 function findCorrectBookmark(url) {
