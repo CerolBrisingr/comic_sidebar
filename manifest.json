@@ -1,0 +1,30 @@
+{
+
+  "manifest_version": 2,
+  "name": "Improved Comic Bookmarks",
+  "description": "Will show comics and your recent viewing history of them.",
+  "version": "0.1",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sb_webcomic_sidebar@whythis.format",
+      "strict_min_version": "54.0a1"
+    }
+  },
+
+  "sidebar_action": {
+    "default_icon": "icons/star.png",
+    "default_title" : "Comic Bookmarks",
+    "default_panel": "comic_sidebar/sidebar_panel.html"
+  },
+
+  "permissions": ["storage", "tabs"],
+
+  "commands": {
+    "_execute_sidebar_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      }
+    }
+  }
+
+}
