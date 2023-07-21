@@ -25,10 +25,14 @@ class NewComicInput {
             this.setInvisible();
         }
         this.okBtn = okBtn;
+        this.okBtn.onclick = () => {
+            this.finalize();
+        }
         
         this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
         this.setDummyValues();
         this.setInvisible();
+        this.openEditor();
     }
     
     set fullLink(newText) {
@@ -90,7 +94,14 @@ class NewComicInput {
         this.prefixObject.disabled = false;
     }
     
-    importLink(url) {
+    importLink(url, fktFinalize) {
+        if (!this.isOpen) {
+            console.log("Editor already in use!")
+            return;
+        }
+        this.occupyEditor(fktFinalize);
+        this.okBtn.innerText = "Add Comic";
+        
         let urlPieces = dissectUrl(url);
         if (urlPieces === undefined) {
             this.disableInterface();
@@ -102,6 +113,53 @@ class NewComicInput {
         this.setUserMessage("", "");
         this.enableInterface();
         this.prefix = urlPieces.base_url;
+    }
+    
+    updateLink(bookmarkData, fktFinalize) {
+        if (!this.isOpen) {
+            console.log("Editor already in use!")
+            return;
+        }
+        this.occupyEditor(fktFinalize);
+        this.okBtn.innerText = "Update Comic";
+        
+        let url = bookmarkData.getMostRecentAutomaticUrl();
+        if (url === undefined) {
+            this.openEditor();
+            this.setInvisible();
+            return;
+        }
+        
+        this.fullLink = url;
+        this.label = bookmarkData.label;
+        this.setUserMessage("", "");
+        this.enableInterface();
+        this.prefix = bookmarkData.base_url;
+    }
+    
+    finalize() {
+        let data = this.gatherData();
+        this.fktFinalize(data);
+        this.openEditor();
+        this.setInvisible();
+    }
+    
+    gatherData() {
+        return {
+            initialUrl: this.fullLink,
+            label: this.label,
+            prefix: this.prefix
+        }
+    }
+    
+    occupyEditor(fktFinalize) {
+        this.fktFinalize = fktFinalize;
+        this.isOpen = false;
+    }
+    
+    openEditor() {
+        this.fktFinalize = () => {};
+        this.isOpen = true;
     }
     
     updateLinkLabel() {

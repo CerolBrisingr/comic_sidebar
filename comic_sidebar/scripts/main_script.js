@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 saveDataToStorage(comicData);
                 buildComicLists(data, container);
             }
+            currentBookmark = new BookmarkDataDummy();
             importBackup(file, container, uiUpdateFkt);
         });
     }
@@ -72,8 +73,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const addPage = document.getElementById('add_page');
         addPage.onclick = function () {addCurrentPage()};
         
-        const saveButton = document.getElementById('clear_data');
-        saveButton.onclick = function() {clearComicData()};
+        const editButton = document.getElementById('edit_element');
+        editButton.onclick = function() {editComicData()};
     }
 
     function initComicAddField() {
@@ -135,22 +136,17 @@ function addAutoBookmark(url) {
     saveDataToStorage();
 }
 
-function addUrlToList(url) {
-    let comicBookmarkBundle = findCorrectBookmark(url);
+function addUrlToList(comicEssentials) {
+    let comicBookmarkBundle = findCorrectBookmark(comicEssentials.initialUrl);
     if (comicBookmarkBundle.valid) {
-        console.log("Page already registered");
+        console.log("Page already registered as " + comicBookmarkBundle.label);
         return;
     }
-    let urlPieces = dissectUrl(url);
-    if (urlPieces === undefined) {
-        console.log("Cannot interpret this link to form a new entry")
-        return;
-    }
-    let bookmarkData = new BookmarkData(urlPieces.base_url, urlPieces.host);
+    let bookmarkData = new BookmarkData(comicEssentials.prefix, comicEssentials.label);
     comicData.push(bookmarkData);
     const container = document.getElementById('container');
     appendComicToPanel(container, bookmarkData);
-    addAutoBookmark(url); // This also updates storage
+    addAutoBookmark(comicEssentials.initialUrl); // This also updates storage
 }
 
 function findCorrectBookmark(url) {
@@ -166,16 +162,28 @@ function findCorrectBookmark(url) {
     return currentBookmark;
 }
 
+// Edit current page on list
+function editComicData() {
+    let bookmark = currentBookmark;
+    if (!bookmark.valid)
+        return;
+    let triggerFkt = (comicEssentials) => {
+        bookmark.update(comicEssentials);
+    }
+    comicAddField.updateLink(bookmark, triggerFkt);
+    comicAddField.setVisible();
+}
+
 // Add current page to list
 function addCurrentPage() {
+    let triggerFkt = (comicEssentials) => {
+        addUrlToList(comicEssentials);
+    }
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            comicAddField.importLink(tabs[0].url);
+            comicAddField.importLink(tabs[0].url, triggerFkt);
             comicAddField.setVisible();
         }, onError)
-    return;
-    browser.tabs.query({windowId: myWindowId, active: true})
-        .then((tabs) => addUrlToList(tabs[0].url), onError)
 }
 
 // Update the sidebar's content.

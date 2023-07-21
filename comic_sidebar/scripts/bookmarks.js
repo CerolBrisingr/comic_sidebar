@@ -37,6 +37,17 @@ class BookmarkData {
             this.automatic.shift();
     }
     
+    update(comicEssentials) {
+        console.log(comicEssentials);
+    }
+    
+    getMostRecentAutomaticUrl() {
+        if (this.automatic.length == 0)
+            return;
+        let bookmark = this.automatic[this.automatic.length-1];
+        return bookmark.href;
+    }
+    
     addManual(url) {
         let bm = new Bookmark(url);
         if (bm.href == "#")
