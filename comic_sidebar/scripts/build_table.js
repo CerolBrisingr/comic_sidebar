@@ -89,7 +89,7 @@ function buildBookmarkObject(bookmark, prefix, strMeta) {
 
 function buildLink(href, prefix, strMeta) {
     let myHref = encodeURI(href);
-    let linkPieces = dissectUrl(href, prefix);
+    let linkPieces = dissectUrl(href, prefix, true);
     if (linkPieces === undefined)
         return;
     let myStrMeta = encodeURI(strMeta);

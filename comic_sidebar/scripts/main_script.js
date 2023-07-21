@@ -2,6 +2,7 @@ import {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl} from "./bookmarks
 import {saveBackup, buildComicObject} from "./backup_export.js";
 import {importBackup, readComicObject} from "./backup_import.js";
 import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
+import {NewComicInput} from "./new_comic_input.js"
 
 /* 
 Browser modified during development:
@@ -16,12 +17,14 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // E.g. keeping all "gocomics" entries among a "gocomics.com" list
 let comicData = [];
 let currentBookmark = new BookmarkDataDummy();
+let comicAddField;
 // Tab management
 let myWindowId;
 
 document.addEventListener('DOMContentLoaded', function () {
     
     wireButtons();
+    initComicAddField();
     dropdownExtension();
     addConsoleOutputToFileSelector();
     loadDataFromStorage();
@@ -39,23 +42,53 @@ document.addEventListener('DOMContentLoaded', function () {
             importBackup(file, container, uiUpdateFkt);
         });
     }
-});
 
-function wireButtons() {
-    const exportTrigger = document.getElementById('export_trigger');
-    exportTrigger.onclick = function() {triggerExport()};
+    function dropdownExtension() {
+        document.documentElement.addEventListener('click', event => {
+            if (event.target.tagName == 'BUTTON' && event.target.hasAttribute(
+                    'aria-expanded')) {
+                event.target.setAttribute('aria-expanded', event.target.getAttribute(
+                    'aria-expanded') != 'true');
+                event.target.nextElementSibling.classList.toggle('visible');
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelector('.visible')
+                    .classList.remove('visible');
+            }
+        });
+    }
     
-    const inputElement = document.getElementById('file-selector');
-    inputElement.style.display = 'none';
-    const inputTrigger = document.getElementById('import_trigger');
-    inputTrigger.onclick = function () {inputElement.click()};
-    
-    const addPage = document.getElementById('add_page');
-    addPage.onclick = function () {addCurrentPage()};
-    
-    const saveButton = document.getElementById('clear_data');
-    saveButton.onclick = function() {clearComicData()};
-}
+    function wireButtons() {
+        const exportTrigger = document.getElementById('export_trigger');
+        exportTrigger.onclick = function() {triggerExport()};
+        
+        const inputElement = document.getElementById('file-selector');
+        inputElement.style.display = 'none';
+        const inputTrigger = document.getElementById('import_trigger');
+        inputTrigger.onclick = function () {inputElement.click()};
+        
+        const addPage = document.getElementById('add_page');
+        addPage.onclick = function () {addCurrentPage()};
+        
+        const saveButton = document.getElementById('clear_data');
+        saveButton.onclick = function() {clearComicData()};
+    }
+
+    function initComicAddField() {
+        let fullFrame = document.getElementById('new_comic_input_frame');
+        let fullLink = document.getElementById('new_comic_full_link');
+        let label = document.getElementById('new_comic_label');
+        let prefix = document.getElementById('new_comic_prefix');
+        let linkLabel = document.getElementById('new_comic_link_label');
+        let textMsg = document.getElementById('new_comic_message');
+        let errorMsg = document.getElementById('new_comic_error');
+        let cancelBtn = document.getElementById('new_comic_cancel');
+        let okBtn = document.getElementById('new_comic_finalize');
+        comicAddField = new NewComicInput(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
+    }
+});
 
 function saveDataToStorage() {
     let comicDataObject = buildComicObject(comicData);
@@ -80,23 +113,6 @@ function clearComicData() {
     comicData = [];
     saveDataToStorage();
     loadDataFromStorage();
-}
-
-function dropdownExtension() {
-    document.documentElement.addEventListener('click', event => {
-        if (event.target.tagName == 'BUTTON' && event.target.hasAttribute(
-                'aria-expanded')) {
-            event.target.setAttribute('aria-expanded', event.target.getAttribute(
-                'aria-expanded') != 'true');
-            event.target.nextElementSibling.classList.toggle('visible');
-        }
-    });
-    document.addEventListener('keyup', (e) => {
-        if (e.key === 'Escape') {
-            document.querySelector('.visible')
-                .classList.remove('visible');
-        }
-    });
 }
 
 function triggerExport() {
@@ -152,6 +168,12 @@ function findCorrectBookmark(url) {
 
 // Add current page to list
 function addCurrentPage() {
+    browser.tabs.query({windowId: myWindowId, active: true})
+        .then((tabs) => {
+            comicAddField.importLink(tabs[0].url);
+            comicAddField.setVisible();
+        }, onError)
+    return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => addUrlToList(tabs[0].url), onError)
 }

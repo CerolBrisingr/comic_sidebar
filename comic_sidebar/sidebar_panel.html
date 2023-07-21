@@ -16,27 +16,31 @@
         <button id="clear_data">Clear data</button>
         <button id="add_page">Add page</button>
     </div>
-    <div class="input_frame" id="input_frame">
+    <div class="input_frame" id="new_comic_input_frame">
         <table>
             <tr>
                 <th>Link</th>
-                <td id="new_comic_full_link">https://www.somecomic.com/archives/comic/page_123/</td>
+                <td id="new_comic_full_link">Full_Link</td>
             </tr>
             <tr>
                 <th>Comic Label</th>
-                <td><input class="td" id="new_comic_label" type="text" value="www.somecomic.com"></td>
+                <td><input class="td" id="new_comic_label" type="text" value="Comic_Label"></td>
             </tr>
             <tr>
                 <th>Link Prefix</th>
-                <td><input class="td" id="new_comic_prefix" type="text" value="https://www.somecomic.com"></td>
+                <td><input class="td" id="new_comic_prefix" type="text" value="Link_Prefix"></td>
             </tr>
             <tr>
                 <th>Link Label</th>
-                <td id="new_comic_link_label">/archives/comic/page_123/</td>
+                <td id="new_comic_link_label">Link_Label_Format</td>
             </tr>
         </table>
-        <button>Cancel</button>
-        <button>Add Comic</button>
+        <div>
+            <span id="new_comic_message">Error: </span>
+            <span id="new_comic_error" style="color:red">Hope you're debugging!</span>
+        </div>
+        <button id="new_comic_cancel">Cancel</button>
+        <button id="new_comic_finalize">Add Comic</button>
     </div>
     <input type="file" id="file-selector"><br>
     <nav>
