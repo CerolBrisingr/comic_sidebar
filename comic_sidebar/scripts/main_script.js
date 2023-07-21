@@ -169,6 +169,8 @@ function editComicData() {
         return;
     let triggerFkt = (comicEssentials) => {
         bookmark.update(comicEssentials);
+        const container = document.getElementById('container');
+        buildComicLists(comicData, container);
     }
     comicAddField.updateLink(bookmark, triggerFkt);
     comicAddField.setVisible();

@@ -23,6 +23,7 @@ class NewComicInput {
             this.setDummyValues();
             this.okBtn.disabled = true;
             this.setInvisible();
+            this.openEditor();
         }
         this.okBtn = okBtn;
         this.okBtn.onclick = () => {

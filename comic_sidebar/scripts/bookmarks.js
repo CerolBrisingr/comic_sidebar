@@ -38,7 +38,8 @@ class BookmarkData {
     }
     
     update(comicEssentials) {
-        console.log(comicEssentials);
+        this.label = comicEssentials.label;
+        this.base_url = comicEssentials.prefix;
     }
     
     getMostRecentAutomaticUrl() {
