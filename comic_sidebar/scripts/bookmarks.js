@@ -24,6 +24,8 @@ class BookmarkData {
     }
     
     addAutomatic(url) {
+        if (!this.isValidNewUrl(url))
+            return;
         let bm = new Bookmark(url);
         if (bm.href == "#")
             return;
@@ -35,6 +37,17 @@ class BookmarkData {
         this.automatic.push(bm);
         if (this.automatic.length > 4)
             this.automatic.shift();
+    }
+    
+    isValidNewUrl(url) {
+        let urlPieces = dissectUrl(url, this.base_url);
+        if (urlPieces === undefined)
+            return false;
+        if (urlPieces.tail === "") {
+            console.log("New URL must differ from prefix")
+            return false;
+        }
+        return true;
     }
     
     update(comicEssentials) {
@@ -50,6 +63,8 @@ class BookmarkData {
     }
     
     addManual(url) {
+        if (!this.isValidNewUrl(url))
+            return;
         let bm = new Bookmark(url);
         if (bm.href == "#")
             return;
