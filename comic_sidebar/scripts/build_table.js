@@ -110,11 +110,6 @@ function addExpandButton(clickField, comic) {
     editButton.setAttribute("aria-expanded",false);
     clickField.appendChild(editButton);
     
-    let span = document.createElement("span");
-    span.classList.add("visually-hidden");
-    span.innerText = "Untermenü aufklappen";
-    editButton.appendChild(span);
-    
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttributeNS(null, "viewBox", '0 0 1 1');
     editButton.appendChild(svg);
