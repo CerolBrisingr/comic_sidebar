@@ -2,7 +2,7 @@ import {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl} from "./bookmarks
 import {saveBackup, buildComicObject} from "./backup_export.js";
 import {importBackup, readComicObject} from "./backup_import.js";
 import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
-import {NewComicInput} from "./new_comic_input.js"
+import {ComicEditor} from "./comic_editor.js"
 
 /* 
 Browser modified during development:
@@ -17,7 +17,7 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // E.g. keeping all "gocomics" entries among a "gocomics.com" list
 let comicData = [];
 let currentBookmark = new BookmarkDataDummy();
-let comicAddField;
+let comicEditField;
 // Tab management
 let myWindowId;
 let hasWindowId = false;
@@ -26,7 +26,7 @@ let hasLoaded = false;
 document.addEventListener('DOMContentLoaded', function () {
     
     wireButtons();
-    initComicAddField();
+    initcomicEditField();
     dropdownExtension();
     addConsoleOutputToFileSelector();
     loadDataFromStorage();
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editButton.onclick = function() {editComicData()};
     }
 
-    function initComicAddField() {
+    function initcomicEditField() {
         let fullFrame = document.getElementById('new_comic_input_frame');
         let fullLink = document.getElementById('new_comic_full_link');
         let label = document.getElementById('new_comic_label');
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let errorMsg = document.getElementById('new_comic_error');
         let cancelBtn = document.getElementById('new_comic_cancel');
         let okBtn = document.getElementById('new_comic_finalize');
-        comicAddField = new NewComicInput(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
+        comicEditField = new ComicEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
     }
 });
 
@@ -176,8 +176,8 @@ function editComicData() {
         const container = document.getElementById('container');
         buildComicLists(comicData, container);
     }
-    comicAddField.updateLink(bookmark, triggerFkt);
-    comicAddField.setVisible();
+    comicEditField.updateLink(bookmark, triggerFkt);
+    comicEditField.setVisible();
 }
 
 // Add current page to list
@@ -187,8 +187,8 @@ function addCurrentPage() {
     }
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            comicAddField.importLink(tabs[0].url, triggerFkt);
-            comicAddField.setVisible();
+            comicEditField.importLink(tabs[0].url, triggerFkt);
+            comicEditField.setVisible();
         }, onError)
 }
 

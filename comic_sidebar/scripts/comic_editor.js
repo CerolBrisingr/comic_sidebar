@@ -1,10 +1,10 @@
 import {dissectUrl} from "./bookmarks.js"
 
-class NewComicInput {
+class ComicEditor {
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
         for (let arg of arguments) {
             if (arg === undefined) {
-                throw("Constructor input incomplete, cannot build NewComicInput instance");
+                throw("Constructor input incomplete, cannot build ComicEditor instance");
             }
         }
         
@@ -171,4 +171,4 @@ class NewComicInput {
     }
 }
 
-export {NewComicInput}
+export {ComicEditor}
