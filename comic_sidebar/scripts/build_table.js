@@ -19,6 +19,7 @@ function addComicToList(newList, comic) {
     if (clickField === undefined)
         return;
     newList.push(clickField);
+    addExpandButton(clickField, comic);
     let bookmarkList = createSubList(clickField, comic.base_url);
     if (bookmarkList === undefined)
         return;
@@ -53,15 +54,6 @@ function createSubList(parentElement, myId) {
 
 function makeInteractive(obj) {
     obj.classList.add('submenu');
-    obj.insertAdjacentHTML('beforebegin',
-            `
-        <button aria-expanded="false">
-            <span class="visually-hidden">Untermenü aufklappen</span>
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'>
-              <path d='M0.3,0.1 0.3,0.9 0.8,0.5z' />
-            </svg>
-        </button>
-    `);
 }
 
 function addBookmarks(parentElement, bookmarkParent, bookmarkList, strMeta) {
@@ -111,6 +103,25 @@ function createClickField(myHref, myInnerText) {
     let myLink = Object.assign(document.createElement("a"), {href:encodeURI(myHref), innerText:myInnerText});
     listEntry.appendChild(myLink);
     return listEntry;
+}
+
+function addExpandButton(clickField, comic) {
+    let editButton = document.createElement("button");
+    editButton.setAttribute("aria-expanded",false);
+    clickField.appendChild(editButton);
+    
+    let span = document.createElement("span");
+    span.classList.add("visually-hidden");
+    span.innerText = "Untermenü aufklappen";
+    editButton.appendChild(span);
+    
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttributeNS(null, "viewBox", '0 0 1 1');
+    editButton.appendChild(svg);
+    
+    let path = document.createElementNS('http://www.w3.org/2000/svg', "path");
+    path.setAttributeNS(null, "d", 'M0.3,0.1 0.3,0.9 0.8,0.5z');
+    svg.append(path);
 }
 
 export {buildComicLists, updateComicList, appendComicToPanel}
