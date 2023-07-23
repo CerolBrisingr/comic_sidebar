@@ -20,6 +20,8 @@ let currentBookmark = new BookmarkDataDummy();
 let comicAddField;
 // Tab management
 let myWindowId;
+let hasWindowId = false;
+let hasLoaded = false;
 
 document.addEventListener('DOMContentLoaded', function () {
     
@@ -28,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
     dropdownExtension();
     addConsoleOutputToFileSelector();
     loadDataFromStorage();
+    hasLoaded = true;
+    firstContentUpdate();
     
     function addConsoleOutputToFileSelector() {
         const fileSelector = document.getElementById('file-selector');
@@ -199,6 +203,16 @@ function onError(error) {
     contentBox.textContent ="Error: ${error}";
 }
 
+function firstContentUpdate() {
+    if (!hasWindowId) {
+        return;
+    }
+    if (!hasLoaded) {
+        return;
+    }
+    updateContent();
+}
+
 // Update content when a new tab becomes active.
 browser.tabs.onActivated.addListener(updateContent);
 // Update content when a new page is loaded into a tab.
@@ -207,5 +221,6 @@ browser.tabs.onUpdated.addListener(updateContent);
 // and update its content.
 browser.windows.getCurrent({populate: true}).then((windowInfo) => {
     myWindowId = windowInfo.id;
-    updateContent();
+    hasWindowId = true;
+    firstContentUpdate();
 });

@@ -1,7 +1,7 @@
 nav > ul {
 	list-style: none;
 	// Safari hack, see https://www.scottohara.me/blog/2019/01/12/lists-and-safari.html
-	list-style: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E");
+	/* list-style: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"); */
 	margin: 0;
 	padding: 0;
 	display: flex;
@@ -148,15 +148,18 @@ nav li:focus [aria-expanded] svg {
 	--text-color: black;
 }
 
+/* comic edit frame */
 div.input_frame {
 	margin: 6px;
     border: 2px solid black;
 }
 
+/* comic edit input fields */
 input.td {
     width: 100%
 }
 
+/* Table in comic edit frame */
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;

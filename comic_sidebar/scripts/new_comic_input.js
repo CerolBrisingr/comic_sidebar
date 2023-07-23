@@ -20,7 +20,6 @@ class NewComicInput {
         
         this.cancelBtn = cancelBtn;
         this.cancelBtn.onclick = () => {
-            this.setDummyValues();
             this.okBtn.disabled = true;
             this.setInvisible();
             this.openEditor();
@@ -31,7 +30,6 @@ class NewComicInput {
         }
         
         this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
-        this.setDummyValues();
         this.setInvisible();
         this.openEditor();
     }
@@ -73,10 +71,6 @@ class NewComicInput {
     
     setVisible() {
         this.fullFrame.style.removeProperty("display");
-    }
-    
-    setDummyValues() {
-        this.importLink("https://www.somecomic.com/archives/comic/page_1234/");
     }
     
     disableInterface() {
