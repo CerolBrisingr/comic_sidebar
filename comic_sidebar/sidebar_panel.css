@@ -111,18 +111,7 @@ nav ul li {
 	z-index: 10;
 }
 
-nav li:hover [aria-expanded] svg {
-	background: var(--accent1-color);
-	fill: var(--background-color);
-}
-
-nav li:focus [aria-expanded] svg {
-	background: var(--background-color);
-	fill: var(--accent1-color);
-}
-
 .edit_button:hover svg,
-[aria-expanded]:focus svg,
 [aria-expanded]:hover svg {
 	fill: var(--background-color);
 	background: var(--accent1-color);
@@ -130,10 +119,6 @@ nav li:focus [aria-expanded] svg {
 
 [aria-expanded="true"] svg {
 	transform: translate(0, 0) rotate(90deg);
-    fill: var(--background-color);
-}
-[aria-expanded="false"] svg {
-    fill: var(--accent1-color);
 }
 
 .visually-hidden,

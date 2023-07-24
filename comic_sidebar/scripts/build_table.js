@@ -83,6 +83,11 @@ function editComicData(comic, comicEditor) {
 function makeExpandible(bookmarkList, expandButton) {
     expandButton.onclick = () => {
         bookmarkList.classList.toggle('visible');
+        if (bookmarkList.classList.contains('visible')) {
+            expandButton.setAttribute('aria-expanded', 'true');
+        } else {
+            expandButton.setAttribute('aria-expanded', 'false');
+        }
     }
 }
 
