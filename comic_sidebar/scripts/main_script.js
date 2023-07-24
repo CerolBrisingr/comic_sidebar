@@ -1,4 +1,4 @@
-import {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl} from "./bookmarks.js";
+import {Bookmark, Comic, ComicDummy, dissectUrl} from "./bookmarks.js";
 import {saveBackup, buildComicObject} from "./backup_export.js";
 import {importBackup, readComicObject} from "./backup_import.js";
 import {buildComicLists, updateComicUrls, appendComicToPanel} from "./build_table.js";
@@ -16,8 +16,8 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // My be a good idea to use a map of base-urls for 2-stage differentiation
 // E.g. keeping all "gocomics" entries among a "gocomics.com" list
 let comicData = [];
-let currentBookmark = new BookmarkDataDummy();
-let comicEditField;
+let currentBookmark = new ComicDummy();
+let comicEditor;
 let container;
 // Tab management
 let myWindowId;
@@ -40,9 +40,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const uiUpdateFkt = function(data, container) {
                 comicData = data;
                 saveDataToStorage(comicData);
-                buildComicLists(data, container, comicEditField);
+                buildComicLists(data, container, comicEditor);
             }
-            currentBookmark = new BookmarkDataDummy();
+            currentBookmark = new ComicDummy();
             importBackup(file, container, uiUpdateFkt);
         });
     }
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let errorMsg = document.getElementById('new_comic_error');
         let cancelBtn = document.getElementById('new_comic_cancel');
         let okBtn = document.getElementById('new_comic_finalize');
-        comicEditField = new ComicEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
+        comicEditor = new ComicEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
     }
 });
 
@@ -90,7 +90,7 @@ function loadDataFromStorage() {
         }
         let importData = readComicObject(storageResult.comicData);
         comicData = importData;
-        buildComicLists(importData, container, comicEditField);
+        buildComicLists(importData, container, comicEditor);
         }, 
         () => {console.log("No data stored locally, aborting loading sequence! (1)")});
 }
@@ -127,9 +127,9 @@ function addUrlToList(comicEssentials) {
         console.log("Page already registered as " + comicBookmarkBundle.label);
         return;
     }
-    let bookmarkData = new BookmarkData(comicEssentials.prefix, comicEssentials.label);
-    comicData.push(bookmarkData);
-    appendComicToPanel(container, bookmarkData, comicEditField);
+    let Comic = new Comic(comicEssentials.prefix, comicEssentials.label);
+    comicData.push(Comic);
+    appendComicToPanel(container, Comic, comicEditor);
     addAutoBookmark(comicEssentials.initialUrl); // This also updates storage
 }
 
@@ -142,7 +142,7 @@ function findCorrectBookmark(url) {
             return bookmark;
             }
     }
-    currentBookmark = new BookmarkDataDummy();
+    currentBookmark = new ComicDummy();
     return currentBookmark;
 }
 
@@ -153,8 +153,8 @@ function addCurrentPage() {
     }
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            comicEditField.importLink(tabs[0].url, triggerFkt);
-            comicEditField.setVisible();
+            comicEditor.importLink(tabs[0].url, triggerFkt);
+            comicEditor.setVisible();
         }, onError)
 }
 

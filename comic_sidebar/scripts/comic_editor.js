@@ -110,7 +110,7 @@ class ComicEditor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(bookmarkData, fktFinalize) {
+    updateLink(Comic, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -118,7 +118,7 @@ class ComicEditor {
         this.occupyEditor(fktFinalize);
         this.okBtn.innerText = "Update Comic";
         
-        let url = bookmarkData.getMostRecentAutomaticUrl();
+        let url = Comic.getMostRecentAutomaticUrl();
         if (url === undefined) {
             this.openEditor();
             this.setInvisible();
@@ -126,10 +126,10 @@ class ComicEditor {
         }
         
         this.fullLink = url;
-        this.label = bookmarkData.label;
+        this.label = Comic.label;
         this.setUserMessage("", "");
         this.enableInterface();
-        this.prefix = bookmarkData.base_url;
+        this.prefix = Comic.base_url;
     }
     
     finalize() {

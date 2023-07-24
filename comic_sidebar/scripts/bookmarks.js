@@ -1,4 +1,4 @@
-class BookmarkData {
+class Comic {
     constructor(base_url, label) {
         if (!(typeof base_url === "string")) {
             base_url = "invalid";
@@ -90,7 +90,7 @@ class BookmarkData {
     }
 }
 
-class BookmarkDataDummy {
+class ComicDummy {
     constructor() {}
     
     get valid() {
@@ -155,4 +155,4 @@ function dissectUrl(url, prefix, fallback) {
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl}
+export {Bookmark, Comic, ComicDummy, dissectUrl}

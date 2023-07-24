@@ -1,4 +1,4 @@
-import {Bookmark, BookmarkData} from "./bookmarks.js"
+import {Bookmark, Comic} from "./bookmarks.js"
 
 async function importBackup(file, container, uiUpdateFkt) {
     if (!fileHasJsonExtension(file)) {
@@ -34,23 +34,23 @@ function readComicObject(data) {
         return undefined;
     if (!(data.type === "sb_webcomic_sidebar_backup"))
         return undefined;
-    for (let comic of data.data) {
-        tryAddComic(importData, comic);
+    for (let comicInfo of data.data) {
+        tryAddComic(importData, comicInfo);
     }
     return importData;
 }
 
-function tryAddComic(importData, comic) {
-    if (!comic.hasOwnProperty("label") || !comic.hasOwnProperty("base_url"))
+function tryAddComic(importData, comicInfo) {
+    if (!comicInfo.hasOwnProperty("label") || !comicInfo.hasOwnProperty("base_url"))
         return;
-    let bookmarkData = new BookmarkData(comic.base_url, comic.label)
-    if (!bookmarkData.valid)
+    let comic = new Comic(comicInfo.base_url, comicInfo.label)
+    if (!comic.valid)
         return;
-    if (comic.hasOwnProperty("automatic"))
-        tryAddBookmarks((url)=>bookmarkData.addAutomatic(url), comic.automatic);
-    if (comic.hasOwnProperty("manual"))
-        tryAddBookmarks((url)=>bookmarkData.addManual(url), comic.manual);
-    importData.push(bookmarkData);
+    if (comicInfo.hasOwnProperty("automatic"))
+        tryAddBookmarks((url)=>comic.addAutomatic(url), comicInfo.automatic);
+    if (comicInfo.hasOwnProperty("manual"))
+        tryAddBookmarks((url)=>comic.addManual(url), comicInfo.manual);
+    importData.push(comic);
 }
 
 function tryAddBookmarks(importCall, source) {

@@ -1,28 +1,28 @@
-import {Bookmark, BookmarkData, dissectUrl} from "./bookmarks.js"
+import {Bookmark, Comic, dissectUrl} from "./bookmarks.js"
 
-function buildComicLists(data, container, comicEditField) {
+function buildComicLists(data, container, comicEditor) {
     let newList = [];
     for (let comic of data) {
-        addComicToList(newList, comic, comicEditField);
+        addComicToList(newList, comic, comicEditor);
     }
     container.replaceChildren(...newList);
 }
 
-function updateComicUrls(unorderedList, comicBookmark) {
+function updateComicUrls(unorderedList, comic) {
     unorderedList.replaceChildren();
-    addBookmarks(unorderedList, comicBookmark, comicBookmark.automatic, "auto");
-    addBookmarks(unorderedList, comicBookmark, comicBookmark.manual, "manual");
+    addBookmarks(unorderedList, comic, comic.automatic, "auto");
+    addBookmarks(unorderedList, comic, comic.manual, "manual");
 }
 
-function addComicToList(newList, comic, comicEditField) {
+function addComicToList(newList, comic, comicEditor) {
     let clickField = createClickField(comic.label);
     if (clickField === undefined)
         return;
     newList.push(clickField);
-    updateComicListing(clickField, comic, comicEditField);
+    updateComicListing(clickField, comic, comicEditor);
 }
 
-function updateComicListing(clickField, comic, comicEditField) {
+function updateComicListing(clickField, comic, comicEditor) {
     clickField.replaceChildren();
     addLink(clickField, comic.label);
     let editButton = addEditButton(clickField);
@@ -32,12 +32,12 @@ function updateComicListing(clickField, comic, comicEditField) {
         return;
     updateComicUrls(bookmarkList, comic);
     makeExpandible(bookmarkList, expandButton);
-    enableEditing(editButton, clickField, comic, comicEditField);
+    enableEditing(editButton, clickField, comic, comicEditor);
 }
 
-function appendComicToPanel(container, bookmarkData, comicEditField) {
+function appendComicToPanel(container, comic, comicEditor) {
     let shortList = [];
-    addComicToList(shortList, bookmarkData, comicEditField);
+    addComicToList(shortList, comic, comicEditor);
     if (shortList.length == 0) {
         console.log("Could not build new list entry. Might be bad!");
         return;
@@ -60,25 +60,24 @@ function createSubList(parentElement, myId) {
     return unorderedList;
 }
 
-function enableEditing(editButton, clickField, comic, comicEditField) {
+function enableEditing(editButton, clickField, comic, comicEditor) {
     editButton.onclick = () => {
         let triggerFkt = () => {
-            comic.update(comicEditField);
-            updateComicListing(clickField, comic, comicEditField);
-            comicEditField.setInvisible();
+            comic.update(comicEditor);
+            updateComicListing(clickField, comic, comicEditor);
         }
-        comicEditField.updateLink(comic, triggerFkt);
-        comicEditField.setVisible();
+        comicEditor.updateLink(comic, triggerFkt);
+        comicEditor.setVisible();
     }
 }
 
-function editComicData(bookmark, comicEditField) {
+function editComicData(comic, comicEditor) {
     let triggerFkt = (comicEssentials) => {
-        bookmark.update(comicEssentials);
-        buildComicLists(comicData, container, comicEditField);
+        comic.update(comicEssentials);
+        buildComicLists(comicData, container, comicEditor);
     }
-    comicEditField.updateLink(bookmark, triggerFkt);
-    comicEditField.setVisible();
+    comicEditor.updateLink(comic, triggerFkt);
+    comicEditor.setVisible();
 }
 
 function makeExpandible(bookmarkList, expandButton) {

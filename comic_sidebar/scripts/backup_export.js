@@ -1,4 +1,4 @@
-import {BookmarkData} from "./bookmarks.js"
+import {Comic} from "./bookmarks.js"
 
 function saveBackup(comicData) {
     const link = document.createElement("a");
