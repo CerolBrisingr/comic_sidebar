@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const inputTrigger = document.getElementById('import_trigger');
         inputTrigger.onclick = function () {inputElement.click()};
         
-        const addPage = document.getElementById('add_page');
-        addPage.onclick = function () {addCurrentPage()};
+        const addComic = document.getElementById('add_comic');
+        addComic.onclick = function () {addCurrentPage()};
         
         const editButton = document.getElementById('edit_element');
         editButton.onclick = function() {editComicData()};

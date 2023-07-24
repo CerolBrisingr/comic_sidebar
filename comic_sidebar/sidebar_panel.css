@@ -148,6 +148,23 @@ nav li:focus [aria-expanded] svg {
 	--text-color: black;
 }
 
+/* Add comic button */
+.add_comic {
+	height: 2em;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    text-align: center;
+	font-weight: bold;
+    color: var(--accent1-color);
+}
+.add_comic:hover {
+    color: var(--background-color);
+    background-color: var(--accent1-color);
+    
+}
+
 /* comic edit frame */
 div.input_frame {
 	margin: 6px;
@@ -156,7 +173,7 @@ div.input_frame {
 
 /* comic edit input fields */
 input.td {
-    width: 100%
+    width: 100%;
 }
 
 /* Table in comic edit frame */
