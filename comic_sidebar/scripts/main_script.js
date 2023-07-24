@@ -1,7 +1,7 @@
 import {Bookmark, BookmarkData, BookmarkDataDummy, dissectUrl} from "./bookmarks.js";
 import {saveBackup, buildComicObject} from "./backup_export.js";
 import {importBackup, readComicObject} from "./backup_import.js";
-import {buildComicLists, updateComicList, appendComicToPanel} from "./build_table.js";
+import {buildComicLists, updateComicUrls, appendComicToPanel} from "./build_table.js";
 import {ComicEditor} from "./comic_editor.js"
 
 /* 
@@ -18,6 +18,7 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 let comicData = [];
 let currentBookmark = new BookmarkDataDummy();
 let comicEditField;
+let container;
 // Tab management
 let myWindowId;
 let hasWindowId = false;
@@ -25,9 +26,8 @@ let hasLoaded = false;
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    wireButtons();
-    initcomicEditField();
-    dropdownExtension();
+    initUi();
+    setUpComicEditor();
     addConsoleOutputToFileSelector();
     loadDataFromStorage();
     hasLoaded = true;
@@ -35,37 +35,21 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function addConsoleOutputToFileSelector() {
         const fileSelector = document.getElementById('file-selector');
-        const container = document.getElementById('container');
         fileSelector.addEventListener('change', (event) => {
             const file = event.target.files[0];
             const uiUpdateFkt = function(data, container) {
                 comicData = data;
                 saveDataToStorage(comicData);
-                buildComicLists(data, container);
+                buildComicLists(data, container, comicEditField);
             }
             currentBookmark = new BookmarkDataDummy();
             importBackup(file, container, uiUpdateFkt);
         });
     }
-
-    function dropdownExtension() {
-        document.documentElement.addEventListener('click', event => {
-            if (event.target.tagName == 'BUTTON' && event.target.hasAttribute(
-                    'aria-expanded')) {
-                event.target.setAttribute('aria-expanded', event.target.getAttribute(
-                    'aria-expanded') != 'true');
-                event.target.nextElementSibling.classList.toggle('visible');
-            }
-        });
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelector('.visible')
-                    .classList.remove('visible');
-            }
-        });
-    }
     
-    function wireButtons() {
+    function initUi() {
+        container = document.getElementById('container');
+        
         const exportTrigger = document.getElementById('export_trigger');
         exportTrigger.onclick = function() {triggerExport()};
         
@@ -76,12 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const addComic = document.getElementById('add_comic');
         addComic.onclick = function () {addCurrentPage()};
-        
-        const editButton = document.getElementById('edit_element');
-        editButton.onclick = function() {editComicData()};
     }
 
-    function initcomicEditField() {
+    function setUpComicEditor() {
         let fullFrame = document.getElementById('new_comic_input_frame');
         let fullLink = document.getElementById('new_comic_full_link');
         let label = document.getElementById('new_comic_label');
@@ -109,7 +90,7 @@ function loadDataFromStorage() {
         }
         let importData = readComicObject(storageResult.comicData);
         comicData = importData;
-        buildComicLists(importData, container);
+        buildComicLists(importData, container, comicEditField);
         }, 
         () => {console.log("No data stored locally, aborting loading sequence! (1)")});
 }
@@ -136,7 +117,7 @@ function addAutoBookmark(url) {
         return;
         }
     comicBookmarkBundle.addAutomatic(url);
-    updateComicList(unorderedList, comicBookmarkBundle);
+    updateComicUrls(unorderedList, comicBookmarkBundle);
     saveDataToStorage();
 }
 
@@ -148,8 +129,7 @@ function addUrlToList(comicEssentials) {
     }
     let bookmarkData = new BookmarkData(comicEssentials.prefix, comicEssentials.label);
     comicData.push(bookmarkData);
-    const container = document.getElementById('container');
-    appendComicToPanel(container, bookmarkData);
+    appendComicToPanel(container, bookmarkData, comicEditField);
     addAutoBookmark(comicEssentials.initialUrl); // This also updates storage
 }
 
@@ -164,20 +144,6 @@ function findCorrectBookmark(url) {
     }
     currentBookmark = new BookmarkDataDummy();
     return currentBookmark;
-}
-
-// Edit current page on list
-function editComicData() {
-    let bookmark = currentBookmark;
-    if (!bookmark.valid)
-        return;
-    let triggerFkt = (comicEssentials) => {
-        bookmark.update(comicEssentials);
-        const container = document.getElementById('container');
-        buildComicLists(comicData, container);
-    }
-    comicEditField.updateLink(bookmark, triggerFkt);
-    comicEditField.setVisible();
 }
 
 // Add current page to list

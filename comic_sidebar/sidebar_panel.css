@@ -39,7 +39,6 @@ nav a {
 	color: var(--link-color);
 	--link-color: gold;
 	background-color: var(--background-color);
-	/*transition: all .25s ease-in;*/
 	position: relative;
 }
 
@@ -69,15 +68,7 @@ nav ul ul {
 
 nav ul li {
 	display: block;
-	/* width: 15em; */
 }
-/**     Show the submenu on hover, focus     **/
-/* 
-nav li:hover ul {
-  visibility: visible;
-  height: auto;
-}
-nav li:focus-within > ul, */
 
 .visible {
 	visibility: visible;
@@ -92,13 +83,27 @@ nav li:focus-within > ul, */
 	height: 1.5em;
 	padding: 0;
 	background: var(--background-color);
-	/* damit er bei nav a:focus noch sichtbar ist */
 	
 	outline: transparent;
 	border: none;
 	border-radius: 0.3em;
 }
 
+.edit_button {
+	position: absolute;
+	right: 2.5em;
+	top: 0.25em;
+	width: 1.5em;
+	height: 1.5em;
+	padding: 0;
+	background: var(--background-color);
+	
+	outline: transparent;
+	border: none;
+	border-radius: 0.3em;
+}
+
+.edit_button svg,
 [aria-expanded] svg {
 	pointer-events: none;
 	fill: var(--accent1-color);
@@ -116,6 +121,7 @@ nav li:focus [aria-expanded] svg {
 	fill: var(--accent1-color);
 }
 
+.edit_button:hover svg,
 [aria-expanded]:focus svg,
 [aria-expanded]:hover svg {
 	fill: var(--background-color);
