@@ -1,35 +1,43 @@
 import {Bookmark, BookmarkData, dissectUrl} from "./bookmarks.js"
 
-function buildComicLists(data, container) {
+function buildComicLists(data, container, comicEditField) {
     let newList = [];
     for (let comic of data) {
-        addComicToList(newList, comic);
+        addComicToList(newList, comic, comicEditField);
     }
     container.replaceChildren(...newList);
 }
 
-function updateComicList(unorderedList, comicBookmark) {
+function updateComicUrls(unorderedList, comicBookmark) {
     unorderedList.replaceChildren();
     addBookmarks(unorderedList, comicBookmark, comicBookmark.automatic, "auto");
     addBookmarks(unorderedList, comicBookmark, comicBookmark.manual, "manual");
 }
 
-function addComicToList(newList, comic) {
-    let clickField = createClickField("#", comic.label);
+function addComicToList(newList, comic, comicEditField) {
+    let clickField = createClickField(comic.label);
     if (clickField === undefined)
         return;
     newList.push(clickField);
-    addExpandButton(clickField, comic);
+    updateComicListing(clickField, comic, comicEditField);
+}
+
+function updateComicListing(clickField, comic, comicEditField) {
+    clickField.replaceChildren();
+    addLink(clickField, comic.label);
+    let editButton = addEditButton(clickField);
+    let expandButton = addExpandButton(clickField);
     let bookmarkList = createSubList(clickField, comic.base_url);
     if (bookmarkList === undefined)
         return;
-    updateComicList(bookmarkList, comic);
-    makeInteractive(bookmarkList);
+    updateComicUrls(bookmarkList, comic);
+    makeExpandible(bookmarkList, expandButton);
+    enableEditing(editButton, clickField, comic, comicEditField);
 }
 
-function appendComicToPanel(container, bookmarkData) {
+function appendComicToPanel(container, bookmarkData, comicEditField) {
     let shortList = [];
-    addComicToList(shortList, bookmarkData);
+    addComicToList(shortList, bookmarkData, comicEditField);
     if (shortList.length == 0) {
         console.log("Could not build new list entry. Might be bad!");
         return;
@@ -52,8 +60,31 @@ function createSubList(parentElement, myId) {
     return unorderedList;
 }
 
-function makeInteractive(obj) {
-    obj.classList.add('submenu');
+function enableEditing(editButton, clickField, comic, comicEditField) {
+    editButton.onclick = () => {
+        let triggerFkt = () => {
+            comic.update(comicEditField);
+            updateComicListing(clickField, comic, comicEditField);
+            comicEditField.setInvisible();
+        }
+        comicEditField.updateLink(comic, triggerFkt);
+        comicEditField.setVisible();
+    }
+}
+
+function editComicData(bookmark, comicEditField) {
+    let triggerFkt = (comicEssentials) => {
+        bookmark.update(comicEssentials);
+        buildComicLists(comicData, container, comicEditField);
+    }
+    comicEditField.updateLink(bookmark, triggerFkt);
+    comicEditField.setVisible();
+}
+
+function makeExpandible(bookmarkList, expandButton) {
+    expandButton.onclick = () => {
+        bookmarkList.classList.toggle('visible');
+    }
 }
 
 function addBookmarks(parentElement, bookmarkParent, bookmarkList, strMeta) {
@@ -96,18 +127,22 @@ function buildLink(href, prefix, strMeta) {
     return myLink;
 }
 
-function createClickField(myHref, myInnerText) {
-    if (!(typeof myHref === "string") || !(typeof myInnerText === "string"))
+function createClickField(comicLabel) {
+    if (!(typeof comicLabel === "string"))
         return;
     let listEntry = document.createElement("li");
-    let myLink = Object.assign(document.createElement("a"), {href:encodeURI(myHref), innerText:myInnerText});
-    listEntry.appendChild(myLink);
     return listEntry;
 }
 
-function addExpandButton(clickField, comic) {
+function addLink(listEntry, comicLabel) {
+    listEntry.classList.add('comic_listing');
+    let myLink = Object.assign(document.createElement("a"), {href:"#", innerText:comicLabel});
+    listEntry.appendChild(myLink);
+}
+
+function addEditButton(clickField) {
     let editButton = document.createElement("button");
-    editButton.setAttribute("aria-expanded",false);
+    editButton.classList.add('edit_button');
     clickField.appendChild(editButton);
     
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -115,8 +150,24 @@ function addExpandButton(clickField, comic) {
     editButton.appendChild(svg);
     
     let path = document.createElementNS('http://www.w3.org/2000/svg', "path");
-    path.setAttributeNS(null, "d", 'M0.3,0.1 0.3,0.9 0.8,0.5z');
+    path.setAttributeNS(null, "d", 'M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
     svg.append(path);
+    return editButton;
 }
 
-export {buildComicLists, updateComicList, appendComicToPanel}
+function addExpandButton(clickField) {
+    let expandButton = document.createElement("button");
+    expandButton.setAttribute("aria-expanded",false);
+    clickField.appendChild(expandButton);
+    
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttributeNS(null, "viewBox", '0 0 1 1');
+    expandButton.appendChild(svg);
+    
+    let path = document.createElementNS('http://www.w3.org/2000/svg', "path");
+    path.setAttributeNS(null, "d", 'M0.3,0.1 0.3,0.9 0.8,0.5z');
+    svg.append(path);
+    return expandButton;
+}
+
+export {buildComicLists, updateComicUrls, appendComicToPanel}
