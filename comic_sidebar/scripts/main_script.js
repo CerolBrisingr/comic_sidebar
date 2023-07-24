@@ -127,9 +127,9 @@ function addUrlToList(comicEssentials) {
         console.log("Page already registered as " + comicBookmarkBundle.label);
         return;
     }
-    let Comic = new Comic(comicEssentials.prefix, comicEssentials.label);
-    comicData.push(Comic);
-    appendComicToPanel(container, Comic, comicEditor);
+    let comic = new Comic(comicEssentials.prefix, comicEssentials.label);
+    comicData.push(comic);
+    appendComicToPanel(container, comic, comicEditor);
     addAutoBookmark(comicEssentials.initialUrl); // This also updates storage
 }
 
