@@ -61,13 +61,22 @@ class ComicVisuals {
         }
     }
     
+    expand () {
+        this.bookmarkList.classList.add('visible');
+        this.expandButton.setAttribute('aria-expanded', 'true');
+    }
+    
+    collapse () {
+        this.bookmarkList.classList.remove('visible');
+        this.expandButton.setAttribute('aria-expanded', 'false');
+    }
+    
     #enableBookmarkExpansion() {
             this.expandButton.onclick = () => {
-            this.bookmarkList.classList.toggle('visible');
             if (this.bookmarkList.classList.contains('visible')) {
-                this.expandButton.setAttribute('aria-expanded', 'true');
+                this.collapse();
             } else {
-                this.expandButton.setAttribute('aria-expanded', 'false');
+                this.expand();
             }
         }
     }

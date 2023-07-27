@@ -6,7 +6,6 @@ class ComicManager {
         this.comicData = comicData;
         this.fktTriggerStorage = fktTriggerStorage;
         this.createComicVisuals(comicData);
-        this.expanded = false;
     }
     
     createComicVisuals(comicData) {
@@ -65,11 +64,11 @@ class ComicManager {
     }
     
     expand() {
-        this.expanded = true;
+        this.comicVisuals.expand();
     }
     
     collapse() {
-        this.expanded = false;
+        this.comicVisuals.collapse();
     }
 }
 
