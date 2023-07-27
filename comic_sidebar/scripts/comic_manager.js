@@ -1,9 +1,10 @@
 import {ComicVisuals} from "./comic_visuals.js"
 
 class ComicManager {
-    constructor(comicData, comicEditor) {
+    constructor(comicData, comicEditor, fktTriggerStorage) {
         this.comicEditor = comicEditor;
         this.comicData = comicData;
+        this.fktTriggerStorage = fktTriggerStorage;
         this.createComicVisuals(comicData);
         this.expanded = false;
     }
@@ -29,11 +30,13 @@ class ComicManager {
             return;
         let editor = this.comicEditor;
         let manager = this;
+        let store = this.fktTriggerStorage;
         
         editButton.onclick = () => {
             let triggerFkt = () => {
                 comicData.update(editor);
                 manager.updateComicVisuals(comicData);
+                store();
             }
             editor.updateLink(comicData, triggerFkt);
             editor.setVisible();
@@ -45,8 +48,10 @@ class ComicManager {
     }
     
     addAutomatic(url) {
-        this.comicData.addAutomatic(url);
-        throw("Still need to update visuals");
+        let didUpdate = this.comicData.addAutomatic(url);
+        if (didUpdate)
+            this.comicVisuals.updateComicUrls(this.comicData);
+        return didUpdate;
     }
     
     get visuals() {

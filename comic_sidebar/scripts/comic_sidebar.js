@@ -11,8 +11,13 @@ class ComicSidebar {
     importComicDataList (comicDataList){
         let visualsList = [];
         this.comicManagerList.length = 0; // keep object permanence
+        let fktTriggerStorage = () => {this.saveToStorage();}
         for (let comicData of comicDataList) {
-            let newManager = new ComicManager(comicData, this.comicEditor);
+            let newManager = new ComicManager(
+                comicData, 
+                this.comicEditor, 
+                fktTriggerStorage
+                );
             if (!newManager.valid)
                 continue;
             this.comicManagerList.push(newManager);
@@ -22,30 +27,34 @@ class ComicSidebar {
     }
     
     registerPage(url) {
-        comicManager = this.selectCorrespondingManager(url);
+        let comicManager = this.selectCorrespondingManager(url);
         if (!comicManager.valid)
             return;
-        comicManager.addAutomatic(url);
+        if (comicManager.addAutomatic(url))
+            this.saveToStorage();
     }
     
     selectCorrespondingManager(url) {
         if (this.currentManager.urlIsCompatible(url))
-            return currentManager;
-        let sidebar = this;
+            return this.currentManager;
         for (let comicManager of this.comicManagerList) {
             if (comicManager.urlIsCompatible(url)) {
-                sidebar.updateCurrentManager(comicManager);
+                this.updateCurrentManager(comicManager);
                 return comicManager;
             }
+        }
         this.updateCurrentManager(new ComicManagerDummy());
         return new ComicManagerDummy();
-        }
     }
     
     updateCurrentManager(newManager) {
         this.currentManager.collapse();
         newManager.expand();
         this.currentManager = newManager;
+    }
+    
+    saveToStorage() {
+        console.log('Should have saved, implement it!');
     }
 }
 

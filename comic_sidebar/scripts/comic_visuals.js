@@ -45,10 +45,10 @@ class ComicVisuals {
         this.listing.appendChild(this.bookmarkList);
     }
     
-    updateComicUrls(comic) {
+    updateComicUrls(comicData) {
         this.bookmarkList.replaceChildren();
-        this.#addBookmarks(comic, comic.automatic, "auto");
-        this.#addBookmarks(comic, comic.manual, "manual");
+        this.#addBookmarks(comicData, comicData.automatic, "auto");
+        this.#addBookmarks(comicData, comicData.manual, "manual");
     }
     
     #addBookmarks(bookmarkParent, bookmarkList, strMeta) {

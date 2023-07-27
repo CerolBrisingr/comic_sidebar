@@ -91,10 +91,6 @@ function saveDataToStorage() {
     browser.storage.local.set({comicData: comicDataObject});
 }
 
-function saveDataToStorageNew() {
-    
-}
-
 function loadDataFromStorageNew() {
     let gettingItem = browser.storage.local.get("comicData");
     gettingItem.then((storageResult) => {
@@ -187,15 +183,18 @@ function addCurrentPage() {
 
 // Update the sidebar's content.
 function updateContent() {
-    if (tryNew)
+    if (tryNew) {
+        browser.tabs.query({windowId: myWindowId, active: true})
+            .then((tabs) => comicSidebar.registerPage(tabs[0].url), onError)
         return;
+    }
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => addAutoBookmark(tabs[0].url), onError)
 }
 
 // Display error for failed promises
 function onError(error) {
-    contentBox.textContent ="Error: ${error}";
+    console.log("Error: ${error}");
 }
 
 function firstContentUpdate() {

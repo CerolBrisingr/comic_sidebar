@@ -25,18 +25,19 @@ class Comic {
     
     addAutomatic(url) {
         if (!this.isValidNewUrl(url))
-            return;
+            return false;
         let bm = new Bookmark(url);
         if (bm.href == "#")
-            return;
+            return false;
         if (this.automatic.length > 0)
             if (this.automatic[this.automatic.length -1].href === url) {
                 console.log("Avoiding duplicate automatic entry");
-                return;
+                return false;
             }
         this.automatic.push(bm);
         if (this.automatic.length > 4)
             this.automatic.shift();
+        return true;
     }
     
     isValidNewUrl(url) {
