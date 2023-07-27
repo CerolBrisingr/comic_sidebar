@@ -25,7 +25,10 @@ class ComicVisuals {
     
     #createBaseLink(comicLabel) {
         this.baseLink = Object.assign(document.createElement("a"), {href:"#", innerText:comicLabel});
-        this.baseLink.onclick = () => {openUrlInMyTab(this.baseLink.href)}
+        this.baseLink.onclick = () => {
+            openUrlInMyTab(this.baseLink.href);
+            return false;
+            }
         this.listing.appendChild(this.baseLink);
     }
     
