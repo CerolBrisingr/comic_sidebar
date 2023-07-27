@@ -3,6 +3,7 @@ import {saveBackup, buildComicObject} from "./backup_export.js";
 import {importBackup, readComicObject} from "./backup_import.js";
 import {buildComicLists, updateComicUrls, appendComicToPanel} from "./build_table.js";
 import {ComicEditor} from "./comic_editor.js"
+import {ComicSidebar} from "./comic_sidebar.js"
 
 /* 
 Browser modified during development:
@@ -24,10 +25,19 @@ let myWindowId;
 let hasWindowId = false;
 let hasLoaded = false;
 
+let tryNew = true;
+let comicSidebar;
+
 document.addEventListener('DOMContentLoaded', function () {
     
     initUi();
     setUpComicEditor();
+    
+    if (tryNew) {
+        comicSidebar = new ComicSidebar(container, comicEditor);
+        loadDataFromStorageNew();
+        return;
+    }
     addConsoleOutputToFileSelector();
     loadDataFromStorage();
     hasLoaded = true;
@@ -79,6 +89,19 @@ document.addEventListener('DOMContentLoaded', function () {
 function saveDataToStorage() {
     let comicDataObject = buildComicObject(comicData);
     browser.storage.local.set({comicData: comicDataObject});
+}
+
+function loadDataFromStorageNew() {
+    let gettingItem = browser.storage.local.get("comicData");
+    gettingItem.then((storageResult) => {
+        if (!storageResult.hasOwnProperty("comicData")) {
+            console.log("No data stored locally, aborting loading sequence! (2)");
+            return;
+        }
+        let importData = readComicObject(storageResult.comicData);
+        comicSidebar.importComicDataList(importData);
+        }, 
+        () => {console.log("No data stored locally, aborting loading sequence! (1)")});
 }
 
 function loadDataFromStorage() {
@@ -160,6 +183,8 @@ function addCurrentPage() {
 
 // Update the sidebar's content.
 function updateContent() {
+    if (tryNew)
+        return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => addAutoBookmark(tabs[0].url), onError)
 }
