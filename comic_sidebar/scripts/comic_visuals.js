@@ -25,6 +25,7 @@ class ComicVisuals {
     
     #createBaseLink(comicLabel) {
         this.baseLink = Object.assign(document.createElement("a"), {href:"#", innerText:comicLabel});
+        this.baseLink.onclick = () => {openUrlInMyTab(this.baseLink.href)}
         this.listing.appendChild(this.baseLink);
     }
     
@@ -49,6 +50,8 @@ class ComicVisuals {
         this.bookmarkList.replaceChildren();
         this.#addBookmarks(comicData, comicData.automatic, "auto");
         this.#addBookmarks(comicData, comicData.manual, "manual");
+        let lastAutomatic = comicData.automatic.slice(-1);
+        this.baseLink.href = lastAutomatic[0].href;
     }
     
     #addBookmarks(bookmarkParent, bookmarkList, strMeta) {
@@ -127,6 +130,8 @@ function buildLink(href, prefix, strMeta) {
 }
 
 function openUrlInMyTab(url) {
+    if (url === undefined)
+        return;
     let test = dissectUrl(url);
     if (test === undefined)
         return;
