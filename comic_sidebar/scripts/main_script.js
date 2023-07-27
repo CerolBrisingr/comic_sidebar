@@ -91,6 +91,10 @@ function saveDataToStorage() {
     browser.storage.local.set({comicData: comicDataObject});
 }
 
+function saveDataToStorageNew() {
+    
+}
+
 function loadDataFromStorageNew() {
     let gettingItem = browser.storage.local.get("comicData");
     gettingItem.then((storageResult) => {

@@ -23,7 +23,7 @@ class ComicManager {
         this.enableEditing(comicData);
     }
     
-    enableEditing(clickField, comicData) {
+    enableEditing(comicData) {
         let editButton = this.comicVisuals.editButton;
         if (editButton === undefined)
             return;
