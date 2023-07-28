@@ -65,9 +65,9 @@ class ComicVisuals {
         this.baseLink.href = lastAutomatic[0].href;
     }
     
-    #addBookmarks(bookmarkParent, bookmarkList, strMeta) {
+    #addBookmarks(comicData, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
-            let prefix = bookmarkParent.base_url;
+            let prefix = comicData.base_url;
             let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
             if (bookmarkObject === undefined)
                 continue;
@@ -132,7 +132,7 @@ function buildBookmarkObject(bookmark, prefix, strMeta) {
         return;
     if (!(typeof strMeta === "string"))
         return;
-    let myLink = buildLink(bookmark.href, prefix, strMeta);
+    let myLink = buildLink(bookmark, prefix, strMeta);
     if (myLink === undefined)
         return;
     let listEntry = document.createElement("li");
@@ -140,15 +140,15 @@ function buildBookmarkObject(bookmark, prefix, strMeta) {
     return listEntry;
 }
 
-function buildLink(href, prefix, strMeta) {
-    let myHref = encodeURI(href);
-    let linkPieces = dissectUrl(href, prefix, true);
+function buildLink(bookmark, prefix, strMeta) {
+    let myHref = encodeURI(bookmark.href);
+    let linkPieces = dissectUrl(bookmark.href, prefix, true);
     if (linkPieces === undefined)
         return;
     let myStrMeta = encodeURI(strMeta);
     let myLink = document.createElement("a")
     myLink.href = myHref;
-    myLink.innerText = linkPieces.tail;
+    myLink.innerText = bookmark.getLabel(linkPieces.tail);
     myLink.classList.add(myStrMeta);
     myLink.onclick = function() {
         openUrlInMyTab(myHref);

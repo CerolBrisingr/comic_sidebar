@@ -47,19 +47,31 @@ function tryAddComic(comicDataList, comicInfo) {
     if (!comicData.valid)
         return;
     if (comicInfo.hasOwnProperty("automatic"))
-        tryAddBookmarks((url)=>comicData.addAutomatic(url), comicInfo.automatic);
+        tryAddAutomaticBookmarks(comicData, comicInfo);
     if (comicInfo.hasOwnProperty("manual"))
-        tryAddBookmarks((url)=>comicData.addManual(url), comicInfo.manual);
+        tryAddManualBookmarks(comicData, comicInfo);
     comicDataList.push(comicData);
 }
 
-function tryAddBookmarks(importCall, source) {
-    if (!Array.isArray(source))
+function tryAddAutomaticBookmarks(comicData, comicInfo) {
+    if (!Array.isArray(comicInfo.automatic))
         return;
-    for (let bookmark of source) {
+    for (let bookmark of comicInfo.automatic) {
         if (!bookmark.hasOwnProperty("href"))
             return;
-        importCall(bookmark.href);
+        comicData.addAutomatic(bookmark.href);
+    }
+}
+
+function tryAddManualBookmarks(comicData, comicInfo) {
+    if (!Array.isArray(comicInfo.manual))
+        return;
+    for (let bookmark of comicInfo.manual) {
+        if (!bookmark.hasOwnProperty("href"))
+            return;
+        let manualBookmark = comicData.addManual(bookmark.href);
+        if (bookmark.hasOwnProperty("label"))
+            manualBookmark.setLabel(bookmark.label);
     }
 }
 

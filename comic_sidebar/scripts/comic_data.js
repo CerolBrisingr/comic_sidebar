@@ -66,12 +66,13 @@ class ComicData {
     addManual(url) {
         if (!this.isValidNewUrl(url))
             return;
-        let bm = new Bookmark(url);
-        if (bm.href == "#")
+        let bookmark = new Bookmark(url);
+        if (bookmark.href == "#")
             return;
-        this.manual.push(bm);
+        this.manual.push(bookmark);
         if (this.manual.length > 2)
             this.manual.shift();
+        return bookmark;
     }
     
     returnAsObject() {
@@ -93,8 +94,23 @@ class ComicData {
 
 class Bookmark {
     #href = "#";
+    #label = undefined;
     constructor(href) {
         this.href = href;
+    }
+    
+    setLabel(value) {
+        if (typeof value === "string") {
+            this.#label = value;
+        } else {
+            this.#label = undefined;
+        }
+    }
+    
+    getLabel(fallback) {
+        if (this.#label === undefined)
+            return fallback;
+        return this.#label;
     }
     
     get href() {
