@@ -87,6 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function saveDataToStorage() {
+    if (tryNew)
+        return;
     let comicDataObject = buildComicObject(comicData);
     browser.storage.local.set({comicData: comicDataObject});
 }
@@ -171,13 +173,20 @@ function findCorrectBookmark(url) {
 
 // Add current page to list
 function addCurrentPage() {
+    if (tryNew) {
+        browser.tabs.query({windowId: myWindowId, active: true})
+            .then((tabs) => {
+                comicSidebar.tryRegisterPage(tabs[0].url);
+                }
+                , onError);
+        return;
+    }
     let triggerFkt = (comicEssentials) => {
         addUrlToList(comicEssentials);
     }
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
             comicEditor.importLink(tabs[0].url, triggerFkt);
-            comicEditor.setVisible();
         }, onError)
 }
 
@@ -185,7 +194,7 @@ function addCurrentPage() {
 function updateContent() {
     if (tryNew) {
         browser.tabs.query({windowId: myWindowId, active: true})
-            .then((tabs) => comicSidebar.registerPage(tabs[0].url), onError)
+            .then((tabs) => comicSidebar.updateBookmark(tabs[0].url), onError)
         return;
     }
     browser.tabs.query({windowId: myWindowId, active: true})

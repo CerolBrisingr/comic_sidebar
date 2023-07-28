@@ -53,6 +53,14 @@ class ComicVisuals {
         this.bookmarkList.replaceChildren();
         this.#addBookmarks(comicData, comicData.automatic, "auto");
         this.#addBookmarks(comicData, comicData.manual, "manual");
+        this.#updateBaseLink(comicData);
+    }
+    
+    #updateBaseLink(comicData) {
+        if (comicData.automatic.length == 0) {
+            this.baseLink.href = "#";
+            return;
+        }
         let lastAutomatic = comicData.automatic.slice(-1);
         this.baseLink.href = lastAutomatic[0].href;
     }
