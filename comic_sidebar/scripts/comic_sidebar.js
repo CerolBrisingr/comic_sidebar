@@ -40,6 +40,11 @@ class ComicSidebar {
             () => {console.log("No data stored locally, aborting loading sequence! (1)")});
     }
     
+    saveToStorage() {
+        let comicDataObject = buildComicObject(this.#compileComicDataList());
+        browser.storage.local.set({comicData: comicDataObject});
+    }
+    
     #importComicDataList(comicDataList){
         let visualsList = [];
         this.comicManagerList.length = 0; // keep object permanence
@@ -120,10 +125,6 @@ class ComicSidebar {
         this.currentManager.collapse();
         newManager.expand();
         this.currentManager = newManager;
-    }
-    
-    saveToStorage() {
-        console.log('Should have saved, implement it!');
     }
 }
 
