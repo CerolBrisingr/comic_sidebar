@@ -1,45 +1,22 @@
-import {Bookmark, Comic} from "./bookmarks.js"
+import {Bookmark, ComicData} from "./bookmarks.js"
 
-async function importBackup(file, container, uiUpdateFkt) {
+async function importBackup(file, uiUpdateFkt) {
     if (!fileHasJsonExtension(file)) {
         console.log("Invalid file extension, searching for JSON file!")
         return;
     }
     const reader = new FileReader();
     reader.addEventListener('load', (event) => {
-        let data
+        let jsonObject
         try {
-            data = JSON.parse(event.target.result);
+            jsonObject = JSON.parse(event.target.result);
         } catch {
             console.log("Invalid source file, could not parse as JSON!")
             return;
         }
-        let importData = readComicObject(data);
-        if (importData.length > 0)
-            uiUpdateFkt(importData, container);
-            return;
-    });
-    reader.readAsText(file);
-    return;
-}
-
-async function importBackupNew(file, uiUpdateFkt) {
-    if (!fileHasJsonExtension(file)) {
-        console.log("Invalid file extension, searching for JSON file!")
-        return;
-    }
-    const reader = new FileReader();
-    reader.addEventListener('load', (event) => {
-        let data
-        try {
-            data = JSON.parse(event.target.result);
-        } catch {
-            console.log("Invalid source file, could not parse as JSON!")
-            return;
-        }
-        let importData = readComicObject(data);
-        if (importData.length > 0)
-            uiUpdateFkt(importData);
+        let comicDataList = readComicObject(jsonObject);
+        if (comicDataList.length > 0)
+            uiUpdateFkt(comicDataList);
             return;
     });
     reader.readAsText(file);
@@ -52,28 +29,28 @@ function fileHasJsonExtension(file) {
 }
 
 function readComicObject(data) {
-    let importData = [];
+    let comicDataList = [];
     if (!(data.hasOwnProperty("data") && data.hasOwnProperty("type")))
         return undefined;
     if (!(data.type === "sb_webcomic_sidebar_backup"))
         return undefined;
     for (let comicInfo of data.data) {
-        tryAddComic(importData, comicInfo);
+        tryAddComic(comicDataList, comicInfo);
     }
-    return importData;
+    return comicDataList;
 }
 
-function tryAddComic(importData, comicInfo) {
+function tryAddComic(comicDataList, comicInfo) {
     if (!comicInfo.hasOwnProperty("label") || !comicInfo.hasOwnProperty("base_url"))
         return;
-    let comic = new Comic(comicInfo.base_url, comicInfo.label)
-    if (!comic.valid)
+    let comicData = new ComicData(comicInfo.base_url, comicInfo.label)
+    if (!comicData.valid)
         return;
     if (comicInfo.hasOwnProperty("automatic"))
-        tryAddBookmarks((url)=>comic.addAutomatic(url), comicInfo.automatic);
+        tryAddBookmarks((url)=>comicData.addAutomatic(url), comicInfo.automatic);
     if (comicInfo.hasOwnProperty("manual"))
-        tryAddBookmarks((url)=>comic.addManual(url), comicInfo.manual);
-    importData.push(comic);
+        tryAddBookmarks((url)=>comicData.addManual(url), comicInfo.manual);
+    comicDataList.push(comicData);
 }
 
 function tryAddBookmarks(importCall, source) {
@@ -86,4 +63,4 @@ function tryAddBookmarks(importCall, source) {
     }
 }
 
-export {importBackup, importBackupNew, readComicObject}
+export {importBackup, readComicObject}

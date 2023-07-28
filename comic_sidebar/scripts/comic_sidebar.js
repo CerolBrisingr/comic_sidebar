@@ -1,6 +1,6 @@
 import {ComicManager, ComicManagerDummy} from "./comic_manager.js"
-import {Comic} from "./bookmarks.js"
-import {importBackupNew, readComicObject} from "./backup_import.js"
+import {ComicData} from "./bookmarks.js"
+import {importBackup, readComicObject} from "./backup_import.js"
 import {saveBackup, buildComicObject} from "./backup_export.js"
 
 class ComicSidebar {
@@ -20,7 +20,7 @@ class ComicSidebar {
         let uiUpdateFkt = (comicDataList) => {
             this.#importComicDataList(comicDataList);
         }
-        importBackupNew(file, uiUpdateFkt);
+        importBackup(file, uiUpdateFkt);
     }
     
     saveBackup() {
@@ -89,7 +89,7 @@ class ComicSidebar {
             console.log("Page already registered as " + comicManager.comicData.label);
             return;
         }
-        let comicData = new Comic(comicEssentials.prefix, comicEssentials.label);
+        let comicData = new ComicData(comicEssentials.prefix, comicEssentials.label);
         let newManager = this.buildNewManager(comicData);
         if (!newManager.valid) {
             console.log("Failed to build comic entry");

@@ -1,4 +1,4 @@
-class Comic {
+class ComicData {
     constructor(base_url, label) {
         if (!(typeof base_url === "string")) {
             base_url = "invalid";
@@ -91,18 +91,6 @@ class Comic {
     }
 }
 
-class ComicDummy {
-    constructor() {}
-    
-    get valid() {
-        return false;
-    }
-    
-    urlIsCompatible(ignoredString) {
-        return false;
-    }
-}
-
 class Bookmark {
     #href = "#";
     constructor(href) {
@@ -156,4 +144,4 @@ function dissectUrl(url, prefix, fallback) {
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {Bookmark, Comic, ComicDummy, dissectUrl}
+export {Bookmark, ComicData, dissectUrl}
