@@ -11,9 +11,9 @@ class ComicSidebar {
         this.comicEditor = comicEditor;
         this.currentManager = new ComicManagerDummy();
         this.container = container;
-        this.#fktTriggerStorage = () => {this.saveToStorage();};
+        this.#fktTriggerStorage = () => {this.#saveToStorage();};
         
-        this.importStorage();
+        this.#importStorage();
     }
     
     importBackup(file) {
@@ -27,7 +27,7 @@ class ComicSidebar {
         saveBackup(this.#compileComicDataList());
     }
     
-    importStorage() {
+    #importStorage() {
         let gettingItem = browser.storage.local.get("comicData");
         gettingItem.then((storageResult) => {
             if (!storageResult.hasOwnProperty("comicData")) {
@@ -40,7 +40,7 @@ class ComicSidebar {
             () => {console.log("No data stored locally, aborting loading sequence! (1)")});
     }
     
-    saveToStorage() {
+    #saveToStorage() {
         let comicDataObject = buildComicObject(this.#compileComicDataList());
         browser.storage.local.set({comicData: comicDataObject});
     }
@@ -49,14 +49,14 @@ class ComicSidebar {
         let visualsList = [];
         this.comicManagerList.length = 0; // keep object permanence
         for (let comicData of comicDataList) {
-            let newManager = this.buildNewManager(comicData);
+            let newManager = this.#buildNewManager(comicData);
             if (!newManager.valid)
                 continue;
             this.comicManagerList.push(newManager);
             visualsList.push(newManager.visuals);
         }
         this.container.replaceChildren(...visualsList);
-        this.saveToStorage();
+        this.#saveToStorage();
     }
     
     #compileComicDataList() {
@@ -67,7 +67,7 @@ class ComicSidebar {
         return comicDataList;
     }
     
-    buildNewManager(comicData) {
+    #buildNewManager(comicData) {
         return new ComicManager(
                 comicData,
                 this.comicEditor,
@@ -84,13 +84,13 @@ class ComicSidebar {
     
     #registerPage(comicEssentials) {
         let comicManager 
-            = this.selectCorrespondingManager(comicEssentials.initialUrl);
+            = this.#selectCorrespondingManager(comicEssentials.initialUrl);
         if (comicManager.valid) {
             console.log("Page already registered as " + comicManager.comicData.label);
             return;
         }
         let comicData = new ComicData(comicEssentials.prefix, comicEssentials.label);
-        let newManager = this.buildNewManager(comicData);
+        let newManager = this.#buildNewManager(comicData);
         if (!newManager.valid) {
             console.log("Failed to build comic entry");
             return;
@@ -101,27 +101,27 @@ class ComicSidebar {
     }
     
     updateBookmark(url) {
-        let comicManager = this.selectCorrespondingManager(url);
+        let comicManager = this.#selectCorrespondingManager(url);
         if (!comicManager.valid)
             return;
         if (comicManager.addAutomatic(url))
-            this.saveToStorage();
+            this.#saveToStorage();
     }
     
-    selectCorrespondingManager(url) {
+    #selectCorrespondingManager(url) {
         if (this.currentManager.urlIsCompatible(url))
             return this.currentManager;
         for (let comicManager of this.comicManagerList) {
             if (comicManager.urlIsCompatible(url)) {
-                this.updateCurrentManager(comicManager);
+                this.#updateCurrentManager(comicManager);
                 return comicManager;
             }
         }
-        this.updateCurrentManager(new ComicManagerDummy());
+        this.#updateCurrentManager(new ComicManagerDummy());
         return new ComicManagerDummy();
     }
     
-    updateCurrentManager(newManager) {
+    #updateCurrentManager(newManager) {
         this.currentManager.collapse();
         newManager.expand();
         this.currentManager = newManager;
