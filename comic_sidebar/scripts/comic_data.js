@@ -125,9 +125,15 @@ class Bookmark {
     }
     
     returnAsObject() {
-        return {
-            href:this.href
+        if (this.#label === undefined) {
+            return {href:this.href}
+        } else {
+            return {
+                href: this.href, 
+                label: this.#label 
+                };
         }
+            
     }
 }
 
