@@ -1,10 +1,13 @@
 import {dissectUrl} from "./comic_data.js"
 
 class ComicVisuals {
-    constructor(comicData) {
+    #fktTriggerStorage;
+    
+    constructor(comicData, fktTriggerStorage) {
         this.editButton = undefined;
         this.createListing();
         this.updateListing(comicData);
+        this.#fktTriggerStorage = fktTriggerStorage;
     }
     
     createListing() {
