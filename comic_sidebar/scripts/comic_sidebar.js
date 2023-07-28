@@ -1,5 +1,5 @@
 import {ComicManager, ComicManagerDummy} from "./comic_manager.js"
-import {ComicData} from "./bookmarks.js"
+import {ComicData} from "./comic_data.js"
 import {importBackup, readComicObject} from "./backup_import.js"
 import {saveBackup, buildComicObject} from "./backup_export.js"
 

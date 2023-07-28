@@ -1,4 +1,4 @@
-import {Bookmark, ComicData} from "./bookmarks.js"
+import {Bookmark, ComicData} from "./comic_data.js"
 
 async function importBackup(file, uiUpdateFkt) {
     if (!fileHasJsonExtension(file)) {

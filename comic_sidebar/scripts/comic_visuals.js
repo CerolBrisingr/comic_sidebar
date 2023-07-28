@@ -1,4 +1,4 @@
-import {dissectUrl} from "./bookmarks.js"
+import {dissectUrl} from "./comic_data.js"
 
 class ComicVisuals {
     constructor(comicData) {
