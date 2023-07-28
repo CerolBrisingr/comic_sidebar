@@ -1,5 +1,7 @@
 import {ComicManager, ComicManagerDummy} from "./comic_manager.js"
 import {Comic} from "./bookmarks.js"
+import {importBackupNew, readComicObject} from "./backup_import.js"
+import {saveBackup, buildComicObject} from "./backup_export.js"
 
 class ComicSidebar {
     #fktTriggerStorage;
@@ -10,9 +12,35 @@ class ComicSidebar {
         this.currentManager = new ComicManagerDummy();
         this.container = container;
         this.#fktTriggerStorage = () => {this.saveToStorage();};
+        
+        this.importStorage();
     }
     
-    importComicDataList (comicDataList){
+    importBackup(file) {
+        let uiUpdateFkt = (comicDataList) => {
+            this.#importComicDataList(comicDataList);
+        }
+        importBackupNew(file, uiUpdateFkt);
+    }
+    
+    saveBackup() {
+        saveBackup(this.#compileComicDataList());
+    }
+    
+    importStorage() {
+        let gettingItem = browser.storage.local.get("comicData");
+        gettingItem.then((storageResult) => {
+            if (!storageResult.hasOwnProperty("comicData")) {
+                console.log("No data stored locally, aborting loading sequence! (2)");
+                return;
+            }
+            let importData = readComicObject(storageResult.comicData);
+            this.#importComicDataList(importData);
+            }, 
+            () => {console.log("No data stored locally, aborting loading sequence! (1)")});
+    }
+    
+    #importComicDataList(comicDataList){
         let visualsList = [];
         this.comicManagerList.length = 0; // keep object permanence
         for (let comicData of comicDataList) {
@@ -23,6 +51,15 @@ class ComicSidebar {
             visualsList.push(newManager.visuals);
         }
         this.container.replaceChildren(...visualsList);
+        this.saveToStorage();
+    }
+    
+    #compileComicDataList() {
+        let comicDataList = [];
+        for (let comicManager of this.comicManagerList) {
+            comicDataList.push(comicManager.comicData);
+        }
+        return comicDataList;
     }
     
     buildNewManager(comicData) {

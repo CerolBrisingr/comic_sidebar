@@ -23,6 +23,29 @@ async function importBackup(file, container, uiUpdateFkt) {
     return;
 }
 
+async function importBackupNew(file, uiUpdateFkt) {
+    if (!fileHasJsonExtension(file)) {
+        console.log("Invalid file extension, searching for JSON file!")
+        return;
+    }
+    const reader = new FileReader();
+    reader.addEventListener('load', (event) => {
+        let data
+        try {
+            data = JSON.parse(event.target.result);
+        } catch {
+            console.log("Invalid source file, could not parse as JSON!")
+            return;
+        }
+        let importData = readComicObject(data);
+        if (importData.length > 0)
+            uiUpdateFkt(importData);
+            return;
+    });
+    reader.readAsText(file);
+    return;
+}
+
 function fileHasJsonExtension(file) {
     let fileExt = file.name.split('.').pop();
     return (fileExt === "json")
@@ -63,4 +86,4 @@ function tryAddBookmarks(importCall, source) {
     }
 }
 
-export {importBackup, readComicObject}
+export {importBackup, importBackupNew, readComicObject}

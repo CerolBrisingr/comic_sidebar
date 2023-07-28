@@ -35,15 +35,14 @@ document.addEventListener('DOMContentLoaded', function () {
     
     if (tryNew) {
         comicSidebar = new ComicSidebar(container, comicEditor);
-        loadDataFromStorageNew();
         return;
     }
-    addConsoleOutputToFileSelector();
+    wireBackupImportToFileSelector();
     loadDataFromStorage();
     hasLoaded = true;
     firstContentUpdate();
     
-    function addConsoleOutputToFileSelector() {
+    function wireBackupImportToFileSelector() {
         const fileSelector = document.getElementById('file-selector');
         fileSelector.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -67,6 +66,11 @@ document.addEventListener('DOMContentLoaded', function () {
         inputElement.style.display = 'none';
         const inputTrigger = document.getElementById('import_trigger');
         inputTrigger.onclick = function () {inputElement.click()};
+        if (tryNew) {
+            inputElement.addEventListener('change', (event) => {
+                comicSidebar.importBackup(event.target.files[0]);
+            });
+        }
         
         const addComic = document.getElementById('add_comic');
         addComic.onclick = function () {addCurrentPage()};
@@ -93,19 +97,6 @@ function saveDataToStorage() {
     browser.storage.local.set({comicData: comicDataObject});
 }
 
-function loadDataFromStorageNew() {
-    let gettingItem = browser.storage.local.get("comicData");
-    gettingItem.then((storageResult) => {
-        if (!storageResult.hasOwnProperty("comicData")) {
-            console.log("No data stored locally, aborting loading sequence! (2)");
-            return;
-        }
-        let importData = readComicObject(storageResult.comicData);
-        comicSidebar.importComicDataList(importData);
-        }, 
-        () => {console.log("No data stored locally, aborting loading sequence! (1)")});
-}
-
 function loadDataFromStorage() {
     let gettingItem = browser.storage.local.get("comicData");
     gettingItem.then((storageResult) => {
@@ -127,6 +118,10 @@ function clearComicData() {
 }
 
 function triggerExport() {
+    if (tryNew) {
+        comicSidebar.saveBackup();
+        return;
+    }
     saveBackup(comicData);
 }
 
