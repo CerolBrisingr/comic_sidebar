@@ -1,8 +1,6 @@
-import {Comic} from "./bookmarks.js"
-
-function saveBackup(comicData) {
+function saveBackup(comicDataList) {
     const link = document.createElement("a");
-    const content = exportJSON(comicData);
+    const content = exportJSON(comicDataList);
     const file = new Blob([content], { type: 'text/plain' });
     link.href = URL.createObjectURL(file);
     link.download = "backup.json";
@@ -10,16 +8,16 @@ function saveBackup(comicData) {
     URL.revokeObjectURL(link.href);
 }
 
-function buildComicObject(data) {
+function buildComicObject(comicDataList) {
     let comicObject = {data: [], type: "sb_webcomic_sidebar_backup"};
-    for (let comic of data) {
-        comicObject.data.push(comic.returnAsObject());
+    for (let comicData of comicDataList) {
+        comicObject.data.push(comicData.returnAsObject());
     }
     return comicObject;
 }
 
-function exportJSON(data) {
-    let comicObject = buildComicObject(data);
+function exportJSON(comicDataList) {
+    let comicObject = buildComicObject(comicDataList);
     return JSON.stringify(comicObject);
 }
 

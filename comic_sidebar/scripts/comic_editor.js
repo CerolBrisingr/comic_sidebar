@@ -148,6 +148,7 @@ class ComicEditor {
     }
     
     occupyEditor(fktFinalize) {
+        this.setVisible();
         this.fktFinalize = fktFinalize;
         this.isOpen = false;
     }

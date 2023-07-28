@@ -1,4 +1,4 @@
-class Comic {
+class ComicData {
     constructor(base_url, label) {
         if (!(typeof base_url === "string")) {
             base_url = "invalid";
@@ -25,18 +25,19 @@ class Comic {
     
     addAutomatic(url) {
         if (!this.isValidNewUrl(url))
-            return;
+            return false;
         let bm = new Bookmark(url);
         if (bm.href == "#")
-            return;
+            return false;
         if (this.automatic.length > 0)
             if (this.automatic[this.automatic.length -1].href === url) {
                 console.log("Avoiding duplicate automatic entry");
-                return;
+                return false;
             }
         this.automatic.push(bm);
         if (this.automatic.length > 4)
             this.automatic.shift();
+        return true;
     }
     
     isValidNewUrl(url) {
@@ -87,18 +88,6 @@ class Comic {
             thisAsObject.automatic.push(bookmark.returnAsObject());
             }
         return thisAsObject;
-    }
-}
-
-class ComicDummy {
-    constructor() {}
-    
-    get valid() {
-        return false;
-    }
-    
-    urlIsCompatible(ignoredString) {
-        return false;
     }
 }
 
@@ -155,4 +144,4 @@ function dissectUrl(url, prefix, fallback) {
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {Bookmark, Comic, ComicDummy, dissectUrl}
+export {Bookmark, ComicData, dissectUrl}
