@@ -34,13 +34,15 @@ class ComicVisuals {
     
     #addEditButton() {
         this.editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
-        this.editButton.classList.add('edit_button');
+        this.editButton.classList.add('svg_button');
+        this.editButton.classList.add('second_button');
         this.listing.appendChild(this.editButton);
     }
     
     #addExpandButton() {
         this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
         this.expandButton.setAttribute("aria-expanded",false);
+        this.expandButton.classList.add('first_button');
         this.listing.appendChild(this.expandButton);
     }
     
@@ -71,6 +73,7 @@ class ComicVisuals {
             let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
             if (bookmarkObject === undefined)
                 continue;
+            bookmarkObject.appendChild(createPinButton());
             this.bookmarkList.appendChild(bookmarkObject);
         }
     }
@@ -94,6 +97,13 @@ class ComicVisuals {
             }
         }
     }
+}
+
+function createPinButton() {
+    let pinButton = createSvgButton('M0.3,0.9 0.9,0.3 0.7,0.1z');
+    pinButton.classList.add('svg_button');
+    pinButton.classList.add('first_button');
+    return pinButton;
 }
 
 function createSvgButton(pathString, viewBox='0 0 1 1') {
