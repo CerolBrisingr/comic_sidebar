@@ -88,6 +88,7 @@ function firstContentUpdate() {
     if (!hasLoaded) {
         return;
     }
+    console.log('Initial update');
     updateContent();
 }
 
