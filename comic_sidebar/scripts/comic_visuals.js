@@ -15,8 +15,8 @@ class ComicVisuals {
     updateListing(comicData) {
         this.listing.replaceChildren();
         this.#createBaseLink(comicData.label);
-        this.#addEditButton();
-        this.#addExpandButton();
+        this.#addEditComicButton();
+        this.#addExpandComicButton();
         this.#createBookmarkList(comicData.base_url);
         this.updateComicUrls(comicData);
         
@@ -32,14 +32,12 @@ class ComicVisuals {
         this.listing.appendChild(this.baseLink);
     }
     
-    #addEditButton() {
-        this.editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
-        this.editButton.classList.add('svg_button');
-        this.editButton.classList.add('second_button');
+    #addEditComicButton() {
+        this.editButton = createEditButton();
         this.listing.appendChild(this.editButton);
     }
     
-    #addExpandButton() {
+    #addExpandComicButton() {
         this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
         this.expandButton.setAttribute("aria-expanded",false);
         this.expandButton.classList.add('first_button');
@@ -73,6 +71,8 @@ class ComicVisuals {
             let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
             if (bookmarkObject === undefined)
                 continue;
+            if (strMeta === "manual")
+                bookmarkObject.appendChild(createEditButton());
             bookmarkObject.appendChild(createPinButton());
             this.bookmarkList.appendChild(bookmarkObject);
         }
@@ -97,6 +97,13 @@ class ComicVisuals {
             }
         }
     }
+}
+
+function createEditButton() {
+    let editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
+    editButton.classList.add('svg_button');
+    editButton.classList.add('second_button');
+    return editButton;
 }
 
 function createPinButton() {
