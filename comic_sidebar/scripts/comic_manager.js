@@ -92,4 +92,16 @@ class ComicManagerDummy {
     
 }
 
+class ComicManagerInterface {
+    #comicManager
+
+    construct(comicManager) {
+        this.#comicManager = comicManager;
+    }
+
+    editor() {
+        this.#comicManager.editComic();
+    }
+}
+
 export {ComicManager, ComicManagerDummy}
