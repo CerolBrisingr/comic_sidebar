@@ -26,10 +26,12 @@ class ComicManager {
         let triggerFkt = () => {
             this.#comicData.update(this.#comicEditor);
             this.#updateComicVisuals();
-            this.#sidebarInterface.saveProgress();
+            this.saveProgress();
+            this.expand();
             }
          this.#comicEditor.updateLink(this.#comicData, triggerFkt);
          this.#comicEditor.setVisible();
+         this.expand();
     }
     
     #updateComicVisuals() {
@@ -76,6 +78,10 @@ class ComicManager {
     collapse() {
         this.comicVisuals.collapse();
     }
+    
+    saveProgress() {
+        this.#sidebarInterface.saveProgress();
+    }
 }
 
 class ComicManagerDummy {
@@ -102,12 +108,20 @@ class ComicManagerDummy {
 class ComicManagerInterface {
     #comicManager
 
-    construct(comicManager) {
+    constructor(comicManager) {
         this.#comicManager = comicManager;
     }
 
-    editor() {
+    editComic() {
         this.#comicManager.editComic();
+    }
+    
+    pinUrl(url) {
+        if (this.#comicManager.addManual(url)) {
+            this.#comicManager.saveProgress();
+            return true;
+        }
+        return false;
     }
 }
 

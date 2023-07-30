@@ -131,7 +131,7 @@ class ComicSidebar {
 class ComicSidebarInterface {
     #comicSidebar
     
-    construct(comciSidebar) {
+    constructor(comicSidebar) {
         this.#comicSidebar = comicSidebar;
     }
     

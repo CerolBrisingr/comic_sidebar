@@ -26,15 +26,21 @@ class ComicData {
     addAutomatic(url) {
         if (!this.isValidNewUrl(url))
             return false;
-        let bm = new Bookmark(url);
-        if (bm.href == "#")
+        let newBoockmark = new Bookmark(url);
+        if (newBoockmark.href == "#")
             return false;
         if (this.automatic.length > 0)
             if (this.automatic[this.automatic.length -1].href === url) {
                 console.log("Avoiding duplicate automatic entry");
                 return false;
             }
-        this.automatic.push(bm);
+        for (let bookmark of this.manual) {
+            if (bookmark.href === url) {
+                console.log("Manual entry for this exists. Avoiding duplicate");
+                return false;
+            }
+        }
+        this.automatic.push(newBoockmark);
         if (this.automatic.length > 4)
             this.automatic.shift();
         return true;
@@ -66,17 +72,17 @@ class ComicData {
     addManual(url) {
         if (!this.isValidNewUrl(url))
             return undefined;
-        let bookmark = new Bookmark(url);
-        if (bookmark.href == "#")
+        let newBookmark = new Bookmark(url);
+        if (newBookmark.href == "#")
             return undefined;
-        for (bookmark of this.manual) {
+        for (let bookmark of this.manual) {
             if (bookmark.href === url) {
                 console.log("Avoiding duplicate manual entry");
                 return undefined;
             }
         }
-        this.manual.push(bookmark);
-        return bookmark;
+        this.manual.push(newBookmark);
+        return newBookmark;
     }
     
     returnAsObject() {

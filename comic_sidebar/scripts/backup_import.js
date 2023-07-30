@@ -70,6 +70,8 @@ function tryAddManualBookmarks(comicData, comicInfo) {
         if (!bookmark.hasOwnProperty("href"))
             return;
         let manualBookmark = comicData.addManual(bookmark.href);
+        if (manualBookmark === undefined)
+            return;
         if (bookmark.hasOwnProperty("label"))
             manualBookmark.setLabel(bookmark.label);
     }

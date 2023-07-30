@@ -4,13 +4,12 @@ class ComicVisuals {
     #managerInterface;
     
     constructor(comicData, managerInterface) {
-        this.editButton = undefined;
-        this.createListing();
+        this.#createListing();
         this.updateListing(comicData);
         this.#managerInterface = managerInterface;
     }
     
-    createListing() {
+    #createListing() {
         this.listing = document.createElement("li");
         this.listing.classList.add('comic_listing');
     }
@@ -36,9 +35,9 @@ class ComicVisuals {
     }
     
     #addEditComicButton() {
-        this.editButton = createEditButton();
-        this.listing.appendChild(this.editButton);
-        this.editButton.onclick = () => {
+        let editButton = createEditButton();
+        this.listing.appendChild(editButton);
+        editButton.onclick = () => {
             this.#managerInterface.editComic();
         }
     }
@@ -79,19 +78,26 @@ class ComicVisuals {
                 continue;
             if (strMeta === "manual") {
                 bookmarkObject.appendChild(createEditButton());
-                bookmarkObject.appendChild(createPinButton());
+                bookmarkObject.appendChild(this.createUnpinUrlButton(bookmark));
             } else {
-                bookmarkObject.appendChild(createPinButton());
+                bookmarkObject.appendChild(this.createPinUrlButton(bookmark));
+                
             }
             this.bookmarkList.appendChild(bookmarkObject);
         }
     }
     
-    createPinUrlButton() {
-        let pinUrlButton = createPinButton();
-        pinUrlButton.onclick = () => {
-            console.log("Add capability to add manual")
+    createPinUrlButton(bookmark) {
+        let pinButton = createPinButton();
+        pinButton.onclick = () => {
+            this.#managerInterface.pinUrl(bookmark.href);
         }
+        return pinButton;
+    }
+    
+    createUnpinUrlButton(bookmark) {
+        let pinButton = createPinButton();
+        return pinButton;
     }
     
     expand () {
