@@ -56,6 +56,13 @@ class ComicManager {
         this.comicVisuals.updateComicUrls(this.#comicData);
         return true;
     }
+
+    removeManual(bookmark) {
+        let didRemove = this.#comicData.removeManual(bookmark);
+        if (didRemove)
+            this.comicVisuals.updateComicUrls(this.#comicData);
+        return didRemove;
+    }
     
     get visuals() {
         return this.comicVisuals.listing;
@@ -116,8 +123,16 @@ class ComicManagerInterface {
         this.#comicManager.editComic();
     }
     
-    pinUrl(url) {
-        if (this.#comicManager.addManual(url)) {
+    pinBookmark(bookmark) {
+        if (this.#comicManager.addManual(bookmark.href)) {
+            this.#comicManager.saveProgress();
+            return true;
+        }
+        return false;
+    }
+    
+    unpinBookmark(bookmark) {
+        if (this.#comicManager.removeManual(bookmark)) {
             this.#comicManager.saveProgress();
             return true;
         }

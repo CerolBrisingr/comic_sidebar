@@ -85,6 +85,16 @@ class ComicData {
         return newBookmark;
     }
     
+    removeManual(bookmark) {
+        let index = this.manual.indexOf(bookmark);
+        if (index === -1) {
+            console.log('Could not find requested bookmark in list to remove it');
+            return false;
+        }
+        this.manual.splice(index, 1);
+        return true;
+    }
+    
     returnAsObject() {
         let thisAsObject = {
             label:this.label,

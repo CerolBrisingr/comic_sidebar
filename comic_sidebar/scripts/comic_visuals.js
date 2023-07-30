@@ -90,13 +90,16 @@ class ComicVisuals {
     createPinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
-            this.#managerInterface.pinUrl(bookmark.href);
+            this.#managerInterface.pinBookmark(bookmark);
         }
         return pinButton;
     }
     
     createUnpinUrlButton(bookmark) {
         let pinButton = createPinButton();
+        pinButton.onclick = () => {
+            this.#managerInterface.unpinBookmark(bookmark);
+        }
         return pinButton;
     }
     
