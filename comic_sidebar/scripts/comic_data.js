@@ -65,13 +65,17 @@ class ComicData {
     
     addManual(url) {
         if (!this.isValidNewUrl(url))
-            return;
+            return undefined;
         let bookmark = new Bookmark(url);
         if (bookmark.href == "#")
-            return;
+            return undefined;
+        for (bookmark of this.manual) {
+            if (bookmark.href === url) {
+                console.log("Avoiding duplicate manual entry");
+                return undefined;
+            }
+        }
         this.manual.push(bookmark);
-        if (this.manual.length > 2)
-            this.manual.shift();
         return bookmark;
     }
     

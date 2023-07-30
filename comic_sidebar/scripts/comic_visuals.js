@@ -1,13 +1,13 @@
 import {dissectUrl} from "./comic_data.js"
 
 class ComicVisuals {
-    #fktTriggerStorage;
+    #managerInterface;
     
-    constructor(comicData, fktTriggerStorage) {
+    constructor(comicData, managerInterface) {
         this.editButton = undefined;
         this.createListing();
         this.updateListing(comicData);
-        this.#fktTriggerStorage = fktTriggerStorage;
+        this.#managerInterface = managerInterface;
     }
     
     createListing() {
@@ -38,6 +38,9 @@ class ComicVisuals {
     #addEditComicButton() {
         this.editButton = createEditButton();
         this.listing.appendChild(this.editButton);
+        this.editButton.onclick = () => {
+            this.#managerInterface.editComic();
+        }
     }
     
     #addExpandComicButton() {
@@ -74,10 +77,20 @@ class ComicVisuals {
             let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
             if (bookmarkObject === undefined)
                 continue;
-            if (strMeta === "manual")
+            if (strMeta === "manual") {
                 bookmarkObject.appendChild(createEditButton());
-            bookmarkObject.appendChild(createPinButton());
+                bookmarkObject.appendChild(createPinButton());
+            } else {
+                bookmarkObject.appendChild(createPinButton());
+            }
             this.bookmarkList.appendChild(bookmarkObject);
+        }
+    }
+    
+    createPinUrlButton() {
+        let pinUrlButton = createPinButton();
+        pinUrlButton.onclick = () => {
+            console.log("Add capability to add manual")
         }
     }
     

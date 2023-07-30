@@ -1,55 +1,58 @@
 import {ComicVisuals} from "./comic_visuals.js"
 
 class ComicManager {
-    #fktTriggerStorage;
+    #comicData;
+    #comicEditor;
+    #sidebarInterface;
     
-    constructor(comicData, comicEditor, fktTriggerStorage) {
-        this.comicEditor = comicEditor;
-        this.comicData = comicData;
-        this.#fktTriggerStorage = fktTriggerStorage;
-        this.createComicVisuals(comicData);
+    constructor(comicData, comicEditor, sidebarInterface) {
+        this.#comicEditor = comicEditor;
+        this.#comicData = comicData;
+        this.#sidebarInterface = sidebarInterface;
+        this.#createComicVisuals();
     }
     
-    createComicVisuals(comicData) {
-        if (comicData === undefined) {
+    #createComicVisuals() {
+        if (this.#comicData === undefined) {
             this.comicVisuals = undefined;
             console.log("Encountered invalid comicData");
             return;
         }
-        this.comicVisuals = new ComicVisuals(comicData, this.#fktTriggerStorage);
-        this.enableEditing(comicData);
+        let comicManagerInterface = new ComicManagerInterface(this);
+        this.comicVisuals = new ComicVisuals(this.#comicData, comicManagerInterface);
     }
     
-    updateComicVisuals(comicData) {
-        this.comicVisuals.updateListing(comicData);
-        this.enableEditing(comicData);
-    }
-    
-    enableEditing(comicData) {
-        let editButton = this.comicVisuals.editButton;
-        if (editButton === undefined)
-            return;
-        
-        editButton.onclick = () => {
-            let triggerFkt = () => {
-                comicData.update(this.comicEditor);
-                this.updateComicVisuals(comicData);
-                this.#fktTriggerStorage();
+    editComic() {
+        let triggerFkt = () => {
+            this.#comicData.update(this.#comicEditor);
+            this.#updateComicVisuals();
+            this.#sidebarInterface.saveProgress();
             }
-            this.comicEditor.updateLink(comicData, triggerFkt);
-            this.comicEditor.setVisible();
-        }
+         this.#comicEditor.updateLink(this.#comicData, triggerFkt);
+         this.#comicEditor.setVisible();
+    }
+    
+    #updateComicVisuals() {
+        this.comicVisuals.updateListing(this.#comicData);
     }
     
     urlIsCompatible(url) {
-        return this.comicData.urlIsCompatible(url);
+        return this.#comicData.urlIsCompatible(url);
     }
     
     addAutomatic(url) {
-        let didUpdate = this.comicData.addAutomatic(url);
+        let didUpdate = this.#comicData.addAutomatic(url);
         if (didUpdate)
-            this.comicVisuals.updateComicUrls(this.comicData);
+            this.comicVisuals.updateComicUrls(this.#comicData);
         return didUpdate;
+    }
+    
+    addManual(url) {
+        let bookmark = this.#comicData.addManual(url);
+        if (bookmark === undefined)
+            return false
+        this.comicVisuals.updateComicUrls(this.#comicData);
+        return true;
     }
     
     get visuals() {
@@ -57,9 +60,13 @@ class ComicManager {
     }
     
     get valid() {
-        if (this.comicData === undefined || this.comicVisuals === undefined)
+        if (this.#comicData === undefined || this.comicVisuals === undefined)
             return false;
-        return this.comicData.valid;
+        return this.#comicData.valid;
+    }
+    
+    getComicData() {
+        return this.#comicData;
     }
     
     expand() {
