@@ -1,4 +1,4 @@
-import {dissectUrl} from "./comic_data.js"
+import {dissectUrl} from "./url.js"
 
 class ComicEditor {
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {

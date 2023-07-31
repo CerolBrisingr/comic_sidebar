@@ -90,6 +90,10 @@ nav ul li {
 	border-radius: 0.3em;
 }
 
+.no_draw {
+    display: none;
+}
+
 .first_button {
 	right: 0.5em;
 }
@@ -135,6 +139,7 @@ nav ul li {
 }
 
 /* Add comic button */
+.edit_comic,
 .add_comic {
 	height: 2em;
     width: 100%;

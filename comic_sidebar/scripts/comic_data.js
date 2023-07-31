@@ -1,3 +1,5 @@
+import {dissectUrl} from "./url.js"
+
 class ComicData {
     constructor(base_url, label) {
         if (!(typeof base_url === "string")) {
@@ -157,33 +159,4 @@ class Bookmark {
     }
 }
 
-function dissectUrl(url, prefix, fallback) {
-    let currentUrl
-    try {
-        currentUrl = new URL(url);
-    } catch (error) {
-        console.error(error);
-        return;
-    }
-    
-    if (currentUrl.origin === "null")
-        return;
-    
-    if (arguments.length < 2)
-        prefix = currentUrl.origin;
-    if (arguments.length < 3)
-        fallback = false;
-    
-    if (!url.startsWith(prefix)) {
-        if (fallback) {
-            prefix = currentUrl.origin;
-        } else {
-            console.log("Prefix does not match start of URL");
-            return;
-        }
-    }
-    let tail = url.slice(prefix.length);
-    return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
-}
-
-export {Bookmark, ComicData, dissectUrl}
+export {Bookmark, ComicData}

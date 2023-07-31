@@ -1,4 +1,5 @@
-import {dissectUrl} from "./comic_data.js"
+import {dissectUrl, openUrlInMyTab} from "./url.js"
+import {BookmarkButton} from "./bookmark_button.js"
 
 class ComicVisuals {
     #managerInterface;
@@ -157,38 +158,12 @@ function buildBookmarkObject(bookmark, prefix, strMeta) {
         return;
     if (!(typeof strMeta === "string"))
         return;
-    let myLink = buildLink(bookmark, prefix, strMeta);
-    if (myLink === undefined)
+    let bookmarkButton = new BookmarkButton(bookmark, prefix, strMeta);
+    if (!bookmarkButton.isValid())
         return;
     let listEntry = document.createElement("li");
-    listEntry.appendChild(myLink);
+    listEntry.appendChild(bookmarkButton.getHtmlRoot());
     return listEntry;
-}
-
-function buildLink(bookmark, prefix, strMeta) {
-    let myHref = encodeURI(bookmark.href);
-    let linkPieces = dissectUrl(bookmark.href, prefix, true);
-    if (linkPieces === undefined)
-        return;
-    let myStrMeta = encodeURI(strMeta);
-    let myLink = document.createElement("a")
-    myLink.href = myHref;
-    myLink.innerText = bookmark.getLabel(linkPieces.tail);
-    myLink.classList.add(myStrMeta);
-    myLink.onclick = function() {
-        openUrlInMyTab(myHref);
-        return false;
-    }
-    return myLink;
-}
-
-function openUrlInMyTab(url) {
-    if (url === undefined)
-        return;
-    let test = dissectUrl(url);
-    if (test === undefined)
-        return;
-    browser.tabs.update({url: url});
 }
 
 export {ComicVisuals}
