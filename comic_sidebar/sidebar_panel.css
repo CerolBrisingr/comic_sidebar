@@ -75,35 +75,34 @@ nav ul li {
 	height: auto;
 }
 
+.svg_button,
 [aria-expanded] {
 	position: absolute;
+    /*right: 0.5em*/
+	top: 0.25em;
+	width: 1.5em;
+	height: 1.5em;
+	padding: 0;
+	background: var(--background-color);
+	
+	outline: transparent;
+	border: none;
+	border-radius: 0.3em;
+}
+
+.no_draw {
+    display: none;
+}
+
+.first_button {
 	right: 0.5em;
-	top: 0.25em;
-	width: 1.5em;
-	height: 1.5em;
-	padding: 0;
-	background: var(--background-color);
-	
-	outline: transparent;
-	border: none;
-	border-radius: 0.3em;
 }
 
-.edit_button {
-	position: absolute;
+.second_button {
 	right: 2.5em;
-	top: 0.25em;
-	width: 1.5em;
-	height: 1.5em;
-	padding: 0;
-	background: var(--background-color);
-	
-	outline: transparent;
-	border: none;
-	border-radius: 0.3em;
 }
 
-.edit_button svg,
+.svg_button svg,
 [aria-expanded] svg {
 	pointer-events: none;
 	fill: var(--accent1-color);
@@ -111,7 +110,7 @@ nav ul li {
 	z-index: 10;
 }
 
-.edit_button:hover svg,
+.svg_button:hover svg,
 [aria-expanded]:hover svg {
 	fill: var(--background-color);
 	background: var(--accent1-color);
@@ -140,6 +139,7 @@ nav ul li {
 }
 
 /* Add comic button */
+.edit_comic,
 .add_comic {
 	height: 2em;
     width: 100%;

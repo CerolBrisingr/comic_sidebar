@@ -1,13 +1,16 @@
-import {dissectUrl} from "./comic_data.js"
+import {dissectUrl, openUrlInMyTab} from "./url.js"
+import {BookmarkButton} from "./bookmark_button.js"
 
 class ComicVisuals {
-    constructor(comicData) {
-        this.editButton = undefined;
-        this.createListing();
+    #managerInterface;
+    
+    constructor(comicData, managerInterface) {
+        this.#managerInterface = managerInterface;
+        this.#createListing();
         this.updateListing(comicData);
     }
     
-    createListing() {
+    #createListing() {
         this.listing = document.createElement("li");
         this.listing.classList.add('comic_listing');
     }
@@ -15,8 +18,8 @@ class ComicVisuals {
     updateListing(comicData) {
         this.listing.replaceChildren();
         this.#createBaseLink(comicData.label);
-        this.#addEditButton();
-        this.#addExpandButton();
+        this.#addEditComicButton();
+        this.#addExpandComicButton();
         this.#createBookmarkList(comicData.base_url);
         this.updateComicUrls(comicData);
         
@@ -32,15 +35,18 @@ class ComicVisuals {
         this.listing.appendChild(this.baseLink);
     }
     
-    #addEditButton() {
-        this.editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
-        this.editButton.classList.add('edit_button');
-        this.listing.appendChild(this.editButton);
+    #addEditComicButton() {
+        let editButton = createEditButton();
+        this.listing.appendChild(editButton);
+        editButton.onclick = () => {
+            this.#managerInterface.editComic();
+        }
     }
     
-    #addExpandButton() {
+    #addExpandComicButton() {
         this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
         this.expandButton.setAttribute("aria-expanded",false);
+        this.expandButton.classList.add('first_button');
         this.listing.appendChild(this.expandButton);
     }
     
@@ -65,14 +71,47 @@ class ComicVisuals {
         this.baseLink.href = lastAutomatic[0].href;
     }
     
-    #addBookmarks(bookmarkParent, bookmarkList, strMeta) {
+    #addBookmarks(comicData, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
-            let prefix = bookmarkParent.base_url;
-            let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
-            if (bookmarkObject === undefined)
-                continue;
+            let prefix = comicData.base_url; 
+            let bookmarkButton = new BookmarkButton(
+                bookmark, prefix, strMeta, this.#managerInterface);
+            if (!bookmarkButton.isValid())
+                return;
+            let bookmarkObject = buildBookmarkObject(bookmarkButton);
+            if (strMeta === "manual") {
+                bookmarkObject.appendChild(this.#createEditBookmarkButton(bookmarkButton));
+                bookmarkObject.appendChild(this.#createUnpinUrlButton(bookmark));
+            } else {
+                bookmarkObject.appendChild(this.#createPinUrlButton(bookmark));
+                
+            }
             this.bookmarkList.appendChild(bookmarkObject);
         }
+    }
+    
+    #createEditBookmarkButton(bookmarkButton) {
+        let editButton = createEditButton();
+        editButton.onclick = () => {
+            bookmarkButton.edit();
+        }
+        return editButton;
+    }
+    
+    #createPinUrlButton(bookmark) {
+        let pinButton = createPinButton();
+        pinButton.onclick = () => {
+            this.#managerInterface.pinBookmark(bookmark);
+        }
+        return pinButton;
+    }
+    
+    #createUnpinUrlButton(bookmark) {
+        let pinButton = createPinButton();
+        pinButton.onclick = () => {
+            this.#managerInterface.unpinBookmark(bookmark);
+        }
+        return pinButton;
     }
     
     expand () {
@@ -96,6 +135,20 @@ class ComicVisuals {
     }
 }
 
+function createEditButton() {
+    let editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
+    editButton.classList.add('svg_button');
+    editButton.classList.add('second_button');
+    return editButton;
+}
+
+function createPinButton() {
+    let pinButton = createSvgButton('M0.3,0.9 0.9,0.3 0.7,0.1z');
+    pinButton.classList.add('svg_button');
+    pinButton.classList.add('first_button');
+    return pinButton;
+}
+
 function createSvgButton(pathString, viewBox='0 0 1 1') {
     let svgButton = document.createElement("button");
     
@@ -110,43 +163,10 @@ function createSvgButton(pathString, viewBox='0 0 1 1') {
     return svgButton;
 }
 
-function buildBookmarkObject(bookmark, prefix, strMeta) {
-    if (!(typeof bookmark.href === "string"))
-        return;
-    if (!(typeof strMeta === "string"))
-        return;
-    let myLink = buildLink(bookmark.href, prefix, strMeta);
-    if (myLink === undefined)
-        return;
+function buildBookmarkObject(bookmarkButton) {
     let listEntry = document.createElement("li");
-    listEntry.appendChild(myLink);
+    listEntry.appendChild(bookmarkButton.getHtmlRoot());
     return listEntry;
-}
-
-function buildLink(href, prefix, strMeta) {
-    let myHref = encodeURI(href);
-    let linkPieces = dissectUrl(href, prefix, true);
-    if (linkPieces === undefined)
-        return;
-    let myStrMeta = encodeURI(strMeta);
-    let myLink = document.createElement("a")
-    myLink.href = myHref;
-    myLink.innerText = linkPieces.tail;
-    myLink.classList.add(myStrMeta);
-    myLink.onclick = function() {
-        openUrlInMyTab(myHref);
-        return false;
-    }
-    return myLink;
-}
-
-function openUrlInMyTab(url) {
-    if (url === undefined)
-        return;
-    let test = dissectUrl(url);
-    if (test === undefined)
-        return;
-    browser.tabs.update({url: url});
 }
 
 export {ComicVisuals}

@@ -1,56 +1,67 @@
 import {ComicVisuals} from "./comic_visuals.js"
 
 class ComicManager {
-    constructor(comicData, comicEditor, fktTriggerStorage) {
-        this.comicEditor = comicEditor;
-        this.comicData = comicData;
-        this.fktTriggerStorage = fktTriggerStorage;
-        this.createComicVisuals(comicData);
+    #comicData;
+    #comicEditor;
+    #sidebarInterface;
+    
+    constructor(comicData, comicEditor, sidebarInterface) {
+        this.#comicEditor = comicEditor;
+        this.#comicData = comicData;
+        this.#sidebarInterface = sidebarInterface;
+        this.#createComicVisuals();
     }
     
-    createComicVisuals(comicData) {
-        if (comicData === undefined) {
+    #createComicVisuals() {
+        if (this.#comicData === undefined) {
             this.comicVisuals = undefined;
             console.log("Encountered invalid comicData");
             return;
         }
-        this.comicVisuals = new ComicVisuals(comicData);
-        this.enableEditing(comicData);
+        let comicManagerInterface = new ComicManagerInterface(this);
+        this.comicVisuals = new ComicVisuals(this.#comicData, comicManagerInterface);
     }
     
-    updateComicVisuals(comicData) {
-        this.comicVisuals.updateListing(comicData);
-        this.enableEditing(comicData);
-    }
-    
-    enableEditing(comicData) {
-        let editButton = this.comicVisuals.editButton;
-        if (editButton === undefined)
-            return;
-        let editor = this.comicEditor;
-        let manager = this;
-        let store = this.fktTriggerStorage;
-        
-        editButton.onclick = () => {
-            let triggerFkt = () => {
-                comicData.update(editor);
-                manager.updateComicVisuals(comicData);
-                store();
+    editComic() {
+        let triggerFkt = () => {
+            this.#comicData.update(this.#comicEditor);
+            this.#updateComicVisuals();
+            this.saveProgress();
+            this.expand();
             }
-            editor.updateLink(comicData, triggerFkt);
-            editor.setVisible();
-        }
+         this.#comicEditor.updateLink(this.#comicData, triggerFkt);
+         this.#comicEditor.setVisible();
+         this.expand();
+    }
+    
+    #updateComicVisuals() {
+        this.comicVisuals.updateListing(this.#comicData);
     }
     
     urlIsCompatible(url) {
-        return this.comicData.urlIsCompatible(url);
+        return this.#comicData.urlIsCompatible(url);
     }
     
     addAutomatic(url) {
-        let didUpdate = this.comicData.addAutomatic(url);
+        let didUpdate = this.#comicData.addAutomatic(url);
         if (didUpdate)
-            this.comicVisuals.updateComicUrls(this.comicData);
+            this.comicVisuals.updateComicUrls(this.#comicData);
         return didUpdate;
+    }
+    
+    addManual(url) {
+        let bookmark = this.#comicData.addManual(url);
+        if (bookmark === undefined)
+            return false
+        this.comicVisuals.updateComicUrls(this.#comicData);
+        return true;
+    }
+
+    removeManual(bookmark) {
+        let didRemove = this.#comicData.removeManual(bookmark);
+        if (didRemove)
+            this.comicVisuals.updateComicUrls(this.#comicData);
+        return didRemove;
     }
     
     get visuals() {
@@ -58,9 +69,13 @@ class ComicManager {
     }
     
     get valid() {
-        if (this.comicData === undefined || this.comicVisuals === undefined)
+        if (this.#comicData === undefined || this.comicVisuals === undefined)
             return false;
-        return this.comicData.valid;
+        return this.#comicData.valid;
+    }
+    
+    getComicData() {
+        return this.#comicData;
     }
     
     expand() {
@@ -69,6 +84,10 @@ class ComicManager {
     
     collapse() {
         this.comicVisuals.collapse();
+    }
+    
+    saveProgress() {
+        this.#sidebarInterface.saveProgress();
     }
 }
 
@@ -91,6 +110,38 @@ class ComicManagerDummy {
         // Nothing to do
     }
     
+}
+
+class ComicManagerInterface {
+    #comicManager
+
+    constructor(comicManager) {
+        this.#comicManager = comicManager;
+    }
+
+    editComic() {
+        this.#comicManager.editComic();
+    }
+    
+    pinBookmark(bookmark) {
+        if (this.#comicManager.addManual(bookmark.href)) {
+            this.saveProgress();
+            return true;
+        }
+        return false;
+    }
+    
+    unpinBookmark(bookmark) {
+        if (this.#comicManager.removeManual(bookmark)) {
+            this.saveProgress();
+            return true;
+        }
+        return false;
+    }
+    
+    saveProgress() {
+        this.#comicManager.saveProgress();
+    }
 }
 
 export {ComicManager, ComicManagerDummy}

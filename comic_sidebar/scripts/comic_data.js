@@ -1,3 +1,5 @@
+import {dissectUrl} from "./url.js"
+
 class ComicData {
     constructor(base_url, label) {
         if (!(typeof base_url === "string")) {
@@ -26,15 +28,21 @@ class ComicData {
     addAutomatic(url) {
         if (!this.isValidNewUrl(url))
             return false;
-        let bm = new Bookmark(url);
-        if (bm.href == "#")
+        let newBoockmark = new Bookmark(url);
+        if (newBoockmark.href == "#")
             return false;
         if (this.automatic.length > 0)
             if (this.automatic[this.automatic.length -1].href === url) {
                 console.log("Avoiding duplicate automatic entry");
                 return false;
             }
-        this.automatic.push(bm);
+        for (let bookmark of this.manual) {
+            if (bookmark.href === url) {
+                console.log("Manual entry for this exists. Avoiding duplicate");
+                return false;
+            }
+        }
+        this.automatic.push(newBoockmark);
         if (this.automatic.length > 4)
             this.automatic.shift();
         return true;
@@ -65,13 +73,28 @@ class ComicData {
     
     addManual(url) {
         if (!this.isValidNewUrl(url))
-            return;
-        let bm = new Bookmark(url);
-        if (bm.href == "#")
-            return;
-        this.manual.push(bm);
-        if (this.manual.length > 2)
-            this.manual.shift();
+            return undefined;
+        let newBookmark = new Bookmark(url);
+        if (newBookmark.href == "#")
+            return undefined;
+        for (let bookmark of this.manual) {
+            if (bookmark.href === url) {
+                console.log("Avoiding duplicate manual entry");
+                return undefined;
+            }
+        }
+        this.manual.push(newBookmark);
+        return newBookmark;
+    }
+    
+    removeManual(bookmark) {
+        let index = this.manual.indexOf(bookmark);
+        if (index === -1) {
+            console.log('Could not find requested bookmark in list to remove it');
+            return false;
+        }
+        this.manual.splice(index, 1);
+        return true;
     }
     
     returnAsObject() {
@@ -93,8 +116,23 @@ class ComicData {
 
 class Bookmark {
     #href = "#";
+    #label = undefined;
     constructor(href) {
         this.href = href;
+    }
+    
+    setLabel(value) {
+        if (typeof value === "string") {
+            this.#label = value;
+        } else {
+            this.#label = undefined;
+        }
+    }
+    
+    getLabel(fallback) {
+        if (this.#label === undefined)
+            return fallback;
+        return this.#label;
     }
     
     get href() {
@@ -109,39 +147,16 @@ class Bookmark {
     }
     
     returnAsObject() {
-        return {
-            href:this.href
-        }
-    }
-}
-
-function dissectUrl(url, prefix, fallback) {
-    let currentUrl
-    try {
-        currentUrl = new URL(url);
-    } catch (error) {
-        console.error(error);
-        return;
-    }
-    
-    if (currentUrl.origin === "null")
-        return;
-    
-    if (arguments.length < 2)
-        prefix = currentUrl.origin;
-    if (arguments.length < 3)
-        fallback = false;
-    
-    if (!url.startsWith(prefix)) {
-        if (fallback) {
-            prefix = currentUrl.origin;
+        if (this.#label === undefined) {
+            return {href:this.href}
         } else {
-            console.log("Prefix does not match start of URL");
-            return;
+            return {
+                href: this.href, 
+                label: this.#label 
+                };
         }
+            
     }
-    let tail = url.slice(prefix.length);
-    return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {Bookmark, ComicData, dissectUrl}
+export {Bookmark, ComicData}

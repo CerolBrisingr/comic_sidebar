@@ -4,14 +4,14 @@ import {importBackup, readComicObject} from "./backup_import.js"
 import {saveBackup, buildComicObject} from "./backup_export.js"
 
 class ComicSidebar {
-    #fktTriggerStorage;
+    #sidebarInterface;
     
     constructor(container, comicEditor) {
         this.comicManagerList = [];
         this.comicEditor = comicEditor;
         this.currentManager = new ComicManagerDummy();
         this.container = container;
-        this.#fktTriggerStorage = () => {this.#saveToStorage();};
+        this.#sidebarInterface = new ComicSidebarInterface(this);
         
         this.#importStorage();
     }
@@ -40,7 +40,7 @@ class ComicSidebar {
             () => {console.log("No data stored locally, aborting loading sequence! (1)")});
     }
     
-    #saveToStorage() {
+    saveToStorage() {
         let comicDataObject = buildComicObject(this.#compileComicDataList());
         browser.storage.local.set({comicData: comicDataObject});
     }
@@ -56,13 +56,13 @@ class ComicSidebar {
             visualsList.push(newManager.visuals);
         }
         this.container.replaceChildren(...visualsList);
-        this.#saveToStorage();
+        this.saveToStorage();
     }
     
     #compileComicDataList() {
         let comicDataList = [];
         for (let comicManager of this.comicManagerList) {
-            comicDataList.push(comicManager.comicData);
+            comicDataList.push(comicManager.getComicData());
         }
         return comicDataList;
     }
@@ -71,7 +71,7 @@ class ComicSidebar {
         return new ComicManager(
                 comicData,
                 this.comicEditor,
-                this.#fktTriggerStorage
+                this.#sidebarInterface
                 );
     }
     
@@ -105,7 +105,7 @@ class ComicSidebar {
         if (!comicManager.valid)
             return;
         if (comicManager.addAutomatic(url))
-            this.#saveToStorage();
+            this.saveToStorage();
     }
     
     #selectCorrespondingManager(url) {
@@ -125,6 +125,18 @@ class ComicSidebar {
         this.currentManager.collapse();
         newManager.expand();
         this.currentManager = newManager;
+    }
+}
+
+class ComicSidebarInterface {
+    #comicSidebar
+    
+    constructor(comicSidebar) {
+        this.#comicSidebar = comicSidebar;
+    }
+    
+    saveProgress() {
+        this.#comicSidebar.saveToStorage();
     }
 }
 
