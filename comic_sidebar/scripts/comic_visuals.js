@@ -91,7 +91,7 @@ class ComicVisuals {
     
     #createEditBookmarkButton(bookmarkButton) {
         let editButton = createEditButton();
-        editButton.onClick = () => {
+        editButton.onclick = () => {
             bookmarkButton.edit();
         }
         return editButton;
@@ -162,7 +162,7 @@ function createSvgButton(pathString, viewBox='0 0 1 1') {
     return svgButton;
 }
 
-function buildBookmarkObject(bookmark, prefix, strMeta) {
+function buildBookmarkObject(bookmarkButton) {
     let listEntry = document.createElement("li");
     listEntry.appendChild(bookmarkButton.getHtmlRoot());
     return listEntry;
