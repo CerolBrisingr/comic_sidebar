@@ -165,6 +165,11 @@ class ComicEditor {
             this.setUserMessage("Error: ", "Incompatible prefix. Prefix must be start of URL")
             return;
         }
+        if (!this.prefix.startsWith(urlPieces.base_url)) {
+            this.okBtn.disabled = true;
+            this.setUserMessage("Error: ", "Incompatible prefix. Must contain origin URL \"" + urlPieces.base_url + "\" at the very least");
+            return;
+        }
         this.linkLabel = urlPieces.tail;
         this.okBtn.disabled = false;
         this.setUserMessage("", "");
