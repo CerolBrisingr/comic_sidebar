@@ -59,10 +59,6 @@ class BookmarkButton {
         this.#clickLink.innerText = autoLabel;
     }
     
-    #cancelEditor() {
-        this.#showLabel();
-    }
-    
     #showEditor() {
         this.#clickLink.classList.add("no_draw");
         this.#labelEdit.classList.remove("no_draw");
@@ -110,6 +106,15 @@ class BookmarkButton {
         let myEdit = document.createElement("input");
         myEdit.setAttribute("type", "text");
         myEdit.classList.add("edit_comic", "no_draw");
+        myEdit.onkeydown = (event) => {
+            if (event.key == "Enter") {
+                this.#updateLabel();
+                this.#showLabel();
+            }
+            if (event.key == "Escape") {
+                this.#showLabel();
+            }
+        }
         
         this.#labelEdit = myEdit;
     }
