@@ -4,13 +4,17 @@ class BookmarkButton {
     #container = undefined;
     #clickLink = undefined;
     #labelEdit = undefined;
+    #prefix;
+    #managerInterface;
     #bookmark;
     
-    constructor(bookmark, prefix, strMeta) {
+    constructor(bookmark, prefix, strMeta, managerInterface) {
         this.#bookmark = bookmark;
-        if (!this.#verifyInput(prefix, strMeta))
+        this.#prefix = prefix;
+        this.#managerInterface = managerInterface;
+        if (!this.#verifyInput(strMeta))
             return;
-        this.#buildLink(prefix, strMeta);
+        this.#buildLink(strMeta);
         this.#buildEditor();
         this.#buildContainer();
     }
@@ -24,19 +28,45 @@ class BookmarkButton {
     }
     
     edit() {
-        this.#clickLink.classList.toggle("no_draw");
-        this.#labelEdit.classList.toggle("no_draw");
-        if (this.#clickLink.classList.contains("no_draw")) {
+        if (this.#labelEdit.classList.contains("no_draw")) {
             this.#showEditor();
             this.#labelEdit.select();
         } else {
             this.#showLabel();
+            this.#updateLabel();
         }
+    }
+    
+    #updateLabel() {
+        let newValue = this.#labelEdit.value;
+        newValue.trim();
+        if (newValue == "") {
+            this.#removeLabel();
+            return;
+        }
+        if (newValue === this.#clickLink.innerText) {
+            console.log("Nothing changed, stepping out");
+            return;
+        }
+        this.#bookmark.setLabel(newValue);
+        this.#clickLink.innerText = newValue;
+        this.#managerInterface.saveProgress();
+    }
+    
+    #removeLabel() {
+        this.#bookmark.setLabel(undefined);
+        let autoLabel = this.#getAutomaticLabel();
+        this.#clickLink.innerText = autoLabel;
+    }
+    
+    #cancelEditor() {
+        this.#showLabel();
     }
     
     #showEditor() {
         this.#clickLink.classList.add("no_draw");
         this.#labelEdit.classList.remove("no_draw");
+        this.#labelEdit.value = this.#bookmark.getLabel("< Edit Label Here >");
     }
     
     #showLabel() {
@@ -44,10 +74,10 @@ class BookmarkButton {
         this.#labelEdit.classList.add("no_draw");
     }
     
-    #verifyInput(prefix, strMeta) {
+    #verifyInput(strMeta) {
         if (!(typeof this.#bookmark.href === "string"))
             return false;
-        if (dissectUrl(this.#bookmark.href, prefix, true) === undefined)
+        if (dissectUrl(this.#bookmark.href, this.#prefix, true) === undefined)
             return false;
         if (!(typeof strMeta === "string"))
             return false;
@@ -62,13 +92,12 @@ class BookmarkButton {
         this.#container.appendChild(this.#labelEdit);
     }
 
-    #buildLink(prefix, strMeta) {
+    #buildLink(strMeta) {
         let myHref = encodeURI(this.#bookmark.href);
-        let linkPieces = dissectUrl(this.#bookmark.href, prefix, true);
         let myStrMeta = encodeURI(strMeta);
         let myLink = document.createElement("a")
         myLink.href = myHref;
-        myLink.innerText = this.#bookmark.getLabel(linkPieces.tail);
+        myLink.innerText = this.#getAutomaticLabel();
         myLink.classList.add(myStrMeta);
         myLink.onclick = function() {
             openUrlInMyTab(myHref);
@@ -80,10 +109,14 @@ class BookmarkButton {
     #buildEditor() {
         let myEdit = document.createElement("input");
         myEdit.setAttribute("type", "text");
-        myEdit.setAttribute("value", this.#bookmark.getLabel("< Edit Label Here >"));
         myEdit.classList.add("edit_comic", "no_draw");
         
         this.#labelEdit = myEdit;
+    }
+    
+    #getAutomaticLabel() {
+        let linkPieces = dissectUrl(this.#bookmark.href, this.#prefix, true);
+        return this.#bookmark.getLabel(linkPieces.tail);
     }
 }
 

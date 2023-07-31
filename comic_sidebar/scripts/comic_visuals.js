@@ -5,9 +5,9 @@ class ComicVisuals {
     #managerInterface;
     
     constructor(comicData, managerInterface) {
+        this.#managerInterface = managerInterface;
         this.#createListing();
         this.updateListing(comicData);
-        this.#managerInterface = managerInterface;
     }
     
     #createListing() {
@@ -74,7 +74,8 @@ class ComicVisuals {
     #addBookmarks(comicData, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
             let prefix = comicData.base_url; 
-            let bookmarkButton = new BookmarkButton(bookmark, prefix, strMeta);
+            let bookmarkButton = new BookmarkButton(
+                bookmark, prefix, strMeta, this.#managerInterface);
             if (!bookmarkButton.isValid())
                 return;
             let bookmarkObject = buildBookmarkObject(bookmarkButton);

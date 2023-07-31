@@ -140,7 +140,6 @@ class ComicManagerInterface {
     }
     
     saveProgress() {
-        // TODO: is this actually used?
         this.#comicManager.saveProgress();
     }
 }
