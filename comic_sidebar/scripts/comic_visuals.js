@@ -73,22 +73,31 @@ class ComicVisuals {
     
     #addBookmarks(comicData, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
-            let prefix = comicData.base_url;
-            let bookmarkObject = buildBookmarkObject(bookmark, prefix, strMeta);
-            if (bookmarkObject === undefined)
-                continue;
+            let prefix = comicData.base_url; 
+            let bookmarkButton = new BookmarkButton(bookmark, prefix, strMeta);
+            if (!bookmarkButton.isValid())
+                return;
+            let bookmarkObject = buildBookmarkObject(bookmarkButton);
             if (strMeta === "manual") {
-                bookmarkObject.appendChild(createEditButton());
-                bookmarkObject.appendChild(this.createUnpinUrlButton(bookmark));
+                bookmarkObject.appendChild(this.#createEditBookmarkButton(bookmarkButton));
+                bookmarkObject.appendChild(this.#createUnpinUrlButton(bookmark));
             } else {
-                bookmarkObject.appendChild(this.createPinUrlButton(bookmark));
+                bookmarkObject.appendChild(this.#createPinUrlButton(bookmark));
                 
             }
             this.bookmarkList.appendChild(bookmarkObject);
         }
     }
     
-    createPinUrlButton(bookmark) {
+    #createEditBookmarkButton(bookmarkButton) {
+        let editButton = createEditButton();
+        editButton.onClick = () => {
+            bookmarkButton.edit();
+        }
+        return editButton;
+    }
+    
+    #createPinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
             this.#managerInterface.pinBookmark(bookmark);
@@ -96,7 +105,7 @@ class ComicVisuals {
         return pinButton;
     }
     
-    createUnpinUrlButton(bookmark) {
+    #createUnpinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
             this.#managerInterface.unpinBookmark(bookmark);
@@ -154,13 +163,6 @@ function createSvgButton(pathString, viewBox='0 0 1 1') {
 }
 
 function buildBookmarkObject(bookmark, prefix, strMeta) {
-    if (!(typeof bookmark.href === "string"))
-        return;
-    if (!(typeof strMeta === "string"))
-        return;
-    let bookmarkButton = new BookmarkButton(bookmark, prefix, strMeta);
-    if (!bookmarkButton.isValid())
-        return;
     let listEntry = document.createElement("li");
     listEntry.appendChild(bookmarkButton.getHtmlRoot());
     return listEntry;

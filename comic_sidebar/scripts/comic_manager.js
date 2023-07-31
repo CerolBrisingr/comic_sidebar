@@ -125,7 +125,7 @@ class ComicManagerInterface {
     
     pinBookmark(bookmark) {
         if (this.#comicManager.addManual(bookmark.href)) {
-            this.#comicManager.saveProgress();
+            this.saveProgress();
             return true;
         }
         return false;
@@ -133,10 +133,15 @@ class ComicManagerInterface {
     
     unpinBookmark(bookmark) {
         if (this.#comicManager.removeManual(bookmark)) {
-            this.#comicManager.saveProgress();
+            this.saveProgress();
             return true;
         }
         return false;
+    }
+    
+    saveProgress() {
+        // TODO: is this actually used?
+        this.#comicManager.saveProgress();
     }
 }
 
