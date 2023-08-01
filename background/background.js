@@ -24,16 +24,16 @@ function broadcastActiveState() {
 
 // Try a more static connection
 function contacted(port) {
-    if (port.name !== "port_from_sidebar")
+    if (port.name !== "port_from_sidebar") {
+        console.log("Connection failed due to identification");
         return;
+    }
     sbConnection = port;
     connectionAlive = true;
     sbConnection.onMessage.addListener(receiveMessage);
     sbConnection.onDisconnect.addListener((m) => {
         connectionAlive = false;
         })
-    console.log(port);
-    sbConnection.postMessage("Test bs_to_cs");
 }
 function receiveMessage(message) {
     if (message === "getActiveState") {

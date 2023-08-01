@@ -109,7 +109,6 @@ function establishConnection() {
         "sb_webcomic_sidebar@whythis.format",
         {name: "port_from_sidebar"});
     bsConnection.onMessage.addListener(receiveMessage);
-    bsConnection.postMessage("Test cs_to_bs");
 }
 
 function receiveMessage(message) {
