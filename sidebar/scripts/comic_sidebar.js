@@ -5,12 +5,12 @@ import {saveBackup, buildComicObject} from "./backup_export.js"
 
 class ComicSidebar {
     #sidebarInterface;
+    #comicEditor;
+    #container;
     
-    constructor(container, comicEditor) {
+    constructor() {
         this.comicManagerList = [];
-        this.comicEditor = comicEditor;
         this.currentManager = new ComicManagerDummy();
-        this.container = container;
         this.#sidebarInterface = new ComicSidebarInterface(this);
         
         this.#importStorage();
@@ -25,6 +25,47 @@ class ComicSidebar {
     
     saveBackup() {
         saveBackup(this.#compileComicDataList());
+    }
+    
+    setContainer(container) {
+        this.#container = container;
+        this.#setContainerContent();
+    }
+    
+    removeContainer() {
+        this.#container = undefined;
+    }
+    
+    #setContainerContent() {
+        if (this.#container == undefined)
+            return;
+        let visualsList = [];
+        for (let manager of this.comicManagerList) {
+            if (!manager.valid)
+                continue;
+            visualsList.push(manager.visuals);
+        }
+        this.#container.replaceChildren(...visualsList);
+    }
+    
+    #addToContainer(manager) {
+        if (this.#container == undefined)
+            return;
+        if (!manager.valid)
+            return;
+        this.#container.appendChild(manager.visuals);
+    }
+    
+    setComicEditor(comicEditor) {
+        this.#comicEditor = comicEditor;
+    }
+    
+    getComicEditor() {
+        return this.#comicEditor;
+    }
+    
+    removeComicEditor() {
+        this.#comicEditor = undefined;
     }
     
     #importStorage() {
@@ -46,16 +87,14 @@ class ComicSidebar {
     }
     
     #importComicDataList(comicDataList){
-        let visualsList = [];
         this.comicManagerList.length = 0; // keep object permanence
         for (let comicData of comicDataList) {
             let newManager = this.#buildNewManager(comicData);
             if (!newManager.valid)
                 continue;
             this.comicManagerList.push(newManager);
-            visualsList.push(newManager.visuals);
         }
-        this.container.replaceChildren(...visualsList);
+        this.#setContainerContent();
         this.saveToStorage();
     }
     
@@ -70,7 +109,6 @@ class ComicSidebar {
     #buildNewManager(comicData) {
         return new ComicManager(
                 comicData,
-                this.comicEditor,
                 this.#sidebarInterface
                 );
     }
@@ -79,7 +117,7 @@ class ComicSidebar {
         let triggerFkt = (comicEssentials) => {
             this.#registerPage(comicEssentials);
         }
-        this.comicEditor.importLink(url, triggerFkt);
+        this.#comicEditor.importLink(url, triggerFkt);
     }
     
     #registerPage(comicEssentials) {
@@ -96,7 +134,7 @@ class ComicSidebar {
             return;
         }
         this.comicManagerList.push(newManager);
-        this.container.appendChild(newManager.visuals);
+        this.#addToContainer(newManager);
         this.updateBookmark(comicEssentials.initialUrl); // This also updates storage
     }
     
@@ -133,6 +171,10 @@ class ComicSidebarInterface {
     
     constructor(comicSidebar) {
         this.#comicSidebar = comicSidebar;
+    }
+    
+    getComicEditor() {
+        return this.#comicSidebar.getComicEditor;
     }
     
     saveProgress() {

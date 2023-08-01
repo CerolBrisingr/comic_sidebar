@@ -2,11 +2,9 @@ import {ComicVisuals} from "./comic_visuals.js"
 
 class ComicManager {
     #comicData;
-    #comicEditor;
     #sidebarInterface;
     
-    constructor(comicData, comicEditor, sidebarInterface) {
-        this.#comicEditor = comicEditor;
+    constructor(comicData, sidebarInterface) {
         this.#comicData = comicData;
         this.#sidebarInterface = sidebarInterface;
         this.#createComicVisuals();
@@ -23,15 +21,18 @@ class ComicManager {
     }
     
     editComic() {
+        let comicEditor = this.sidebarInterface.getComicEditor();
+        if (comicEditor == undefined)
+            return
         let triggerFkt = () => {
-            this.#comicData.update(this.#comicEditor);
+            this.#comicData.update(comicEditor);
             this.#updateComicVisuals();
             this.saveProgress();
             this.expand();
             }
-         this.#comicEditor.updateLink(this.#comicData, triggerFkt);
-         this.#comicEditor.setVisible();
-         this.expand();
+        comicEditor.updateLink(this.#comicData, triggerFkt);
+        comicEditor.setVisible();
+        this.expand();
     }
     
     #updateComicVisuals() {

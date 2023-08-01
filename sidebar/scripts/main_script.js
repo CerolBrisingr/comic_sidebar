@@ -63,7 +63,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function setUpSidebar(comicEditor) {
         let container = document.getElementById('container');
-        comicSidebar = new ComicSidebar(container, comicEditor);
+        comicSidebar = new ComicSidebar();
+        comicSidebar.setComicEditor(comicEditor);
+        comicSidebar.setContainer(container);
     }
 });
 
@@ -128,6 +130,12 @@ function sendMessage(message) {
     }
     bsConnection.postMessage(message);
 }
+
+// Clean up on close
+window.addEventListener('unload', (event) => {
+  comicSidebar.removeComicEditor();
+  comicSidebar.removeContainer();
+});
 
 // Update content when a new tab becomes active.
 browser.tabs.onActivated.addListener(updateContent);
