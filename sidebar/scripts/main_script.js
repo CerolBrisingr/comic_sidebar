@@ -12,6 +12,7 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 
 // Tab management
 let myWindowId;
+let isActive = true;
 let hasWindowId = false;
 let hasLoaded = false;
 let comicSidebar;
@@ -21,6 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
     setUpButtons();
     let comicEditor = setUpComicEditor();
     setUpSidebar(comicEditor);
+    pullActiveState();
+    
+    hasLoaded = true;
+    firstContentUpdate();
     
     function setUpButtons() {
         const exportTrigger = document.getElementById('export_trigger');
@@ -56,8 +61,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function setUpSidebar(comicEditor) {
         let container = document.getElementById('container');
         comicSidebar = new ComicSidebar(container, comicEditor);
-        hasLoaded = true;
-        firstContentUpdate();
     }
 });
 
@@ -72,6 +75,8 @@ function addCurrentPage() {
 
 // Update the sidebar's content.
 function updateContent() {
+    if (!isActive)
+        return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => comicSidebar.updateBookmark(tabs[0].url), onError)
 }
@@ -92,6 +97,45 @@ function firstContentUpdate() {
     updateContent();
 }
 
+function handleRequest(request, sender, sendResponse) {
+    let responseString = handleResponse(request);
+    if (!(responseString === undefined)) {
+        sendResponse({ response: responseString});
+    } else {
+        sendResponse({ response: "Could not react to request"});
+    }
+    updateContent();
+}
+
+function handleResponse(message) {
+    if (!message.hasOwnProperty("newState")) {
+        console.log('Not requesting state change');
+        return;
+    }
+    let newState = message.newState;
+    if (!(typeof newState === "boolean")) {
+        console.log('New state value is not boolean');
+        return;
+    }
+    isActive = newState;
+    let responseString = `Updated activity to ${newState}`;
+    console.log(responseString);
+    return responseString;
+}
+
+function pullActiveState() {
+    const sending = browser.runtime.sendMessage({
+        requestStr: "getActive"
+    });
+    sending.then(handleResponse, handleError);
+}
+
+function handleError(error) {
+    console.log(`Error: ${error}`);
+}
+
+// Get state from background script
+browser.runtime.onMessage.addListener(handleRequest);
 // Update content when a new tab becomes active.
 browser.tabs.onActivated.addListener(updateContent);
 // Update content when a new page is loaded into a tab.

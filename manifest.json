@@ -12,9 +12,20 @@
   },
 
   "sidebar_action": {
-    "default_icon": "icons/star.png",
+    "default_icon": "icons/icon.png",
     "default_title" : "Comic Bookmarks",
-    "default_panel": "comic_sidebar/sidebar_panel.html"
+    "default_panel": "sidebar/sidebar_panel.html"
+  },
+  
+  "browser_action": {
+    "default_icon": {
+      "48": "icons/icon_48.png"
+    },
+    "default_title": "Comic Sidebar"
+  },
+  
+  "background": {
+    "scripts": ["background/background.js"]
   },
 
   "permissions": ["storage", "tabs"],
