@@ -16,12 +16,15 @@ let isActive = true;
 let hasWindowId = false;
 let hasLoaded = false;
 let comicSidebar;
+// Connection to background script
+let bsConnection;
 
 document.addEventListener('DOMContentLoaded', function () {
     
     setUpButtons();
     let comicEditor = setUpComicEditor();
     setUpSidebar(comicEditor);
+    establishConnection();
     pullActiveState();
     
     hasLoaded = true;
@@ -97,45 +100,36 @@ function firstContentUpdate() {
     updateContent();
 }
 
-function handleRequest(request, sender, sendResponse) {
-    let responseString = handleResponse(request);
-    if (!(responseString === undefined)) {
-        sendResponse({ response: responseString});
-    } else {
-        sendResponse({ response: "Could not react to request"});
-    }
-    updateContent();
-}
-
-function handleResponse(message) {
-    if (!message.hasOwnProperty("newState")) {
-        console.log('Not requesting state change');
-        return;
-    }
-    let newState = message.newState;
-    if (!(typeof newState === "boolean")) {
-        console.log('New state value is not boolean');
-        return;
-    }
-    isActive = newState;
-    let responseString = `Updated activity to ${newState}`;
-    console.log(responseString);
-    return responseString;
-}
-
 function pullActiveState() {
-    const sending = browser.runtime.sendMessage({
-        requestStr: "getActive"
-    });
-    sending.then(handleResponse, handleError);
+    sendMessage("getActiveState");
 }
 
-function handleError(error) {
-    console.log(`Error: ${error}`);
+function establishConnection() {
+    bsConnection = browser.runtime.connect(
+        "sb_webcomic_sidebar@whythis.format",
+        {name: "port_from_sidebar"});
+    bsConnection.onMessage.addListener(receiveMessage);
+    bsConnection.postMessage("Test cs_to_bs");
 }
 
-// Get state from background script
-browser.runtime.onMessage.addListener(handleRequest);
+function receiveMessage(message) {
+    if (message.hasOwnProperty("setActiveState")) {
+        isActive = Boolean(message.setActiveState);
+        updateContent();
+        return;
+    }
+    console.log("Don't know how to act on this message:");
+    console.log(message);
+}
+
+function sendMessage(message) {
+    if (message == undefined){
+        console.log('Unexpected: failed to send message from sidebar, connection not established!');
+        return;
+    }
+    bsConnection.postMessage(message);
+}
+
 // Update content when a new tab becomes active.
 browser.tabs.onActivated.addListener(updateContent);
 // Update content when a new page is loaded into a tab.

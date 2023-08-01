@@ -1,4 +1,6 @@
 let isActive = true;
+let sbConnection;
+let connectionAlive = false;
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({
@@ -13,47 +15,41 @@ function updateBrowserAction() {
 function toggleActive() {
     isActive = !isActive;
     updateBrowserAction();
-    broadcastState();
+    broadcastActiveState();
 }
 
-function handleRequest(request, sender, sendResponse) {
-    if (!request.hasOwnProperty("requestStr")) {
-        console.log('Missing message purpose');
-        sendResponse({response: 'Missing request'});
+function broadcastActiveState() {
+    sendMessage({setActiveState: isActive});
+}
+
+// Try a more static connection
+function contacted(port) {
+    if (port.name !== "port_from_sidebar")
+        return;
+    sbConnection = port;
+    connectionAlive = true;
+    sbConnection.onMessage.addListener(receiveMessage);
+    sbConnection.onDisconnect.addListener((m) => {
+        connectionAlive = false;
+        })
+    console.log(port);
+    sbConnection.postMessage("Test bs_to_cs");
+}
+function receiveMessage(message) {
+    if (message === "getActiveState") {
+        broadcastActiveState();
         return;
     }
-    if (request.requestStr === "getActive") {
-        sendResponse(buildActiveMessage());
-        return;
-    }
-    sendResponse({response: ""});
+    console.log("Don't know how to act on this message:");
+    console.log(message);
+}
+function sendMessage(message) {
+    if (connectionAlive)
+        sbConnection.postMessage(message);
 }
 
-function handleResponse(message) {
-    if (message === undefined) {
-        return;
-    }
-    if (!message.hasOwnProperty("response")) {
-        console.log("Response message does not contain a valid response");
-        return;
-    }
-    console.log(`Notification response received: ${message.response}`);
-}
-
-function handleError(error) {
-    console.log(`Error: ${error}`);
-}
-
-function buildActiveMessage() {
-    return {newState: isActive};
-}
-
-function broadcastState() {
-    const sending = browser.runtime.sendMessage(buildActiveMessage());
-    sending.then(handleResponse, handleError);
-}
-
-// Get state request from sidebar script
-browser.runtime.onMessage.addListener(handleRequest);
+// Allow connection to sidebar
+browser.runtime.onConnect.addListener(contacted);
+// React to toolbar click
 browser.browserAction.onClicked.addListener(toggleActive);
 updateBrowserAction();
