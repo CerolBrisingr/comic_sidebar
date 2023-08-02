@@ -28,14 +28,14 @@ class UrlListener {
     
     activate() {
         this.#isActive = true;
-        this.#pushLatestUrl();
+        this.retransmit();
     }
     
     deactivate() {
         this.#isActive = false;
     }
     
-    #pushLatestUrl() {
+    retransmit() {
         if (this.#latestUrl === undefined)
             return;
         this.#fktReactToUrl(this.#latestUrl);

@@ -1,6 +1,6 @@
 import {UrlListener} from "./url_listener.js"
 import {ListeningPort} from "./listening_port.js"
-import {ComicSidebar} from "../sidebar/scripts/comic_sidebar.js"
+import {ComicSidebar} from "../sidebar/comic_sidebar.js"
 
 let isActive = true;
 let urlListener = new UrlListener(updateSidebar);
@@ -28,13 +28,17 @@ function receiveMessage(message) {
         comicSidebar.registerPage(message.registerPage);
         return;
     }
+    if (message === "urlRetransmissionRequest") {
+        urlListener.retransmit();
+        return;
+    }
     console.log("Don't know how to act on this message:");
     console.log(message);
 }
 
 function updateSidebar(url) {
-    comicSidebar.updateBookmark(url);
     sbConnection.sendMessage({updateBookmark: url});
+    comicSidebar.updateBookmark(url);
 }
 
 function updateUrlListener() {

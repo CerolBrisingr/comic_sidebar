@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     setUpButtons();
     setUpSidebar();
+    setTimeout(() => {requestUrlRetransmission();}, 250);
     
     function setUpButtons() {
         const exportTrigger = document.getElementById('export_trigger');
@@ -67,6 +68,10 @@ function setUpSidebar() {
     let container = document.getElementById('container');
     comicSidebar.setComicEditor(comicEditor);
     comicSidebar.setContainer(container);
+}
+
+function requestUrlRetransmission() {
+    bsConnection.sendMessage("urlRetransmissionRequest");
 }
 
 // Add current page to list
