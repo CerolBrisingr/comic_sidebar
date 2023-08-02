@@ -1,11 +1,13 @@
 import {UrlListener} from "./url_listener.js"
 import {ListeningPort} from "./listening_port.js"
+import {ComicSidebar} from "../sidebar/scripts/comic_sidebar.js"
 
 let isActive = true;
 let sbConnection;
 let connectionAlive = false;
-let urlListener = new UrlListener(pasteUrl);
+let urlListener = new UrlListener(updateSidebar);
 let port = new ListeningPort(receiveMessage);
+let comicSidebar = new ComicSidebar();
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({
@@ -20,25 +22,24 @@ function updateBrowserAction() {
 function toggleActive() {
     isActive = !isActive;
     updateBrowserAction();
-    broadcastActiveState();
     updateUrlListener();
 }
 
-function broadcastActiveState() {
-    port.sendMessage({setActiveState: isActive});
+function transmitSidebarObject() {
+    port.sendMessage({setSidebar: comicSidebar});
 }
 
 function receiveMessage(message) {
-    if (message === "getActiveState") {
-        broadcastActiveState();
+    if (message === "requestingSidebar") {
+        transmitSidebarObject();
         return;
     }
     console.log("Don't know how to act on this message:");
     console.log(message);
 }
 
-function pasteUrl(url) {
-    console.log(url);
+function updateSidebar(url) {
+    comicSidebar.updateBookmark(url);
 }
 
 function updateUrlListener() {
