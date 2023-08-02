@@ -13,6 +13,10 @@ class ListeningPort {
         });
     }
     
+    isConnected() {
+        return connectionAlive();
+    }
+    
     sendMessage(message) {
         if (connectionAlive)
             this.#connection.postMessage(message);

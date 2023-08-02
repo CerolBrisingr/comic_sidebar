@@ -113,14 +113,15 @@ class ComicSidebar {
                 );
     }
     
-    tryRegisterPage(url) {
+    tryRegisterPage(url, fktUpdateBackground) {
         let triggerFkt = (comicEssentials) => {
-            this.#registerPage(comicEssentials);
+            this.registerPage(comicEssentials);
+            fktUpdateBackground(comicEssentials);
         }
         this.#comicEditor.importLink(url, triggerFkt);
     }
     
-    #registerPage(comicEssentials) {
+    registerPage(comicEssentials) {
         let comicManager 
             = this.#selectCorrespondingManager(comicEssentials.initialUrl);
         if (comicManager.valid) {

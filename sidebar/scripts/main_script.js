@@ -20,7 +20,7 @@ let bsConnection = new SubscriberPort(receiveMessage);
 document.addEventListener('DOMContentLoaded', function () {
     
     setUpButtons();
-    pollSidebar();
+    setUpSidebar();
     
     function setUpButtons() {
         const exportTrigger = document.getElementById('export_trigger');
@@ -47,12 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
 });
 
-function pollSidebar() {
-    if (bsConnection === undefined)
-        return;
-    bsConnection.sendMessage("requestingSidebar");
-}
-
 function setUpComicEditor() {
     let fullFrame = document.getElementById('new_comic_input_frame');
     let fullLink = document.getElementById('new_comic_full_link');
@@ -67,7 +61,8 @@ function setUpComicEditor() {
     return comicEditor;
 }
 
-function setUpSidebar(comicSidebar) {
+function setUpSidebar() {
+    comicSidebar = new ComicSidebar();
     let comicEditor = setUpComicEditor();
     let container = document.getElementById('container');
     comicSidebar.setComicEditor(comicEditor);
@@ -80,8 +75,13 @@ function addCurrentPage() {
         return;
     if (myWindowId === undefined)
         return;
+    let fktUpdateBackground = (comicEssentials) => {
+        bsConnection.sendMessage({registerPage: comicEssentials})
+    }
     browser.tabs.query({windowId: myWindowId, active: true})
-        .then((tabs) => {comicSidebar.tryRegisterPage(tabs[0].url);}
+        .then((tabs) => {
+            comicSidebar.tryRegisterPage(tabs[0].url, fktUpdateBackground);
+            }
             , onError);
 }
 
@@ -90,9 +90,15 @@ function onError(error) {
     console.log("Error: ${error}");
 }
 
+function updateBookmark(url) {
+    if (comicSidebar === undefined)
+        return;
+    comicSidebar.updateBookmark(url);
+}
+
 function receiveMessage(message) {
-    if (message.hasOwnProperty("setSidebar")) {
-        setUpSidebar(message.setSidebar);
+    if (message.hasOwnProperty("updateBookmark")) {
+        updateBookmark(message.updateBookmark);
         return;
     }
     console.log("Don't know how to act on this message:");
