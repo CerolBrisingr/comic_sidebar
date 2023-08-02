@@ -1,6 +1,11 @@
+import {UrlListener} from "./url_listener.js"
+import {ListeningPort} from "./listening_port.js"
+
 let isActive = true;
 let sbConnection;
 let connectionAlive = false;
+let urlListener = new UrlListener(pasteUrl);
+let port = new ListeningPort(receiveMessage);
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({
@@ -16,25 +21,13 @@ function toggleActive() {
     isActive = !isActive;
     updateBrowserAction();
     broadcastActiveState();
+    updateUrlListener();
 }
 
 function broadcastActiveState() {
-    sendMessage({setActiveState: isActive});
+    port.sendMessage({setActiveState: isActive});
 }
 
-// Try a more static connection
-function contacted(port) {
-    if (port.name !== "port_from_sidebar") {
-        console.log("Connection failed due to identification");
-        return;
-    }
-    sbConnection = port;
-    connectionAlive = true;
-    sbConnection.onMessage.addListener(receiveMessage);
-    sbConnection.onDisconnect.addListener((m) => {
-        connectionAlive = false;
-        })
-}
 function receiveMessage(message) {
     if (message === "getActiveState") {
         broadcastActiveState();
@@ -43,13 +36,19 @@ function receiveMessage(message) {
     console.log("Don't know how to act on this message:");
     console.log(message);
 }
-function sendMessage(message) {
-    if (connectionAlive)
-        sbConnection.postMessage(message);
+
+function pasteUrl(url) {
+    console.log(url);
 }
 
-// Allow connection to sidebar
-browser.runtime.onConnect.addListener(contacted);
+function updateUrlListener() {
+    if (isActive) {
+        urlListener.activate();
+    } else {
+        urlListener.deactivate();
+    }
+}
+
 // React to toolbar click
 browser.browserAction.onClicked.addListener(toggleActive);
 updateBrowserAction();

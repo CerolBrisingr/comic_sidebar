@@ -25,10 +25,11 @@
   },
   
   "background": {
-    "scripts": ["background/background.js"]
+    "scripts": ["background/background.js"],
+    "type": "module"
   },
 
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "webNavigation"],
 
   "commands": {
     "_execute_sidebar_action": {
