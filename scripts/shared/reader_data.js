@@ -27,8 +27,8 @@ class ReaderData {
         if (!Array.isArray(list))
             return
         for (let entry of list) {
-            if (entry.hasOwnProperty("url"))
-                this.addAutomatic(String(entry.url));
+            if (entry.hasOwnProperty("href"))
+                this.addAutomatic(String(entry.href));
         }
     }
     
@@ -36,9 +36,9 @@ class ReaderData {
         if (!Array.isArray(list))
             return
         for (let entry of list) {
-            if (!entry.hasOwnProperty("url"))
+            if (!entry.hasOwnProperty("href"))
                 continue;
-            let bookmark = this.addManual(String(entry.url));
+            let bookmark = this.addManual(String(entry.href));
             if ((bookmark !== undefined) && entry.hasOwnProperty("label"))
                 bookmark.setLabel(String(entry.label));
         }
@@ -157,6 +157,10 @@ class ReaderData {
             }
         return thisAsObject;
     }
+    
+    // Interface only
+    expand() {}
+    collapse() {}
 }
 
 class Bookmark {
