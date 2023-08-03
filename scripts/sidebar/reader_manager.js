@@ -1,15 +1,16 @@
-import {ComicVisuals} from "./comic_visuals.js"
+import {ReaderVisuals} from "./reader_visuals.js"
+import {ReaderData} from "../shared/reader_data.js"
 
 class ReaderManager {
     #readerData;
     #parentInterface;
     #container
     
-    constructor(data, parentInterface, container) {
-        this.#readerData = readerData;
+    constructor(readerObject, parentInterface, container) {
         this.#container = container;
-        this.#parentInterface = sidebarInterface;
-        this.#createComicVisuals();
+        this.#parentInterface = parentInterface;
+        this.#readerData = this.#createReaderData(readerObject);
+        this.#createReaderVisuals();
     }
     
     hasVisuals() {
@@ -24,33 +25,40 @@ class ReaderManager {
         return this.#readerData.getPrefixMask();
     }
     
-    #createComicVisuals() {
+    #createReaderData(readerObject) {
+        return new ReaderData(
+            readerObject,
+            new ReaderManagerInterface(this)
+        );
+    }
+    
+    #createReaderVisuals() {
         if (this.#readerData === undefined) {
-            this.comicVisuals = undefined;
+            this.readerVisuals = undefined;
             console.log("Encountered invalid readerData");
             return;
         }
         let readerManagerInterface = new ReaderManagerInterface(this);
-        this.comicVisuals = new ComicVisuals(this.#readerData, readerManagerInterface);
+        this.readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
     }
     
-    editComic() {
-        let comicEditor = this.sidebarInterface.getComicEditor();
-        if (comicEditor == undefined)
+    editReader() {
+        let readerEditor = this.#parentInterface.getReaderEditor();
+        if (readerEditor == undefined)
             return
         let triggerFkt = () => {
-            this.#readerData.update(comicEditor);
-            this.#updateComicVisuals();
+            this.#readerData.update(readerEditor);
+            this.#updateReaderVisuals();
             this.saveProgress();
             this.expand();
             }
-        comicEditor.updateLink(this.#readerData, triggerFkt);
-        comicEditor.setVisible();
+        readerEditor.updateLink(this.#readerData, triggerFkt);
+        readerEditor.setVisible();
         this.expand();
     }
     
-    #updateComicVisuals() {
-        this.comicVisuals.updateListing(this.#readerData);
+    #updateReaderVisuals() {
+        this.readerVisuals.updateListing(this.#readerData);
     }
     
     urlIsCompatible(url) {
@@ -64,7 +72,7 @@ class ReaderManager {
     addAutomatic(url) {
         let didUpdate = this.#readerData.addAutomatic(url);
         if (didUpdate)
-            this.comicVisuals.updateComicUrls(this.#readerData);
+            this.readerVisuals.updateReaderUrls(this.#readerData);
         return didUpdate;
     }
     
@@ -72,28 +80,28 @@ class ReaderManager {
         let bookmark = this.#readerData.addManual(url);
         if (bookmark === undefined)
             return false
-        this.comicVisuals.updateComicUrls(this.#readerData);
+        this.readerVisuals.updateReaderUrls(this.#readerData);
         return true;
     }
 
     removeManual(bookmark) {
         let didRemove = this.#readerData.removeManual(bookmark);
         if (didRemove)
-            this.comicVisuals.updateComicUrls(this.#readerData);
+            this.readerVisuals.updateReaderUrls(this.#readerData);
         return didRemove;
     }
     
-    get visuals() {
-        return this.comicVisuals.listing;
+    getVisuals() {
+        return this.readerVisuals.listing;
     }
     
     isValid() {
-        if (this.#readerData === undefined || this.comicVisuals === undefined)
+        if (this.#readerData === undefined || this.readerVisuals === undefined)
             return false;
         return this.#readerData.isValid();
     }
     
-    getComicData() {
+    getReaderData() {
         return this.#readerData;
     }
     
@@ -102,11 +110,11 @@ class ReaderManager {
     }
     
     expand() {
-        this.comicVisuals.expand();
+        this.readerVisuals.expand();
     }
     
     collapse() {
-        this.comicVisuals.collapse();
+        this.readerVisuals.collapse();
     }
     
     saveProgress() {
@@ -126,7 +134,7 @@ class ReaderManagerDummy {
         return false;
     }
     
-    editComic() {}
+    editReader() {}
     
     pinBookmark(bookmark) {
         return false;

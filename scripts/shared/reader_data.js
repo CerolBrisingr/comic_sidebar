@@ -56,6 +56,14 @@ class ReaderData {
         return this.#prefixMask;
     }
     
+    getPinnedBookmarks() {
+        return this.#manual;
+    }
+    
+    getAutomaticBookmarks() {
+        return this.#automatic;
+    }
+    
     isValid() {
         return ((this.#prefixMask !== undefined) && (this.#label !== undefined));
     }

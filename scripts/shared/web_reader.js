@@ -5,7 +5,7 @@ import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 
 class WebReader {
-    #comicEditor;
+    #readerEditor;
     #container;
     #readerClass;
     #myInterface;
@@ -41,16 +41,16 @@ class WebReader {
         saveBackup(this.#readerStorage.getList());
     }
     
-    setComicEditor(comicEditor) {
-        this.#comicEditor = comicEditor;
+    setComicEditor(readerEditor) {
+        this.#readerEditor = readerEditor;
     }
     
-    getComicEditor() {
-        return this.#comicEditor;
+    getReaderEditor() {
+        return this.#readerEditor;
     }
     
     removeComicEditor() {
-        this.#comicEditor = undefined;
+        this.#readerEditor = undefined;
     }
     
     #selectCorrespondingStorage(url) {
@@ -129,12 +129,12 @@ class WebReader {
         if (this.#container == undefined)
             return;
         let visualsList = [];
-        for (let manager of this.comicManagerList) {
+        for (let manager of this.#readerStorage.getList()) {
             if (!manager.hasVisuals())
-                continue;
+                continue; // not a manager then
             if (!manager.isValid())
                 continue;
-            visualsList.push(manager.visuals);
+            visualsList.push(manager.getVisuals());
         }
         this.#container.replaceChildren(...visualsList);
     }
@@ -146,18 +146,14 @@ class WebReader {
             return;
         if (!manager.isValid())
             return;
-        this.#container.appendChild(manager.visuals);
+        this.#container.appendChild(manager.getVisuals());
     }
     
     // Add new page
-    tryRegisterPage(url, fktUpdateBackground) {
-        if (this.#comicEditor === undefined)
+    configureNewPage(url, fktReceiveEssentials) {
+        if (this.#readerEditor === undefined)
             return;
-        let triggerFkt = (pageEssentials) => {
-            this.registerPage(pageEssentials);
-            fktUpdateBackground(pageEssentials);
-        }
-        this.#comicEditor.importLink(url, triggerFkt);
+        this.#readerEditor.importLink(url, fktReceiveEssentials);
     }
     
     registerPage(pageEssentials) {
@@ -173,7 +169,7 @@ class WebReader {
             console.log("Failed to build comic entry");
             return;
         }
-        this.comicManagerList.push(newManager);
+        this.#readerStorage.saveObject(newManager);
         this.#addToContainer(newManager);
         this.updateBookmark(pageEssentials.initialUrl); // This also updates storage
     }
@@ -257,8 +253,8 @@ class WebReaderInterface {
         this.#webReader = webReader;
     }
     
-    getComicEditor() {
-        return this.#webReader.getComicEditor();
+    getReaderEditor() {
+        return this.#webReader.getReaderEditor();
     }
     
     saveProgress() {

@@ -17,10 +17,10 @@ class ReaderVisuals {
     
     updateListing(readerData) {
         this.listing.replaceChildren();
-        this.#createBaseLink(readerData.label);
+        this.#createBaseLink(readerData.getLabel());
         this.#addEditReaderButton();
         this.#addExpandReaderButton();
-        this.#createBookmarkList(readerData.base_url);
+        this.#createBookmarkList(readerData.getPrefixMask());
         this.updateReaderUrls(readerData);
         
         this.#enableBookmarkExpansion();
@@ -57,17 +57,18 @@ class ReaderVisuals {
     
     updateReaderUrls(readerData) {
         this.bookmarkList.replaceChildren();
-        this.#addBookmarks(readerData, readerData.automatic, "auto");
-        this.#addBookmarks(readerData, readerData.manual, "manual");
+        this.#addBookmarks(readerData, readerData.getAutomaticBookmarks(), "auto");
+        this.#addBookmarks(readerData, readerData.getPinnedBookmarks(), "manual");
         this.#updateBaseLink(readerData);
     }
     
     #updateBaseLink(readerData) {
-        if (readerData.automatic.length == 0) {
+        let automaticBookmarks = readerData.getAutomaticBookmarks();
+        if (automaticBookmarks.length == 0) {
             this.baseLink.href = "#";
             return;
         }
-        let lastAutomatic = readerData.automatic.slice(-1);
+        let lastAutomatic = automaticBookmarks.slice(-1);
         this.baseLink.href = lastAutomatic[0].href;
     }
     

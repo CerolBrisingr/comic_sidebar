@@ -24,12 +24,14 @@ function toggleActive() {
 }
 
 function receiveMessage(message) {
-    if (message.hasOwnProperty("registerPage")) {
-        webReader.registerPage(message.registerPage);
-        return;
-    }
     if (message === "urlRetransmissionRequest") {
         urlListener.retransmit();
+        return;
+    }
+    if (message.hasOwnProperty("requestPageAddition")) {
+        let pageEssentials = message.requestPageAddition;
+        webReader.registerPage(pageEssentials);
+        sbConnection.sendMessage({addPage: pageEssentials});
         return;
     }
     console.log("Don't know how to act on this message:");

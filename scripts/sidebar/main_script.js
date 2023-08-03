@@ -1,5 +1,5 @@
 import {ComicEditor} from "./comic_editor.js"
-//import {ComicSidebar} from "./comic_sidebar.js"
+import {WebReader} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 
 /* 
@@ -13,30 +13,30 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 
 // Tab management
 let myWindowId;
-let comicSidebar;
+let webReader;
 // Connection to background script
-let bsConnection; // = new SubscriberPort(receiveMessage);
+let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    //setUpButtons();
-    //setUpSidebar();
-    //setTimeout(() => {requestUrlRetransmission();}, 250);
+    setUpButtons();
+    setUpWebReader();
+    setTimeout(() => {requestUrlRetransmission();}, 250);
     
     function setUpButtons() {
         const exportTrigger = document.getElementById('export_trigger');
         exportTrigger.onclick = function() {
-            if (comicSidebar === undefined)
+            if (webReader === undefined)
                 return;
-            comicSidebar.saveBackup();
+            webReader.saveBackup();
             };
         
         const inputElement = document.getElementById('file-selector');
         inputElement.style.display = 'none';
         inputElement.addEventListener('change', (event) => {
-            if (comicSidebar === undefined)
+            if (webReader === undefined)
                 return;
-            comicSidebar.importBackup(event.target.files[0]);
+            webReader.importBackup(event.target.files[0]);
         });
         
         const inputTrigger = document.getElementById('import_trigger');
@@ -62,32 +62,31 @@ function setUpComicEditor() {
     return comicEditor;
 }
 
-/*
-function setUpSidebar() {
-    comicSidebar = new ComicSidebar();
+function setUpWebReader() {
     let comicEditor = setUpComicEditor();
     let container = document.getElementById('container');
-    comicSidebar.setComicEditor(comicEditor);
-    comicSidebar.setContainer(container);
+    webReader = new WebReader(container);
+    webReader.setComicEditor(comicEditor);
 }
-*/
 
 function requestUrlRetransmission() {
     bsConnection.sendMessage("urlRetransmissionRequest");
 }
 
+function requestPageAddition(pageEssentials) {
+    bsConnection.sendMessage({requestPageAddition: pageEssentials});
+}
+
 // Add current page to list
 function addCurrentPage() {
-    if (comicSidebar === undefined)
+    // Will start configuration dialog and then hand result over to background script
+    if (webReader === undefined)
         return;
     if (myWindowId === undefined)
         return;
-    let fktUpdateBackground = (comicEssentials) => {
-        bsConnection.sendMessage({registerPage: comicEssentials})
-    }
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            comicSidebar.tryRegisterPage(tabs[0].url, fktUpdateBackground);
+            webReader.configureNewPage(tabs[0].url, requestPageAddition);
             }
             , onError);
 }
@@ -98,14 +97,18 @@ function onError(error) {
 }
 
 function updateBookmark(url) {
-    if (comicSidebar === undefined)
+    if (webReader === undefined)
         return;
-    comicSidebar.updateBookmark(url);
+    webReader.updateBookmark(url);
 }
 
 function receiveMessage(message) {
     if (message.hasOwnProperty("updateBookmark")) {
         updateBookmark(message.updateBookmark);
+        return;
+    }
+    if (message.hasOwnProperty("addPage")) {
+        webReader.registerPage(message.addPage);
         return;
     }
     console.log("Don't know how to act on this message:");
@@ -114,10 +117,9 @@ function receiveMessage(message) {
 
 // Clean up on close
 window.addEventListener('unload', (event) => {
-    if (comicSidebar === undefined)
+    if (webReader === undefined)
         return;
-    comicSidebar.removeComicEditor();
-    comicSidebar.removeContainer();
+    webReader.removeComicEditor();
 });
 
 // When the sidebar loads, get the ID of its window,
