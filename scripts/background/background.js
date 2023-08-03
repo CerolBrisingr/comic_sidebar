@@ -1,11 +1,11 @@
 import {UrlListener} from "./url_listener.js"
 import {ListeningPort} from "./listening_port.js"
-import {ComicSidebar} from "../sidebar/comic_sidebar.js"
+import {WebReader} from "../shared/web_reader.js"
 
 let isActive = true;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
-let comicSidebar = new ComicSidebar();
+let webReader = new WebReader();
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({
@@ -25,7 +25,7 @@ function toggleActive() {
 
 function receiveMessage(message) {
     if (message.hasOwnProperty("registerPage")) {
-        comicSidebar.registerPage(message.registerPage);
+        webReader.registerPage(message.registerPage);
         return;
     }
     if (message === "urlRetransmissionRequest") {
@@ -38,7 +38,7 @@ function receiveMessage(message) {
 
 function updateSidebar(url) {
     sbConnection.sendMessage({updateBookmark: url});
-    comicSidebar.updateBookmark(url);
+    webReader.updateBookmark(url);
 }
 
 function updateUrlListener() {

@@ -15,13 +15,13 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 let myWindowId;
 let comicSidebar;
 // Connection to background script
-let bsConnection = new SubscriberPort(receiveMessage);
+let bsConnection; // = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    setUpButtons();
-    setUpSidebar();
-    setTimeout(() => {requestUrlRetransmission();}, 250);
+    //setUpButtons();
+    //setUpSidebar();
+    //setTimeout(() => {requestUrlRetransmission();}, 250);
     
     function setUpButtons() {
         const exportTrigger = document.getElementById('export_trigger');

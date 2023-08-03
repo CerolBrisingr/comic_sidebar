@@ -10,6 +10,10 @@ class ComicManager {
         this.#createComicVisuals();
     }
     
+    hasVisuals() {
+        return true;
+    }
+    
     #createComicVisuals() {
         if (this.#comicData === undefined) {
             this.comicVisuals = undefined;
@@ -41,6 +45,10 @@ class ComicManager {
     
     urlIsCompatible(url) {
         return this.#comicData.urlIsCompatible(url);
+    }
+    
+    getMostRecentAutomaticUrl() {
+        return this.#comicData.getMostRecentAutomaticUrl();
     }
     
     addAutomatic(url) {
@@ -77,6 +85,10 @@ class ComicManager {
     
     getComicData() {
         return this.#comicData;
+    }
+    
+    returnAsObject() {
+        return this.#comicData.returnAsObject();
     }
     
     expand() {

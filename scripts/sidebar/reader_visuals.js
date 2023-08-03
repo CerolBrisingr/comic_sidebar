@@ -1,13 +1,13 @@
 import {dissectUrl, openUrlInMyTab} from "../shared/url.js"
 import {BookmarkButton} from "./bookmark_button.js"
 
-class ComicVisuals {
-    #managerInterface;
+class ReaderVisuals {
+    #parentInterface;
     
-    constructor(comicData, managerInterface) {
-        this.#managerInterface = managerInterface;
+    constructor(readerData, parentInterface) {
+        this.#parentInterface = parentInterface;
         this.#createListing();
-        this.updateListing(comicData);
+        this.updateListing(readerData);
     }
     
     #createListing() {
@@ -15,19 +15,19 @@ class ComicVisuals {
         this.listing.classList.add('comic_listing');
     }
     
-    updateListing(comicData) {
+    updateListing(readerData) {
         this.listing.replaceChildren();
-        this.#createBaseLink(comicData.label);
-        this.#addEditComicButton();
-        this.#addExpandComicButton();
-        this.#createBookmarkList(comicData.base_url);
-        this.updateComicUrls(comicData);
+        this.#createBaseLink(readerData.label);
+        this.#addEditReaderButton();
+        this.#addExpandReaderButton();
+        this.#createBookmarkList(readerData.base_url);
+        this.updateReaderUrls(readerData);
         
         this.#enableBookmarkExpansion();
     }
     
-    #createBaseLink(comicLabel) {
-        this.baseLink = Object.assign(document.createElement("a"), {href:"#", innerText:comicLabel});
+    #createBaseLink(readerLabel) {
+        this.baseLink = Object.assign(document.createElement("a"), {href:"#", innerText:readerLabel});
         this.baseLink.onclick = () => {
             openUrlInMyTab(this.baseLink.href);
             return false;
@@ -35,15 +35,15 @@ class ComicVisuals {
         this.listing.appendChild(this.baseLink);
     }
     
-    #addEditComicButton() {
+    #addEditReaderButton() {
         let editButton = createEditButton();
         this.listing.appendChild(editButton);
         editButton.onclick = () => {
-            this.#managerInterface.editComic();
+            this.#parentInterface.editReader();
         }
     }
     
-    #addExpandComicButton() {
+    #addExpandReaderButton() {
         this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
         this.expandButton.setAttribute("aria-expanded",false);
         this.expandButton.classList.add('first_button');
@@ -55,27 +55,27 @@ class ComicVisuals {
         this.listing.appendChild(this.bookmarkList);
     }
     
-    updateComicUrls(comicData) {
+    updateReaderUrls(readerData) {
         this.bookmarkList.replaceChildren();
-        this.#addBookmarks(comicData, comicData.automatic, "auto");
-        this.#addBookmarks(comicData, comicData.manual, "manual");
-        this.#updateBaseLink(comicData);
+        this.#addBookmarks(readerData, readerData.automatic, "auto");
+        this.#addBookmarks(readerData, readerData.manual, "manual");
+        this.#updateBaseLink(readerData);
     }
     
-    #updateBaseLink(comicData) {
-        if (comicData.automatic.length == 0) {
+    #updateBaseLink(readerData) {
+        if (readerData.automatic.length == 0) {
             this.baseLink.href = "#";
             return;
         }
-        let lastAutomatic = comicData.automatic.slice(-1);
+        let lastAutomatic = readerData.automatic.slice(-1);
         this.baseLink.href = lastAutomatic[0].href;
     }
     
-    #addBookmarks(comicData, bookmarkList, strMeta) {
+    #addBookmarks(readerData, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
-            let prefix = comicData.base_url; 
+            let prefix = readerData.base_url; 
             let bookmarkButton = new BookmarkButton(
-                bookmark, prefix, strMeta, this.#managerInterface);
+                bookmark, prefix, strMeta, this.#parentInterface);
             if (!bookmarkButton.isValid())
                 return;
             let bookmarkObject = buildBookmarkObject(bookmarkButton);
@@ -101,7 +101,7 @@ class ComicVisuals {
     #createPinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
-            this.#managerInterface.pinBookmark(bookmark);
+            this.#parentInterface.pinBookmark(bookmark);
         }
         return pinButton;
     }
@@ -109,7 +109,7 @@ class ComicVisuals {
     #createUnpinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
-            this.#managerInterface.unpinBookmark(bookmark);
+            this.#parentInterface.unpinBookmark(bookmark);
         }
         return pinButton;
     }
@@ -169,4 +169,4 @@ function buildBookmarkObject(bookmarkButton) {
     return listEntry;
 }
 
-export {ComicVisuals}
+export {ReaderVisuals}

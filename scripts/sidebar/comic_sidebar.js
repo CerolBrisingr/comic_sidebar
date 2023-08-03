@@ -1,7 +1,7 @@
 import {ComicManager, ComicManagerDummy} from "./comic_manager.js"
 import {ComicData} from "./comic_data.js"
-import {importBackup, readComicObject} from "./backup_import.js"
-import {saveBackup, buildComicObject} from "./backup_export.js"
+import {importBackup, readComicObject} from "../shared/backup_import.js"
+import {saveBackup, buildComicObject} from "../shared/backup_export.js"
 
 class ComicSidebar {
     #sidebarInterface;
@@ -82,6 +82,9 @@ class ComicSidebar {
     }
     
     saveToStorage() {
+        console.log("Does work but avoiding this for now");
+        return;
+        
         let comicDataObject = buildComicObject(this.#compileComicDataList());
         browser.storage.local.set({comicData: comicDataObject});
     }
@@ -175,7 +178,7 @@ class ComicSidebarInterface {
     }
     
     getComicEditor() {
-        return this.#comicSidebar.getComicEditor;
+        return this.#comicSidebar.getComicEditor();
     }
     
     saveProgress() {
