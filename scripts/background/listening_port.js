@@ -2,7 +2,7 @@ let connectionAlive = false;
 
 class ListeningPort {
     #connectionName;
-    #connection;
+    #connections = new Map();
     #fktReceive;
     
     constructor(fktReceive, connectionName = "port_from_sidebar") {
@@ -18,8 +18,10 @@ class ListeningPort {
     }
     
     sendMessage(message) {
-        if (connectionAlive)
-            this.#connection.postMessage(message);
+        if (!connectionAlive)
+            return;
+        for (let connection of this.#connections.values())
+            connection.postMessage(message);
     }
     
     #contacted(port) {
@@ -27,13 +29,15 @@ class ListeningPort {
             console.log("Connection failed due to identification");
             return;
         }
-        this.#connection = port;
+        let contextId = port.sender.contextId;
+        this.#connections.set(contextId, port);
         connectionAlive = true;
-        this.#connection.onMessage.addListener((message) => {
+        port.onMessage.addListener((message) => {
             this.#fktReceive(message);
         });
-        this.#connection.onDisconnect.addListener((event) => {
-            connectionAlive = false;
+        port.onDisconnect.addListener((event) => {
+            this.#connections.delete(contextId);
+            connectionAlive = this.#connections.size === 0;
         });
     }
 }
