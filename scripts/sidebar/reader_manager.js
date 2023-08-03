@@ -53,7 +53,6 @@ class ReaderManager {
             this.expand();
             }
         readerEditor.updateLink(this.#readerData, triggerFkt);
-        readerEditor.setVisible();
         this.expand();
     }
     

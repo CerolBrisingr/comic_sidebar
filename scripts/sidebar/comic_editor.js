@@ -21,7 +21,6 @@ class ComicEditor {
         this.cancelBtn = cancelBtn;
         this.cancelBtn.onclick = () => {
             this.okBtn.disabled = true;
-            this.setInvisible();
             this.openEditor();
         }
         this.okBtn = okBtn;
@@ -30,7 +29,6 @@ class ComicEditor {
         }
         
         this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
-        this.setInvisible();
         this.openEditor();
     }
     
@@ -65,11 +63,11 @@ class ComicEditor {
         this.errorMsgObject.innerText = errorMsg;
     }
     
-    setInvisible() {
+    #setInvisible() {
         this.fullFrame.style.display = "none";
     }
     
-    setVisible() {
+    #setVisible() {
         this.fullFrame.style.removeProperty("display");
     }
     
@@ -121,7 +119,6 @@ class ComicEditor {
         let url = Comic.getMostRecentAutomaticUrl();
         if (url === undefined) {
             this.openEditor();
-            this.setInvisible();
             return;
         }
         
@@ -136,7 +133,6 @@ class ComicEditor {
         let data = this.gatherData();
         this.fktFinalize(data);
         this.openEditor();
-        this.setInvisible();
     }
     
     gatherData() {
@@ -148,12 +144,13 @@ class ComicEditor {
     }
     
     occupyEditor(fktFinalize) {
-        this.setVisible();
+        this.#setVisible();
         this.fktFinalize = fktFinalize;
         this.isOpen = false;
     }
     
     openEditor() {
+        this.#setInvisible();
         this.fktFinalize = () => {};
         this.isOpen = true;
     }
