@@ -14,11 +14,13 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // Tab management
 let myWindowId;
 let webReader;
+let comicEditor;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
+    comicEditor = setUpComicEditor();
     setUpButtons();
     setUpWebReader();
     setTimeout(() => {requestUrlRetransmission();}, 250);
@@ -63,7 +65,6 @@ function setUpComicEditor() {
 }
 
 function setUpWebReader() {
-    let comicEditor = setUpComicEditor();
     let container = document.getElementById('container');
     webReader = new WebReader(container);
     webReader.setComicEditor(comicEditor);
@@ -86,7 +87,7 @@ function addCurrentPage() {
         return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            webReader.configureNewPage(tabs[0].url, requestPageAddition);
+            comicEditor.importLink(tabs[0].url, requestPageAddition);
             }
             , onError);
 }

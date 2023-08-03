@@ -149,13 +149,6 @@ class WebReader {
         this.#container.appendChild(manager.getVisuals());
     }
     
-    // Add new page
-    configureNewPage(url, fktReceiveEssentials) {
-        if (this.#readerEditor === undefined)
-            return;
-        this.#readerEditor.importLink(url, fktReceiveEssentials);
-    }
-    
     registerPage(pageEssentials) {
         let storageObject 
             = this.#selectCorrespondingStorage(pageEssentials.initialUrl);
