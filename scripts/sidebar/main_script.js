@@ -1,5 +1,5 @@
 import {ComicEditor} from "./comic_editor.js"
-import {ComicSidebar} from "./comic_sidebar.js"
+//import {ComicSidebar} from "./comic_sidebar.js"
 import {SubscriberPort} from "./subscriber_port.js"
 
 /* 
@@ -62,6 +62,7 @@ function setUpComicEditor() {
     return comicEditor;
 }
 
+/*
 function setUpSidebar() {
     comicSidebar = new ComicSidebar();
     let comicEditor = setUpComicEditor();
@@ -69,6 +70,7 @@ function setUpSidebar() {
     comicSidebar.setComicEditor(comicEditor);
     comicSidebar.setContainer(container);
 }
+*/
 
 function requestUrlRetransmission() {
     bsConnection.sendMessage("urlRetransmissionRequest");

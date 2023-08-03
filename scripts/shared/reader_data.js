@@ -2,19 +2,46 @@ import {dissectUrl} from "./url.js"
 
 class ReaderData {
     #label;
-    #prefix_mask;
+    #prefixMask;
     #automatic;
     #manual;
     #parentInterface;
     
     constructor(data, parentInterface) {
         this.#parentInterface = parentInterface;
-        if (data.hasOwnProperty(prefix_mask))
-            this.#prefix_mask = String(data.prefix_mask);
-        if (data.hasOwnProperty(label))
+        if (data.hasOwnProperty("base_url"))
+            data.prefix_mask = String(data.base_url);
+        if (data.hasOwnProperty("prefix_mask"))
+            this.#prefixMask = String(data.prefix_mask);
+        if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
         this.#automatic = [];
         this.#manual = [];
+        if (data.hasOwnProperty("automatic"))
+            this.#importAutomaticList(data.automatic);
+        if (data.hasOwnProperty("manual"))
+            this.#importManualList(data.manual);
+    }
+    
+    #importAutomaticList(list) {
+        if (!Array.isArray(list))
+            return
+        for (let entry of list) {
+            if (entry.hasOwnProperty("url"))
+                this.addAutomatic(String(entry.url));
+        }
+    }
+    
+    #importManualList(list) {
+        if (!Array.isArray(list))
+            return
+        for (let entry of list) {
+            if (!entry.hasOwnProperty("url"))
+                continue;
+            let bookmark = this.addManual(String(entry.url));
+            if ((bookmark !== undefined) && entry.hasOwnProperty("label"))
+                bookmark.setLabel(String(entry.label));
+        }
     }
     
     hasVisuals() {
@@ -25,14 +52,18 @@ class ReaderData {
         return this.#label;
     }
     
+    getPrefixMask() {
+        return this.#prefixMask;
+    }
+    
     isValid() {
-        return ((this.#prefix_mask !== undefined) && (this.#label !== undefined));
+        return ((this.#prefixMask !== undefined) && (this.#label !== undefined));
     }
     
     urlIsCompatible(url_string) {
         if (!(typeof url_string === "string"))
             return false;
-        return url_string.startsWith(this.#prefix_mask);
+        return url_string.startsWith(this.#prefixMask);
     }
     
     addAutomatic(url) {
@@ -60,7 +91,7 @@ class ReaderData {
     }
     
     #isValidNewUrl(url) {
-        let urlPieces = dissectUrl(url, this.#prefix_mask);
+        let urlPieces = dissectUrl(url, this.#prefixMask);
         if (urlPieces === undefined)
             return false;
         if (urlPieces.tail === "") {
@@ -72,7 +103,7 @@ class ReaderData {
     
     update(pageEssentials) {
         this.#label = pageEssentials.label;
-        this.#prefix_mask = pageEssentials.prefix;
+        this.#prefixMask = pageEssentials.prefix;
         this.#parentInterface.saveProgress();
     }
     
@@ -114,7 +145,7 @@ class ReaderData {
     returnAsObject() {
         let thisAsObject = {
             label:this.#label,
-            prefix_mask:this.#prefix_mask,
+            prefix_mask:this.#prefixMask,
             automatic: [],
             manual: []
         }

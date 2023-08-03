@@ -20,6 +20,10 @@ class ReaderManager {
         return this.#readerData.getLabel();
     }
     
+    getPrefixMask() {
+        return this.#readerData.getPrefixMask();
+    }
+    
     #createComicVisuals() {
         if (this.#readerData === undefined) {
             this.comicVisuals = undefined;
@@ -83,10 +87,10 @@ class ReaderManager {
         return this.comicVisuals.listing;
     }
     
-    get valid() {
+    isValid() {
         if (this.#readerData === undefined || this.comicVisuals === undefined)
             return false;
-        return this.#readerData.valid;
+        return this.#readerData.isValid();
     }
     
     getComicData() {
@@ -114,7 +118,7 @@ class ReaderManagerDummy {
     constructor() {
     }
     
-    get valid() {
+    isValid() {
         return false;
     }
     

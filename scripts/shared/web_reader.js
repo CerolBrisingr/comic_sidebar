@@ -1,8 +1,8 @@
 import {dissectUrl} from "./url.js"
 import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
-import {importBackup, readReaderObjectList} from "./backup_import.js"
-import {saveBackup, buildComicObject} from "./backup_export.js"
+import {importBackup, unpackReaderObjectList} from "./backup_import.js"
+import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 
 class WebReader {
     #comicEditor;
@@ -10,7 +10,7 @@ class WebReader {
     #readerClass;
     #myInterface;
     #savingSuspended = false;
-    #readerStorage = htmlContainer();
+    #readerStorage = new HtmlContainer();
     #currentReader;
     
     constructor(container = undefined) {
@@ -23,15 +23,15 @@ class WebReader {
     }
     
     importBackup(file) {
-        let uiUpdateFkt = (readerObjectList) => {
+        let fktImportBackup = (readerObjectList) => {
             this.#importReaderObjectList(readerObjectList);
         }
-        importBackup(file, uiUpdateFkt);
+        importBackup(file, fktImportBackup);
     }
     
     updateBookmark(url) {
         let object = this.#selectCorrespondingStorage(url);
-        if (!object.valid)
+        if (!object.isValid())
             return;
         if (object.addAutomatic(url))
             this.saveToStorage();
@@ -74,7 +74,7 @@ class WebReader {
     saveProgress() {
         if (this.#savingSuspended)
             return;
-        let comicDataObject = buildComicObject(this.#readerStorage.getList());
+        let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
         
         console.log(comicDataObject);
         return;
@@ -89,7 +89,7 @@ class WebReader {
                 console.log("No data stored locally, aborting loading sequence! (2)");
                 return;
             }
-            let readerObjectList = readReaderObjectList(storageResult.comicData);
+            let readerObjectList = unpackReaderObjectList(storageResult.comicData);
             this.#importReaderObjectList(readerObjectList);
             }, 
             () => {console.log("No data stored locally, aborting loading sequence! (1)")});
@@ -100,13 +100,13 @@ class WebReader {
         this.#savingSuspended = true;
         for (let readerObject of readerObjectList) {
             let newObject = this.#createReaderClass(readerObject);
-            if (!newObject.valid)
+            if (!newObject.isValid())
                 continue;
             this.#readerStorage.saveObject(newObject);
         }
         this.#setContainerContent();
         this.#savingSuspended = false;
-        this.saveToStorage();
+        this.saveProgress();
     }
     
     #createReaderClass(readerObject) {
@@ -132,7 +132,7 @@ class WebReader {
         for (let manager of this.comicManagerList) {
             if (!manager.hasVisuals())
                 continue;
-            if (!manager.valid)
+            if (!manager.isValid())
                 continue;
             visualsList.push(manager.visuals);
         }
@@ -144,7 +144,7 @@ class WebReader {
             return;
         if (!manager.hasVisuals())
             return;
-        if (!manager.valid)
+        if (!manager.isValid())
             return;
         this.#container.appendChild(manager.visuals);
     }
@@ -163,13 +163,13 @@ class WebReader {
     registerPage(pageEssentials) {
         let storageObject 
             = this.#selectCorrespondingStorage(pageEssentials.initialUrl);
-        if (storageObject.valid) {
+        if (storageObject.isValid()) {
             console.log("Page already registered as " + storageObject.getLabel());
             return;
         }
         let readerObject = {prefix_mask: pageEssentials.prefix, label: pageEssentials.label};
         let newManager = this.#createReaderClass(readerObject);
-        if (!newManager.valid) {
+        if (!newManager.isValid()) {
             console.log("Failed to build comic entry");
             return;
         }
@@ -179,14 +179,14 @@ class WebReader {
     }
 }
 
-class htmlContainer {
+class HtmlContainer {
     #data = new Map();
     
     constructor() {}
     
     saveObject(object, url = undefined) {
         if (url === undefined)
-            url = object.getMostRecentAutomaticUrl();
+            url = object.getPrefixMask();
         
         let host = this.#getHost(url);
         if (host === undefined) {

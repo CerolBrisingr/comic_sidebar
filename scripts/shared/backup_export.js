@@ -1,6 +1,6 @@
-function saveBackup(comicDataList) {
+function saveBackup(readerClassList) {
     const link = document.createElement("a");
-    const content = exportJSON(comicDataList);
+    const content = exportJSON(readerClassList);
     const file = new Blob([content], { type: 'text/plain' });
     link.href = URL.createObjectURL(file);
     link.download = "backup.json";
@@ -8,17 +8,17 @@ function saveBackup(comicDataList) {
     URL.revokeObjectURL(link.href);
 }
 
-function buildComicObject(comicDataList) {
-    let comicObject = {data: [], type: "sb_webcomic_sidebar_backup"};
-    for (let comicData of comicDataList) {
-        comicObject.data.push(comicData.returnAsObject());
+function buildWebReaderObject(readerClassList) {
+    let webReaderObject = {data: [], type: "sb_webcomic_sidebar_backup"};
+    for (let readerClass of readerClassList) {
+        webReaderObject.data.push(readerClass.returnAsObject());
     }
-    return comicObject;
+    return webReaderObject;
 }
 
-function exportJSON(comicDataList) {
-    let comicObject = buildComicObject(comicDataList);
-    return JSON.stringify(comicObject);
+function exportJSON(readerClassList) {
+    let webReaderObject = buildWebReaderObject(readerClassList);
+    return JSON.stringify(webReaderObject);
 }
 
-export {saveBackup, buildComicObject}
+export {saveBackup, buildWebReaderObject}
