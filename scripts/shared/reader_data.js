@@ -110,9 +110,9 @@ class ReaderData {
         return true;
     }
     
-    update(pageEssentials) {
-        this.#label = pageEssentials.label;
-        this.#prefixMask = pageEssentials.prefix;
+    updateReaderConfig(readerEssentials) {
+        this.#label = readerEssentials.label;
+        this.#prefixMask = readerEssentials.prefix;
         this.#parentInterface.saveProgress();
     }
     

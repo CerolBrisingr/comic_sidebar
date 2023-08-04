@@ -30,9 +30,15 @@ function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("requestPageAddition")) {
-        let pageEssentials = message.requestPageAddition;
-        webReader.registerPage(pageEssentials);
-        sbConnection.sendMessage({addPage: pageEssentials});
+        let readerEssentials = message.requestPageAddition;
+        webReader.registerPage(readerEssentials);
+        sbConnection.sendMessage({addPage: readerEssentials});
+        return;
+    }
+    if (message.hasOwnProperty("requestPageEdit")) {
+        let readerEssentials = message.requestPageEdit;
+        webReader.modifyPage(readerEssentials);
+        sbConnection.sendMessage({editPage: readerEssentials});
         return;
     }
     console.log("Don't know how to act on this message:");

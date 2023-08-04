@@ -93,7 +93,7 @@ class ComicEditor {
             return;
         }
         this.occupyEditor(fktFinalize);
-        this.okBtn.innerText = "Add Comic";
+        this.okBtn.innerText = "Add Reader";
         
         let urlPieces = dissectUrl(url);
         if (urlPieces === undefined) {
@@ -108,30 +108,30 @@ class ComicEditor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(Comic, fktFinalize) {
+    updateLink(comic, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
         }
         this.occupyEditor(fktFinalize);
-        this.okBtn.innerText = "Update Comic";
+        this.okBtn.innerText = "Update Reader";
         
-        let url = Comic.getMostRecentAutomaticUrl();
+        let url = comic.getMostRecentAutomaticUrl();
         if (url === undefined) {
             this.openEditor();
             return;
         }
         
         this.fullLink = url;
-        this.label = Comic.label;
+        this.label = comic.getLabel();
         this.setUserMessage("", "");
         this.enableInterface();
-        this.prefix = Comic.base_url;
+        this.prefix = comic.getPrefixMask();
     }
     
     finalize() {
-        let data = this.gatherData();
-        this.fktFinalize(data);
+        let readerEssentials = this.gatherData();
+        this.fktFinalize(readerEssentials);
         this.openEditor();
     }
     

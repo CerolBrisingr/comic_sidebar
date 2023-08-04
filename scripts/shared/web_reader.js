@@ -42,16 +42,8 @@ class WebReader {
         saveBackup(this.#readerStorage.getList());
     }
     
-    setComicEditor(readerEditor) {
-        this.#readerEditor = readerEditor;
-    }
-    
-    getReaderEditor() {
-        return this.#readerEditor;
-    }
-    
-    removeComicEditor() {
-        this.#readerEditor = undefined;
+    prepareReaderEdit(readerData) {
+        this.#controller.prepareReaderEdit(readerData);
     }
     
     #selectCorrespondingStorage(url) {
@@ -79,7 +71,7 @@ class WebReader {
             return;
         let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
         
-        console.log(comicDataObject);
+        console.log(comicDataObject.data);
         return;
         
         browser.storage.local.set({comicData: comicDataObject});
@@ -152,14 +144,14 @@ class WebReader {
         this.#container.appendChild(manager.getVisuals());
     }
     
-    registerPage(pageEssentials) {
+    registerPage(readerEssentials) {
         let storageObject 
-            = this.#selectCorrespondingStorage(pageEssentials.initialUrl);
+            = this.#selectCorrespondingStorage(readerEssentials.initialUrl);
         if (storageObject.isValid()) {
             console.log("Page already registered as " + storageObject.getLabel());
             return;
         }
-        let readerObject = {prefix_mask: pageEssentials.prefix, label: pageEssentials.label};
+        let readerObject = {prefix_mask: readerEssentials.prefix, label: readerEssentials.label};
         let newManager = this.#createReaderClass(readerObject);
         if (!newManager.isValid()) {
             console.log("Failed to build comic entry");
@@ -167,7 +159,13 @@ class WebReader {
         }
         this.#readerStorage.saveObject(newManager);
         this.#addToContainer(newManager);
-        this.updateBookmark(pageEssentials.initialUrl); // This also updates storage
+        this.updateBookmark(readerEssentials.initialUrl); // This also updates storage
+    }
+    
+    modifyPage(readerEssentials) {
+        let readerClass = this.#readerStorage.getObject(readerEssentials.initialUrl);
+        if (readerClass)
+            readerClass.updateReaderConfig(readerEssentials);
     }
 }
 
@@ -249,8 +247,8 @@ class WebReaderInterface {
         this.#webReader = webReader;
     }
     
-    getReaderEditor() {
-        return this.#webReader.getReaderEditor();
+    prepareReaderEdit(readerData) {
+        this.#webReader.prepareReaderEdit(readerData);
     }
     
     saveProgress() {
@@ -274,9 +272,9 @@ class WebReaderController {
         return this.#container;
     }
     
-    editComic(comicData) {
+    prepareReaderEdit(readerData) {
         if (this.#fktEditor !== undefined)
-            fktEditor(comicData);
+            this.#fktEditor(readerData);
     }
     
     storageAccessGiven() {

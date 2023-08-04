@@ -42,17 +42,15 @@ class ReaderManager {
         this.readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
     }
     
-    editReader() {
-        let readerEditor = this.#parentInterface.getReaderEditor();
-        if (readerEditor == undefined)
-            return
-        let triggerFkt = () => {
-            this.#readerData.update(readerEditor);
-            this.#updateReaderVisuals();
-            this.saveProgress();
-            this.expand();
-            }
-        readerEditor.updateLink(this.#readerData, triggerFkt);
+    prepareReaderEdit() {
+        this.#parentInterface.prepareReaderEdit(this.#readerData);
+        this.expand();
+    }
+    
+    updateReaderConfig(readerEssentials) {
+        console.log(readerEssentials);
+        this.#readerData.updateReaderConfig(readerEssentials);
+        this.#updateReaderVisuals();
         this.expand();
     }
     
@@ -131,7 +129,7 @@ class ReaderManagerDummy {
         return false;
     }
     
-    editReader() {}
+    prepareReaderEdit() {}
     
     pinBookmark(bookmark) {
         return false;
@@ -151,8 +149,8 @@ class ReaderManagerInterface {
         this.#readerManager = readerManager;
     }
 
-    editReader() {
-        this.#readerManager.editReader();
+    prepareReaderEdit() {
+        this.#readerManager.prepareReaderEdit();
     }
     
     pinBookmark(bookmark) {

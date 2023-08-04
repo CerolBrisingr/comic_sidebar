@@ -39,7 +39,7 @@ class ReaderVisuals {
         let editButton = createEditButton();
         this.listing.appendChild(editButton);
         editButton.onclick = () => {
-            this.#parentInterface.editReader();
+            this.#parentInterface.prepareReaderEdit();
         }
     }
     
@@ -74,7 +74,7 @@ class ReaderVisuals {
     
     #addBookmarks(readerData, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
-            let prefix = readerData.base_url; 
+            let prefix = readerData.getPrefixMask(); 
             let bookmarkButton = new BookmarkButton(
                 bookmark, prefix, strMeta, this.#parentInterface);
             if (!bookmarkButton.isValid())

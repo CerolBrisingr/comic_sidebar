@@ -66,18 +66,25 @@ function setUpComicEditor() {
 
 function setUpWebReader() {
     let container = document.getElementById('container');
-    let fktEditComic = (comicData) => {};
-    let webReaderController = new WebReaderController(false, container, fktEditComic);
+    let webReaderController = new WebReaderController(false, container, prepareReaderEdit);
     webReader = new WebReader(webReaderController);
-    webReader.setComicEditor(comicEditor);
+}
+
+function prepareReaderEdit(readerData) {
+    let currentPrefix = readerData.getPrefixMask();
+    comicEditor.updateLink(readerData, requestReaderEdit);
+}
+
+function requestReaderEdit(readerEssentials) {
+    bsConnection.sendMessage({requestPageEdit: readerEssentials});
 }
 
 function requestUrlRetransmission() {
     bsConnection.sendMessage("urlRetransmissionRequest");
 }
 
-function requestPageAddition(pageEssentials) {
-    bsConnection.sendMessage({requestPageAddition: pageEssentials});
+function requestPageAddition(readerEssentials) {
+    bsConnection.sendMessage({requestPageAddition: readerEssentials});
 }
 
 // Add current page to list
@@ -114,16 +121,13 @@ function receiveMessage(message) {
         webReader.registerPage(message.addPage);
         return;
     }
+    if (message.hasOwnProperty("editPage")) {
+        webReader.modifyPage(message.editPage);
+        return;
+    }
     console.log("Don't know how to act on this message:");
     console.log(message);
 }
-
-// Clean up on close
-window.addEventListener('unload', (event) => {
-    if (webReader === undefined)
-        return;
-    webReader.removeComicEditor();
-});
 
 // When the sidebar loads, get the ID of its window,
 // and update its content.
