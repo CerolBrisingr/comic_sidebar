@@ -1,4 +1,4 @@
-import {ComicEditor} from "./comic_editor.js"
+import {ReaderEditor} from "./reader_editor.js"
 import {WebReader, WebReaderController} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 
@@ -14,13 +14,13 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // Tab management
 let myWindowId;
 let webReader;
-let comicEditor;
+let readerEditor;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    comicEditor = setUpComicEditor();
+    readerEditor = setUpReaderEditor();
     setUpWebReader();
     setUpButtons();
     setTimeout(() => {requestUrlRetransmission();}, 250);
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
 });
 
-function setUpComicEditor() {
+function setUpReaderEditor() {
     let fullFrame = document.getElementById('new_comic_input_frame');
     let fullLink = document.getElementById('new_comic_full_link');
     let label = document.getElementById('new_comic_label');
@@ -60,8 +60,8 @@ function setUpComicEditor() {
     let errorMsg = document.getElementById('new_comic_error');
     let cancelBtn = document.getElementById('new_comic_cancel');
     let okBtn = document.getElementById('new_comic_finalize');
-    let comicEditor = new ComicEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
-    return comicEditor;
+    let readerEditor = new ReaderEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
+    return readerEditor;
 }
 
 function setUpWebReader() {
@@ -72,7 +72,7 @@ function setUpWebReader() {
 
 function prepareReaderEdit(readerData) {
     let currentPrefix = readerData.getPrefixMask();
-    comicEditor.updateLink(readerData, requestReaderEdit);
+    readerEditor.updateLink(readerData, requestReaderEdit);
 }
 
 function requestReaderEdit(readerEssentials) {
@@ -96,7 +96,7 @@ function addCurrentPage() {
         return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            comicEditor.importLink(tabs[0].url, requestPageAddition);
+            readerEditor.importLink(tabs[0].url, requestPageAddition);
             }
             , onError);
 }

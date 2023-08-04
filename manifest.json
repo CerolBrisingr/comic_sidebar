@@ -1,8 +1,8 @@
 {
 
   "manifest_version": 2,
-  "name": "Improved Comic Bookmarks",
-  "description": "Will show comics and your recent viewing history of them.",
+  "name": "WebReader Bookmarks",
+  "description": "Convenient bookmarks for things you read over a long time. Like webcomics.",
   "version": "0.1",
   "browser_specific_settings": {
     "gecko": {
@@ -13,7 +13,7 @@
 
   "sidebar_action": {
     "default_icon": "icons/icon.png",
-    "default_title" : "Comic Bookmarks",
+    "default_title" : "WebReader Bookmarks",
     "default_panel": "sidebar/sidebar_panel.html"
   },
   
@@ -21,7 +21,7 @@
     "default_icon": {
       "48": "icons/icon_48.png"
     },
-    "default_title": "Comic Sidebar"
+    "default_title": "WebReader Sidebar"
   },
   
   "background": {

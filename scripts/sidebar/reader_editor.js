@@ -1,10 +1,10 @@
 import {dissectUrl} from "../shared/url.js"
 
-class ComicEditor {
+class ReaderEditor {
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
         for (let arg of arguments) {
             if (arg === undefined) {
-                throw("Constructor input incomplete, cannot build ComicEditor instance");
+                throw("Constructor input incomplete, cannot build ReaderEditor instance");
             }
         }
         
@@ -108,7 +108,7 @@ class ComicEditor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(comic, fktFinalize) {
+    updateLink(readerData, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -116,17 +116,17 @@ class ComicEditor {
         this.occupyEditor(fktFinalize);
         this.okBtn.innerText = "Update Reader";
         
-        let url = comic.getMostRecentAutomaticUrl();
+        let url = readerData.getMostRecentAutomaticUrl();
         if (url === undefined) {
             this.openEditor();
             return;
         }
         
         this.fullLink = url;
-        this.label = comic.getLabel();
+        this.label = readerData.getLabel();
         this.setUserMessage("", "");
         this.enableInterface();
-        this.prefix = comic.getPrefixMask();
+        this.prefix = readerData.getPrefixMask();
     }
     
     finalize() {
@@ -174,4 +174,4 @@ class ComicEditor {
     }
 }
 
-export {ComicEditor}
+export {ReaderEditor}

@@ -70,10 +70,6 @@ class WebReader {
         if (!this.#controller.storageAccessGiven())
             return;
         let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
-        
-        console.log(comicDataObject.data);
-        return;
-        
         browser.storage.local.set({comicData: comicDataObject});
     }
     
@@ -180,11 +176,9 @@ class HtmlContainer {
         
         let host = this.#getHost(url);
         if (host === undefined) {
-            console.log(`htmlContainer: invalid target url "${String(url)}"`)
             return false;
         }
         if (this.#findObject(host, url) !== undefined) {
-            console.log(`htmlContainer: already contains object for "${String(url)}"`)
             return false;
         }
         if (this.#data.has(host)) {
@@ -202,7 +196,6 @@ class HtmlContainer {
     getObject(url) {
         let host = this.#getHost(url);
         if (host === undefined) {
-            console.log(`htmlContainer: invalid query url "${String(url)}"`)
             return undefined;
         }
         return this.#findObject(host, url);
@@ -210,7 +203,6 @@ class HtmlContainer {
     
     #findObject(host, url) {
         if (!this.#data.has(host)) {
-            console.log("htmlContainer: missing entry for host");
             return undefined;
         }
         for (let object of this.#data.get(host)) {
