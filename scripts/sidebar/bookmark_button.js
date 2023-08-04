@@ -1,4 +1,4 @@
-import {dissectUrl, openUrlInMyTab} from "./url.js"
+import {dissectUrl, openUrlInMyTab} from "../shared/url.js"
 
 class BookmarkButton {
     #container = undefined;

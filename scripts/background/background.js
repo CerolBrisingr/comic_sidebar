@@ -1,0 +1,63 @@
+import {UrlListener} from "./url_listener.js"
+import {ListeningPort} from "./listening_port.js"
+import {WebReader, WebReaderController} from "../shared/web_reader.js"
+
+let isActive = true;
+let urlListener = new UrlListener(updateSidebar);
+let sbConnection = new ListeningPort(receiveMessage);
+let webReaderController = new WebReaderController(true);
+let webReader = new WebReader(webReaderController);
+
+function updateBrowserAction() {
+    browser.browserAction.setIcon({
+        path: isActive ? {
+            48: "../icons/icon_48.png"
+        } : {
+            48: "../icons/icon_gray_48.png"
+        }
+    })
+}
+
+function toggleActive() {
+    isActive = !isActive;
+    updateBrowserAction();
+    updateUrlListener();
+}
+
+function receiveMessage(message) {
+    if (message === "urlRetransmissionRequest") {
+        urlListener.retransmit();
+        return;
+    }
+    if (message.hasOwnProperty("requestPageAddition")) {
+        let readerEssentials = message.requestPageAddition;
+        webReader.registerPage(readerEssentials);
+        sbConnection.sendMessage({addPage: readerEssentials});
+        return;
+    }
+    if (message.hasOwnProperty("requestPageEdit")) {
+        let readerEssentials = message.requestPageEdit;
+        webReader.modifyPage(readerEssentials);
+        sbConnection.sendMessage({editPage: readerEssentials});
+        return;
+    }
+    console.log("Don't know how to act on this message:");
+    console.log(message);
+}
+
+function updateSidebar(url) {
+    sbConnection.sendMessage({updateBookmark: url});
+    webReader.updateBookmark(url);
+}
+
+function updateUrlListener() {
+    if (isActive) {
+        urlListener.activate();
+    } else {
+        urlListener.deactivate();
+    }
+}
+
+// React to toolbar click
+browser.browserAction.onClicked.addListener(toggleActive);
+updateBrowserAction();

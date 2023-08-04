@@ -1,10 +1,10 @@
-import {dissectUrl} from "./url.js"
+import {dissectUrl} from "../shared/url.js"
 
-class ComicEditor {
+class ReaderEditor {
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
         for (let arg of arguments) {
             if (arg === undefined) {
-                throw("Constructor input incomplete, cannot build ComicEditor instance");
+                throw("Constructor input incomplete, cannot build ReaderEditor instance");
             }
         }
         
@@ -21,7 +21,6 @@ class ComicEditor {
         this.cancelBtn = cancelBtn;
         this.cancelBtn.onclick = () => {
             this.okBtn.disabled = true;
-            this.setInvisible();
             this.openEditor();
         }
         this.okBtn = okBtn;
@@ -30,7 +29,6 @@ class ComicEditor {
         }
         
         this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
-        this.setInvisible();
         this.openEditor();
     }
     
@@ -65,11 +63,11 @@ class ComicEditor {
         this.errorMsgObject.innerText = errorMsg;
     }
     
-    setInvisible() {
+    #setInvisible() {
         this.fullFrame.style.display = "none";
     }
     
-    setVisible() {
+    #setVisible() {
         this.fullFrame.style.removeProperty("display");
     }
     
@@ -95,7 +93,7 @@ class ComicEditor {
             return;
         }
         this.occupyEditor(fktFinalize);
-        this.okBtn.innerText = "Add Comic";
+        this.okBtn.innerText = "Add Reader";
         
         let urlPieces = dissectUrl(url);
         if (urlPieces === undefined) {
@@ -110,33 +108,31 @@ class ComicEditor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(Comic, fktFinalize) {
+    updateLink(readerData, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
         }
         this.occupyEditor(fktFinalize);
-        this.okBtn.innerText = "Update Comic";
+        this.okBtn.innerText = "Update Reader";
         
-        let url = Comic.getMostRecentAutomaticUrl();
+        let url = readerData.getMostRecentAutomaticUrl();
         if (url === undefined) {
             this.openEditor();
-            this.setInvisible();
             return;
         }
         
         this.fullLink = url;
-        this.label = Comic.label;
+        this.label = readerData.getLabel();
         this.setUserMessage("", "");
         this.enableInterface();
-        this.prefix = Comic.base_url;
+        this.prefix = readerData.getPrefixMask();
     }
     
     finalize() {
-        let data = this.gatherData();
-        this.fktFinalize(data);
+        let readerEssentials = this.gatherData();
+        this.fktFinalize(readerEssentials);
         this.openEditor();
-        this.setInvisible();
     }
     
     gatherData() {
@@ -148,12 +144,13 @@ class ComicEditor {
     }
     
     occupyEditor(fktFinalize) {
-        this.setVisible();
+        this.#setVisible();
         this.fktFinalize = fktFinalize;
         this.isOpen = false;
     }
     
     openEditor() {
+        this.#setInvisible();
         this.fktFinalize = () => {};
         this.isOpen = true;
     }
@@ -177,4 +174,4 @@ class ComicEditor {
     }
 }
 
-export {ComicEditor}
+export {ReaderEditor}
