@@ -6,6 +6,7 @@ import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 
 class WebReader {
     #readerEditor;
+    #controller;
     #container;
     #readerClass;
     #myInterface;
@@ -13,8 +14,9 @@ class WebReader {
     #readerStorage = new HtmlContainer();
     #currentReader;
     
-    constructor(container = undefined) {
-        this.#container = container;
+    constructor(controller) {
+        this.#controller = controller;
+        this.#container = controller.getContainer();
         this.#readerClass = this.#getReaderClass();
         this.#myInterface = new WebReaderInterface(this);
         this.#currentReader = new ReaderClassDummy();
@@ -33,8 +35,7 @@ class WebReader {
         let object = this.#selectCorrespondingStorage(url);
         if (!object.isValid())
             return;
-        if (object.addAutomatic(url))
-            this.saveToStorage();
+        object.addAutomatic(url);
     }
     
     saveBackup() {
@@ -73,6 +74,8 @@ class WebReader {
     
     saveProgress() {
         if (this.#savingSuspended)
+            return;
+        if (!this.#controller.storageAccessGiven())
             return;
         let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
         
@@ -256,6 +259,31 @@ class WebReaderInterface {
     
 }
 
+class WebReaderController {
+    #savingAllowed;
+    #container;
+    #fktEditor;
+    
+    constructor(allowSave, container = undefined, fktEditor = undefined) {
+        this.#savingAllowed = allowSave;
+        this.#container = container;
+        this.#fktEditor = fktEditor;
+    }
+    
+    getContainer() {
+        return this.#container;
+    }
+    
+    editComic(comicData) {
+        if (this.#fktEditor !== undefined)
+            fktEditor(comicData);
+    }
+    
+    storageAccessGiven() {
+        return this.#savingAllowed;
+    }
+}
+
 class ReaderClassDummy {
     constructor() {}
     
@@ -271,4 +299,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReader}
+export {WebReader, WebReaderController}

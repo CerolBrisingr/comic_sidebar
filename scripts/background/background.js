@@ -1,11 +1,12 @@
 import {UrlListener} from "./url_listener.js"
 import {ListeningPort} from "./listening_port.js"
-import {WebReader} from "../shared/web_reader.js"
+import {WebReader, WebReaderController} from "../shared/web_reader.js"
 
 let isActive = true;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
-let webReader = new WebReader();
+let webReaderController = new WebReaderController(true);
+let webReader = new WebReader(webReaderController);
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({

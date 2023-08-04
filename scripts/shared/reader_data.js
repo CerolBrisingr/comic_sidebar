@@ -76,19 +76,19 @@ class ReaderData {
     
     addAutomatic(url) {
         if (!this.#isValidNewUrl(url))
-            return;
+            return false;
         let newBoockmark = new Bookmark(url);
         if (newBoockmark.href == "#")
-            return;
+            return false;
         if (this.#automatic.length > 0)
             if (this.#automatic[this.#automatic.length -1].href === url) {
                 console.log("Avoiding duplicate automatic entry");
-                return;
+                return false;
             }
         for (let bookmark of this.#manual) {
             if (bookmark.href === url) {
                 console.log("Manual entry for this exists. Avoiding duplicate");
-                return;
+                return false;
             }
         }
         this.#automatic.push(newBoockmark);
@@ -96,6 +96,7 @@ class ReaderData {
             this.#automatic.shift();
         
         this.#parentInterface.saveProgress();
+        return true;
     }
     
     #isValidNewUrl(url) {

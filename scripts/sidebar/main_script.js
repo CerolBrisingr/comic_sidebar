@@ -1,5 +1,5 @@
 import {ComicEditor} from "./comic_editor.js"
-import {WebReader} from "../shared/web_reader.js"
+import {WebReader, WebReaderController} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 
 /* 
@@ -21,8 +21,8 @@ let bsConnection = new SubscriberPort(receiveMessage);
 document.addEventListener('DOMContentLoaded', function () {
     
     comicEditor = setUpComicEditor();
-    setUpButtons();
     setUpWebReader();
+    setUpButtons();
     setTimeout(() => {requestUrlRetransmission();}, 250);
     
     function setUpButtons() {
@@ -66,7 +66,9 @@ function setUpComicEditor() {
 
 function setUpWebReader() {
     let container = document.getElementById('container');
-    webReader = new WebReader(container);
+    let fktEditComic = (comicData) => {};
+    let webReaderController = new WebReaderController(false, container, fktEditComic);
+    webReader = new WebReader(webReaderController);
     webReader.setComicEditor(comicEditor);
 }
 

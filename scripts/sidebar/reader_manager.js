@@ -69,10 +69,8 @@ class ReaderManager {
     }
     
     addAutomatic(url) {
-        let didUpdate = this.#readerData.addAutomatic(url);
-        if (didUpdate)
+        if (this.#readerData.addAutomatic(url))
             this.readerVisuals.updateReaderUrls(this.#readerData);
-        return didUpdate;
     }
     
     addManual(url) {
