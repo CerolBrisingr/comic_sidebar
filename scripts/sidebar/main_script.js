@@ -14,14 +14,13 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // Tab management
 let myWindowId;
 let webReader;
-let readerEditor;
 let isSetUp = false;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    readerEditor = setUpReaderEditor();
+    setUpReaderEditor();
     requestWebReader();
 });
 
@@ -58,8 +57,7 @@ function setUpReaderEditor() {
     let errorMsg = document.getElementById('new_comic_error');
     let cancelBtn = document.getElementById('new_comic_cancel');
     let okBtn = document.getElementById('new_comic_finalize');
-    let readerEditor = new ReaderEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
-    return readerEditor;
+    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
 }
 
 function setUpWebReader(readerObjectList) {
@@ -75,7 +73,7 @@ function setUpWebReader(readerObjectList) {
 
 function prepareReaderEdit(readerData) {
     let currentPrefix = readerData.getPrefixMask();
-    readerEditor.updateLink(readerData, requestReaderEdit);
+    ReaderEditor.updateLink(readerData, requestReaderEdit);
 }
 
 function requestReaderEdit(readerEssentials) {
@@ -112,7 +110,7 @@ function addCurrentPage() {
         return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            readerEditor.importLink(tabs[0].url, requestPageAddition);
+            ReaderEditor.importLink(tabs[0].url, requestPageAddition);
             }
             , onError);
 }
