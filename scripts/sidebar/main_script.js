@@ -66,7 +66,7 @@ function setUpReaderEditor() {
 
 function setUpWebReader() {
     let container = document.getElementById('container');
-    let webReaderController = new WebReaderController(false, container, prepareReaderEdit);
+    let webReaderController = new WebReaderController(container, prepareReaderEdit);
     webReader = new WebReader(webReaderController);
 }
 

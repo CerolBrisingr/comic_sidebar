@@ -5,11 +5,12 @@ class ReaderManager {
     #readerData;
     #parentInterface;
     #container
+    #readerVisuals
     
-    constructor(readerObject, parentInterface, container) {
+    constructor(readerObject, parentInterface, readerTalk, container) {
         this.#container = container;
         this.#parentInterface = parentInterface;
-        this.#readerData = this.#createReaderData(readerObject);
+        this.#readerData = this.#createReaderData(readerObject, readerObject.intId);
         this.#createReaderVisuals();
     }
     
@@ -25,21 +26,22 @@ class ReaderManager {
         return this.#readerData.getPrefixMask();
     }
     
-    #createReaderData(readerObject) {
+    #createReaderData(readerObject, intId) {
         return new ReaderData(
             readerObject,
-            new ReaderManagerInterface(this)
+            new ReaderManagerInterface(this),
+            new ReaderTalk(intId, "satellite")
         );
     }
     
     #createReaderVisuals() {
         if (this.#readerData === undefined) {
-            this.readerVisuals = undefined;
+            this.#readerVisuals = undefined;
             console.log("Encountered invalid readerData");
             return;
         }
         let readerManagerInterface = new ReaderManagerInterface(this);
-        this.readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
+        this.#readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
     }
     
     prepareReaderEdit() {
@@ -55,7 +57,7 @@ class ReaderManager {
     }
     
     #updateReaderVisuals() {
-        this.readerVisuals.updateListing(this.#readerData);
+        this.#readerVisuals.updateListing(this.#readerData);
     }
     
     urlIsCompatible(url) {
@@ -68,36 +70,32 @@ class ReaderManager {
     
     addAutomatic(url) {
         if (this.#readerData.addAutomatic(url))
-            this.readerVisuals.updateReaderUrls(this.#readerData);
+            this.#readerVisuals.updateReaderUrls(this.#readerData);
     }
     
     addManual(url) {
         let bookmark = this.#readerData.addManual(url);
         if (bookmark === undefined)
             return false
-        this.readerVisuals.updateReaderUrls(this.#readerData);
+        this.#readerVisuals.updateReaderUrls(this.#readerData);
         return true;
     }
 
     removeManual(bookmark) {
         let didRemove = this.#readerData.removeManual(bookmark);
         if (didRemove)
-            this.readerVisuals.updateReaderUrls(this.#readerData);
+            this.#readerVisuals.updateReaderUrls(this.#readerData);
         return didRemove;
     }
     
     getVisuals() {
-        return this.readerVisuals.listing;
+        return this.#readerVisuals.listing;
     }
     
     isValid() {
-        if (this.#readerData === undefined || this.readerVisuals === undefined)
+        if (this.#readerData === undefined || this.#readerVisuals === undefined)
             return false;
         return this.#readerData.isValid();
-    }
-    
-    getReaderData() {
-        return this.#readerData;
     }
     
     returnAsObject() {
@@ -105,15 +103,11 @@ class ReaderManager {
     }
     
     expand() {
-        this.readerVisuals.expand();
+        this.#readerVisuals.expand();
     }
     
     collapse() {
-        this.readerVisuals.collapse();
-    }
-    
-    saveProgress() {
-        this.#parentInterface.saveProgress();
+        this.#readerVisuals.collapse();
     }
 }
 
@@ -168,7 +162,6 @@ class ReaderManagerInterface {
     }
     
     saveProgress() {
-        this.#readerManager.saveProgress();
     }
 }
 

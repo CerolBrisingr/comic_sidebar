@@ -1,11 +1,10 @@
 import {dissectUrl} from "./url.js"
-import {ReaderData} from "./reader_data.js"
+import {ReaderData, ReaderTalk} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 
 class WebReader {
-    #readerEditor;
     #controller;
     #container;
     #readerClass;
@@ -89,8 +88,8 @@ class WebReader {
     #importReaderObjectList(readerObjectList){
         this.#readerStorage.clearData();
         this.#savingSuspended = true;
-        for (let readerObject of readerObjectList) {
-            let newObject = this.#createReaderClass(readerObject);
+        for (let [index, readerObject] of readerObjectList.entries()) {
+            let newObject = this.#createReaderClass(readerObject, index);
             if (!newObject.isValid())
                 continue;
             this.#readerStorage.saveObject(newObject);
@@ -100,10 +99,11 @@ class WebReader {
         this.saveProgress();
     }
     
-    #createReaderClass(readerObject) {
+    #createReaderClass(readerObject, intId) {
         return new this.#readerClass(
             readerObject,
             this.#myInterface,
+            new ReaderTalk(intId, "core"),
             this.#container
         )
     }
@@ -250,12 +250,10 @@ class WebReaderInterface {
 }
 
 class WebReaderController {
-    #savingAllowed;
     #container;
     #fktEditor;
     
-    constructor(allowSave, container = undefined, fktEditor = undefined) {
-        this.#savingAllowed = allowSave;
+    constructor(container = undefined, fktEditor = undefined) {
         this.#container = container;
         this.#fktEditor = fktEditor;
     }
@@ -270,7 +268,7 @@ class WebReaderController {
     }
     
     storageAccessGiven() {
-        return this.#savingAllowed;
+        return this.#container === undefined;
     }
 }
 

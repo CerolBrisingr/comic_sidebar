@@ -5,8 +5,7 @@ import {WebReader, WebReaderController} from "../shared/web_reader.js"
 let isActive = true;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
-let webReaderController = new WebReaderController(true);
-let webReader = new WebReader(webReaderController);
+let webReader = new WebReader(new WebReaderController());
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({

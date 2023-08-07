@@ -1,14 +1,19 @@
 import {dissectUrl} from "./url.js"
+import {SubscriberPort} from "../sidebar/subscriber_port"
+import {ListeningPort} from "../background/listening_port"
 
 class ReaderData {
     #label;
+    #intId;
     #prefixMask;
     #automatic;
     #manual;
     #parentInterface;
     
-    constructor(data, parentInterface) {
+    constructor(data, parentInterface, readerTalk) {
         this.#parentInterface = parentInterface;
+        this.#intId = readerTalk.getId();
+        this.#readerTalk = readerTalk.initialize(this);
         if (data.hasOwnProperty("base_url"))
             data.prefix_mask = String(data.base_url);
         if (data.hasOwnProperty("prefix_mask"))
@@ -153,6 +158,7 @@ class ReaderData {
     
     returnAsObject() {
         let thisAsObject = {
+            intId: this.#intId,
             label:this.#label,
             prefix_mask:this.#prefixMask,
             automatic: [],
@@ -170,6 +176,67 @@ class ReaderData {
     // Interface only
     expand() {}
     collapse() {}
+}
+
+class ReaderTalk {
+    #intId;
+    #strId;
+    #isCore;
+    #readerData;
+    #port;
+    constructor(intId, strRole) {
+        this.#intId = intId;
+        switch (strRole.toLowerCase()) {
+            case "core":
+                this.#isCore = true;
+                break;
+            case "satellite":
+                this.#isCore = false;
+                break;
+            default:
+                error(`Invalid ReaderTalk role "${strRole}"`);
+        }
+    }
+    
+    initialize(readerData) {
+        this.#readerData = readerData;
+        if (this.#isCore) {
+            this.#setUpCore();
+        } else {
+            this.#setUpSatellite();
+        }
+        return this;
+    }
+    
+    getId() {
+        return this.#intId;
+    }
+    
+    #getStrId() {
+        return `ìd${this.#intId}`;
+    }
+    
+    #setUpCore() {
+        this.#port = ListeningPort(this.#coreReceive, this.#strId);
+        console.log(`Set up core "${this.#readerData.getLabel()}"`)
+    }
+    
+    #coreReceive(message) {
+        console.log(`Core "${this.#readerData.getLabel()}":`);
+        console.log(message);
+    }
+    
+    #setUpSatellite() {
+        this.#port = SubscriberPort(this.#satelliteReceive, this.#strId);
+        console.log(`Set up satellite "${this.#readerData.getLabel()}"`)
+        this.#port.sendMessage(`Hello "${this.#readerData.getLabel()}"`);
+    }
+    
+    #satelliteReceive(message) {
+        console.log(`Satellite "${this.#readerData.getLabel()}":`);
+        console.log(message);
+    }
+    
 }
 
 class Bookmark {
