@@ -9,9 +9,11 @@ let sbConnection = new ListeningPort(receiveMessage);
 let webReader = new WebReader(new WebReaderController());
 
 function initialize() {
-    webReader.loadInterface();
-    isSetUp = true;
-    transmitWebReaderData();
+    let fktDone = () => {
+        isSetUp = true;
+        transmitWebReaderData();
+    }
+    webReader.loadInterface(fktDone);
 }
 
 function updateBrowserAction() {

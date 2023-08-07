@@ -36,11 +36,12 @@ class WebReader {
     }
     
     saveBackup() {
-        saveBackup(this.getObjectList());
+        saveBackup(this.#readerStorage.getList());
     }
     
     getObjectList() {
-        return this.#readerStorage.getList();
+        let readerObject = buildWebReaderObject(this.#readerStorage.getList());
+        return readerObject.data;
     }
     
     prepareReaderEdit(readerData) {
@@ -71,16 +72,17 @@ class WebReader {
             return;
         if (!this.#controller.storageAccessGiven())
             return;
-        let comicDataObject = buildWebReaderObject(this.getObjectList());
+        let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
         browser.storage.local.set({comicData: comicDataObject});
     }
     
-    loadInterface(readerObjectList = undefined) {
-        if (readerObjectList !== undefined) {
-            this.#importReaderObjectList(readerObjectList);
+    importInterface(readerObjectList) {
+        if (readerObjectList === undefined)
             return;
-        }
-        
+        this.#importReaderObjectList(readerObjectList);
+    }
+    
+    loadInterface(fktDone) {
         let gettingItem = browser.storage.local.get("comicData");
         gettingItem.then((storageResult) => {
             if (!storageResult.hasOwnProperty("comicData")) {
@@ -89,6 +91,7 @@ class WebReader {
             }
             let readerObjectList = unpackReaderObjectList(storageResult.comicData);
             this.#importReaderObjectList(readerObjectList);
+            fktDone();
             }, 
             () => {console.log("No data stored locally, aborting loading sequence! (1)")});
     }
@@ -128,7 +131,7 @@ class WebReader {
         if (this.#container == undefined)
             return;
         let visualsList = [];
-        for (let manager of this.getObjectList()) {
+        for (let manager of this.#readerStorage.getList()) {
             if (!manager.hasVisuals())
                 continue; // not a manager then
             if (!manager.isValid())

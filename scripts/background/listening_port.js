@@ -12,9 +12,6 @@ class ListeningPort {
         this.#connectionName = connectionName;
         this.#startListening();
         this.#registerOpenPort();
-        //browser.runtime.onConnect.addListener((port) => {
-        //    this.#contacted(port);
-        //});
     }
     
     #startListening() {
@@ -24,7 +21,6 @@ class ListeningPort {
 
     static listenForSubscribers(port) {
         if (ListeningPort.openConnections.has(port.name)) {
-            console.log(`Found port "${port.name}"`);
             let fkt = ListeningPort.openConnections.get(port.name);
             fkt(port);
         } else {
@@ -34,7 +30,7 @@ class ListeningPort {
     
     #registerOpenPort() {
         if (ListeningPort.openConnections.has(this.#connectionName)) {
-            console.log(`Conflict: replacing conneciton "${this.#connectionName}"`);
+            console.log(`Conflict: replacing connection "${this.#connectionName}"`);
             ListeningPort.openConnections.delete(this.#connectionName, ListeningPort);
         }
         let fktContacted = (port) => {this.#contacted(port);}
@@ -53,7 +49,6 @@ class ListeningPort {
     }
     
     #contacted(port) {
-        console.log(`${port.name} <=> ${this.#connectionName}`)
         if (port.name !== this.#connectionName) {
             console.log("Connection failed due to identification");
             return;

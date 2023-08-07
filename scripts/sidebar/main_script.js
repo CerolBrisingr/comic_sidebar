@@ -22,32 +22,31 @@ let bsConnection = new SubscriberPort(receiveMessage);
 document.addEventListener('DOMContentLoaded', function () {
     
     readerEditor = setUpReaderEditor();
-    bsConnection.sendMessage("test");
-    
-    function setUpButtons() {
-        const exportTrigger = document.getElementById('export_trigger');
-        exportTrigger.onclick = function() {
-            if (webReader === undefined)
-                return;
-            webReader.saveBackup();
-            };
-        
-        const inputElement = document.getElementById('file-selector');
-        inputElement.style.display = 'none';
-        inputElement.addEventListener('change', (event) => {
-            if (webReader === undefined)
-                return;
-            webReader.importBackup(event.target.files[0]);
-        });
-        
-        const inputTrigger = document.getElementById('import_trigger');
-        inputTrigger.onclick = function () {inputElement.click()};
-        
-        const addComic = document.getElementById('add_comic');
-        addComic.onclick = function () {addCurrentPage()};
-    }
-    
+    requestWebReader();
 });
+
+function setUpButtons() {
+    const exportTrigger = document.getElementById('export_trigger');
+    exportTrigger.onclick = function() {
+        if (webReader === undefined)
+            return;
+        webReader.saveBackup();
+        };
+    
+    const inputElement = document.getElementById('file-selector');
+    inputElement.style.display = 'none';
+    inputElement.addEventListener('change', (event) => {
+        if (webReader === undefined)
+            return;
+        webReader.importBackup(event.target.files[0]);
+    });
+    
+    const inputTrigger = document.getElementById('import_trigger');
+    inputTrigger.onclick = function () {inputElement.click()};
+    
+    const addComic = document.getElementById('add_comic');
+    addComic.onclick = function () {addCurrentPage()};
+}
 
 function setUpReaderEditor() {
     let fullFrame = document.getElementById('new_comic_input_frame');
@@ -67,10 +66,11 @@ function setUpWebReader(readerObjectList) {
     if (readerObjectList === undefined)
         return;
     isSetUp = true;
+    setUpButtons();
     let container = document.getElementById('container');
     let webReaderController = new WebReaderController(container, prepareReaderEdit);
     webReader = new WebReader(webReaderController);
-    webReader.loadInterface(readerObjectList);
+    webReader.importInterface(readerObjectList);
 }
 
 function prepareReaderEdit(readerData) {
@@ -88,6 +88,11 @@ function requestUrlRetransmission() {
 
 function requestPageAddition(readerEssentials) {
     bsConnection.sendMessage({requestPageAddition: readerEssentials});
+}
+
+function requestWebReader() {
+    if (!isSetUp)
+        bsConnection.sendMessage("requestReaderTransmission");
 }
 
 function receiveReaderObjectList(readerObjectList) {
@@ -129,7 +134,6 @@ function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("webReader")) {
-        console.log("Received webReader data");
         setUpWebReader(message.webReader);
         return;
     }

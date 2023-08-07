@@ -182,7 +182,6 @@ class ReaderData {
 
 class ReaderTalk {
     #intId;
-    #strId;
     #isCore;
     #readerData;
     #port;
@@ -219,8 +218,8 @@ class ReaderTalk {
     }
     
     #setUpCore() {
-        this.#port = new ListeningPort(this.#coreReceive, this.#getStrId());
-        console.log(`Set up core "${this.#readerData.getLabel()}"`)
+        let fktReceive = (message) => {this.#coreReceive(message);};
+        this.#port = new ListeningPort(fktReceive, this.#getStrId());
     }
     
     #coreReceive(message) {
@@ -229,8 +228,8 @@ class ReaderTalk {
     }
     
     #setUpSatellite() {
-        this.#port = new SubscriberPort(this.#satelliteReceive, this.#getStrId());
-        console.log(`Set up satellite "${this.#readerData.getLabel()}"`)
+        let fktReceive = (message) => {this.#satelliteReceive(message);};
+        this.#port = new SubscriberPort(fktReceive, this.#getStrId());
         this.#port.sendMessage(`Hello "${this.#readerData.getLabel()}"`);
     }
     

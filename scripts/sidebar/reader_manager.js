@@ -1,5 +1,5 @@
 import {ReaderVisuals} from "./reader_visuals.js"
-import {ReaderData} from "../shared/reader_data.js"
+import {ReaderData, ReaderTalk} from "../shared/reader_data.js"
 
 class ReaderManager {
     #readerData;
