@@ -52,11 +52,20 @@ class ReaderSyncCore extends ReaderSync {
             this.#pinRequestHandler(message.pinRequest);
             return;
         }
+        if (message.hasOwnProperty("unpinRequest")) {
+            this.#unpinRequestHandler(message.unpinRequest);
+        }
     }
     
     #pinRequestHandler(url) {
         if (this.#readerData.addManual(url)) {
-            this.port.sendMessage({pinCommand: url})
+            this.port.sendMessage({pinCommand: url});
+        }
+    }
+    
+    #unpinRequestHandler(url) {
+        if (this.#readerData.removeManual(url)) {
+            this.port.sendMessage({unpinCommand: url});
         }
     }
     
@@ -71,6 +80,10 @@ class ReaderSyncSatellite extends ReaderSync {
     
     sendPinRequest(url) {
         this.port.sendMessage({pinRequest: url});
+    }
+    
+    sendUnpinRequest(url) {
+        this.port.sendMessage({unpinRequest: url});
     }
     
     #setReaderManager(readerManager) {
@@ -91,10 +104,18 @@ class ReaderSyncSatellite extends ReaderSync {
             this.#handlePinCommand(message.pinCommand);
             return;
         }
+        if (message.hasOwnProperty("unpinCommand")) {
+            this.#handleUnpinCommand(message.unpinCommand);
+            return;
+        }
     }
     
     #handlePinCommand(url) {
         this.#readerManager.addManual(url);
+    }
+    
+    #handleUnpinCommand(url) {
+        this.#readerManager.removeManual(url);
     }
 }
 

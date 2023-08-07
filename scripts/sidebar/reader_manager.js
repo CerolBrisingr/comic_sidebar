@@ -81,15 +81,16 @@ class ReaderManager {
     }
     
     addManual(url) {
-        let bookmark = this.#readerData.addManual(url);
-        if (bookmark === undefined)
-            return false
-        this.#readerVisuals.updateReaderUrls(this.#readerData);
-        return true;
+        if (this.#readerData.addManual(url))
+            this.#readerVisuals.updateReaderUrls(this.#readerData);
+    }
+    
+    sendUnpinRequest(url) {
+        this.#readerSync.sendUnpinRequest(url);
     }
 
-    removeManual(bookmark) {
-        let didRemove = this.#readerData.removeManual(bookmark);
+    removeManual(url) {
+        let didRemove = this.#readerData.removeManual(url);
         if (didRemove)
             this.#readerVisuals.updateReaderUrls(this.#readerData);
         return didRemove;
@@ -158,11 +159,8 @@ class ReaderManagerInterface {
         this.#readerManager.sendPinRequest(bookmark.href);
     }
     
-    unpinBookmark(bookmark) {
-        if (this.#readerManager.removeManual(bookmark)) {
-            return true;
-        }
-        return false;
+    requestUnpinBookmark(bookmark) {
+        this.#readerManager.sendUnpinRequest(bookmark.href);
     }
     
     saveProgress() {

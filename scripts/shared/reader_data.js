@@ -148,8 +148,8 @@ class ReaderData {
         return newBookmark;
     }
     
-    removeManual(bookmark) {
-        let index = this.#manual.indexOf(bookmark);
+    removeManual(url) {
+        let index = this.#findManualBookmark(url);
         if (index === -1) {
             console.log('Could not find requested bookmark in list to remove it');
             return false;
@@ -157,6 +157,14 @@ class ReaderData {
         this.#manual.splice(index, 1);
         this.#parentInterface.saveProgress();
         return true;
+    }
+    
+    #findManualBookmark(url) {
+        for (let [index, bookmark] of this.#manual.entries()) {
+            if (bookmark.href === url)
+                return index;
+        }
+        return -1;
     }
     
     returnAsObject() {

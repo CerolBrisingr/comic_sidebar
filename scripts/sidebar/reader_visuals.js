@@ -110,7 +110,7 @@ class ReaderVisuals {
     #createUnpinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
-            this.#parentInterface.unpinBookmark(bookmark);
+            this.#parentInterface.requestUnpinBookmark(bookmark);
         }
         return pinButton;
     }
