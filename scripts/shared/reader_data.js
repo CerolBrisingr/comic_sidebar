@@ -1,10 +1,11 @@
 import {dissectUrl} from "./url.js"
-import {SubscriberPort} from "../sidebar/subscriber_port"
-import {ListeningPort} from "../background/listening_port"
+import {SubscriberPort} from "../sidebar/subscriber_port.js"
+import {ListeningPort} from "../background/listening_port.js"
 
 class ReaderData {
     #label;
     #intId;
+    #readerTalk;
     #prefixMask;
     #automatic;
     #manual;
@@ -13,7 +14,6 @@ class ReaderData {
     constructor(data, parentInterface, readerTalk) {
         this.#parentInterface = parentInterface;
         this.#intId = readerTalk.getId();
-        this.#readerTalk = readerTalk.initialize(this);
         if (data.hasOwnProperty("base_url"))
             data.prefix_mask = String(data.base_url);
         if (data.hasOwnProperty("prefix_mask"))
@@ -26,6 +26,8 @@ class ReaderData {
             this.#importAutomaticList(data.automatic);
         if (data.hasOwnProperty("manual"))
             this.#importManualList(data.manual);
+        
+        this.#readerTalk = readerTalk.initialize(this);
     }
     
     #importAutomaticList(list) {
@@ -213,11 +215,11 @@ class ReaderTalk {
     }
     
     #getStrId() {
-        return `ìd${this.#intId}`;
+        return `id${this.#intId}`;
     }
     
     #setUpCore() {
-        this.#port = ListeningPort(this.#coreReceive, this.#strId);
+        this.#port = new ListeningPort(this.#coreReceive, this.#getStrId());
         console.log(`Set up core "${this.#readerData.getLabel()}"`)
     }
     
@@ -227,7 +229,7 @@ class ReaderTalk {
     }
     
     #setUpSatellite() {
-        this.#port = SubscriberPort(this.#satelliteReceive, this.#strId);
+        this.#port = new SubscriberPort(this.#satelliteReceive, this.#getStrId());
         console.log(`Set up satellite "${this.#readerData.getLabel()}"`)
         this.#port.sendMessage(`Hello "${this.#readerData.getLabel()}"`);
     }
@@ -284,4 +286,4 @@ class Bookmark {
     }
 }
 
-export {Bookmark, ReaderData}
+export {Bookmark, ReaderData, ReaderTalk}

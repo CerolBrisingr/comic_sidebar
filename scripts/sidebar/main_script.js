@@ -15,15 +15,14 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 let myWindowId;
 let webReader;
 let readerEditor;
+let isSetUp = false;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
     readerEditor = setUpReaderEditor();
-    setUpWebReader();
-    setUpButtons();
-    setTimeout(() => {requestUrlRetransmission();}, 250);
+    bsConnection.sendMessage("test");
     
     function setUpButtons() {
         const exportTrigger = document.getElementById('export_trigger');
@@ -64,10 +63,14 @@ function setUpReaderEditor() {
     return readerEditor;
 }
 
-function setUpWebReader() {
+function setUpWebReader(readerObjectList) {
+    if (readerObjectList === undefined)
+        return;
+    isSetUp = true;
     let container = document.getElementById('container');
     let webReaderController = new WebReaderController(container, prepareReaderEdit);
     webReader = new WebReader(webReaderController);
+    webReader.loadInterface(readerObjectList);
 }
 
 function prepareReaderEdit(readerData) {
@@ -85,6 +88,14 @@ function requestUrlRetransmission() {
 
 function requestPageAddition(readerEssentials) {
     bsConnection.sendMessage({requestPageAddition: readerEssentials});
+}
+
+function receiveReaderObjectList(readerObjectList) {
+    if (isSetUp)
+        return;
+    setUpWebReader(readerObjectList);
+    setUpButtons();
+    setTimeout(() => {requestUrlRetransmission();}, 250);
 }
 
 // Add current page to list
@@ -113,6 +124,15 @@ function updateBookmark(url) {
 }
 
 function receiveMessage(message) {
+    if (message === "test") {
+        console.log("Sidebar script received test message");
+        return;
+    }
+    if (message.hasOwnProperty("webReader")) {
+        console.log("Received webReader data");
+        setUpWebReader(message.webReader);
+        return;
+    }
     if (message.hasOwnProperty("updateBookmark")) {
         updateBookmark(message.updateBookmark);
         return;

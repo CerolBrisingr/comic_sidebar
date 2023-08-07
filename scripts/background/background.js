@@ -3,9 +3,16 @@ import {ListeningPort} from "./listening_port.js"
 import {WebReader, WebReaderController} from "../shared/web_reader.js"
 
 let isActive = true;
+let isSetUp = false;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
 let webReader = new WebReader(new WebReaderController());
+
+function initialize() {
+    webReader.loadInterface();
+    isSetUp = true;
+    transmitWebReaderData();
+}
 
 function updateBrowserAction() {
     browser.browserAction.setIcon({
@@ -23,7 +30,16 @@ function toggleActive() {
     updateUrlListener();
 }
 
+function transmitWebReaderData() {
+    sbConnection.sendMessage({webReader: webReader.getObjectList()})
+}
+
 function receiveMessage(message) {
+    if (message === "test") {
+        console.log("Background script received test message");
+        sbConnection.sendMessage("test");
+        return;
+    }
     if (message === "urlRetransmissionRequest") {
         urlListener.retransmit();
         return;
@@ -38,6 +54,14 @@ function receiveMessage(message) {
         let readerEssentials = message.requestPageEdit;
         webReader.modifyPage(readerEssentials);
         sbConnection.sendMessage({editPage: readerEssentials});
+        return;
+    }
+    if (message === "requestReaderTransmission") {
+        if (!isSetUp) {
+            console.log("Core is not ready for data transmission")
+            return;
+        }
+        transmitWebReaderData();
         return;
     }
     console.log("Don't know how to act on this message:");
@@ -57,6 +81,7 @@ function updateUrlListener() {
     }
 }
 
+initialize();
 // React to toolbar click
 browser.browserAction.onClicked.addListener(toggleActive);
 updateBrowserAction();

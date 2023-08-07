@@ -1,16 +1,44 @@
 let connectionAlive = false;
 
 class ListeningPort {
+    static openConnections = new Map();
+    
     #connectionName;
-    #connections = new Map();
+    #connected = new Map();
     #fktReceive;
     
     constructor(fktReceive, connectionName = "port_from_sidebar") {
         this.#fktReceive = fktReceive;
         this.#connectionName = connectionName;
-        browser.runtime.onConnect.addListener((port) => {
-            this.#contacted(port);
-        });
+        this.#startListening();
+        this.#registerOpenPort();
+        //browser.runtime.onConnect.addListener((port) => {
+        //    this.#contacted(port);
+        //});
+    }
+    
+    #startListening() {
+        if (!browser.runtime.onConnect.hasListener(ListeningPort.listenForSubscribers))
+            browser.runtime.onConnect.addListener(ListeningPort.listenForSubscribers);
+    }
+
+    static listenForSubscribers(port) {
+        if (ListeningPort.openConnections.has(port.name)) {
+            console.log(`Found port "${port.name}"`);
+            let fkt = ListeningPort.openConnections.get(port.name);
+            fkt(port);
+        } else {
+            console.log(`Failed to find port "${port.name}"`);
+        }
+    }
+    
+    #registerOpenPort() {
+        if (ListeningPort.openConnections.has(this.#connectionName)) {
+            console.log(`Conflict: replacing conneciton "${this.#connectionName}"`);
+            ListeningPort.openConnections.delete(this.#connectionName, ListeningPort);
+        }
+        let fktContacted = (port) => {this.#contacted(port);}
+        ListeningPort.openConnections.set(this.#connectionName, fktContacted);
     }
     
     isConnected() {
@@ -20,24 +48,25 @@ class ListeningPort {
     sendMessage(message) {
         if (!connectionAlive)
             return;
-        for (let connection of this.#connections.values())
+        for (let connection of this.#connected.values())
             connection.postMessage(message);
     }
     
     #contacted(port) {
+        console.log(`${port.name} <=> ${this.#connectionName}`)
         if (port.name !== this.#connectionName) {
             console.log("Connection failed due to identification");
             return;
         }
         let contextId = port.sender.contextId;
-        this.#connections.set(contextId, port);
+        this.#connected.set(contextId, port);
         connectionAlive = true;
         port.onMessage.addListener((message) => {
             this.#fktReceive(message);
         });
         port.onDisconnect.addListener((event) => {
-            this.#connections.delete(contextId);
-            connectionAlive = this.#connections.size === 0;
+            this.#connected.delete(contextId);
+            connectionAlive = !(this.#connected.size === 0);
         });
     }
 }

@@ -19,8 +19,6 @@ class WebReader {
         this.#readerClass = this.#getReaderClass();
         this.#myInterface = new WebReaderInterface(this);
         this.#currentReader = new ReaderClassDummy();
-        
-        this.#loadContent();
     }
     
     importBackup(file) {
@@ -38,7 +36,11 @@ class WebReader {
     }
     
     saveBackup() {
-        saveBackup(this.#readerStorage.getList());
+        saveBackup(this.getObjectList());
+    }
+    
+    getObjectList() {
+        return this.#readerStorage.getList();
     }
     
     prepareReaderEdit(readerData) {
@@ -64,15 +66,21 @@ class WebReader {
     }
     
     saveProgress() {
+        return;
         if (this.#savingSuspended)
             return;
         if (!this.#controller.storageAccessGiven())
             return;
-        let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
+        let comicDataObject = buildWebReaderObject(this.getObjectList());
         browser.storage.local.set({comicData: comicDataObject});
     }
     
-    #loadContent() {
+    loadInterface(readerObjectList = undefined) {
+        if (readerObjectList !== undefined) {
+            this.#importReaderObjectList(readerObjectList);
+            return;
+        }
+        
         let gettingItem = browser.storage.local.get("comicData");
         gettingItem.then((storageResult) => {
             if (!storageResult.hasOwnProperty("comicData")) {
@@ -120,7 +128,7 @@ class WebReader {
         if (this.#container == undefined)
             return;
         let visualsList = [];
-        for (let manager of this.#readerStorage.getList()) {
+        for (let manager of this.getObjectList()) {
             if (!manager.hasVisuals())
                 continue; // not a manager then
             if (!manager.isValid())
