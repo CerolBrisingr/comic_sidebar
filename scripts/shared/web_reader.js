@@ -1,5 +1,5 @@
 import {dissectUrl} from "./url.js"
-import {ReaderData, ReaderTalk} from "./reader_data.js"
+import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
@@ -114,7 +114,7 @@ class WebReader {
         return new this.#readerClass(
             readerObject,
             this.#myInterface,
-            new ReaderTalk(intId, "core"),
+            intId,
             this.#container
         )
     }

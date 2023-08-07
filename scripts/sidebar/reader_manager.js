@@ -1,15 +1,18 @@
 import {ReaderVisuals} from "./reader_visuals.js"
-import {ReaderData, ReaderTalk} from "../shared/reader_data.js"
+import {ReaderData} from "../shared/reader_data.js"
+import {ReaderSync} from "../shared/reader_sync.js"
 
 class ReaderManager {
     #readerData;
     #parentInterface;
-    #container
-    #readerVisuals
+    #container;
+    #readerVisuals;
+    #readerSync;
     
-    constructor(readerObject, parentInterface, readerTalk, container) {
+    constructor(readerObject, parentInterface, intId, container) {
         this.#container = container;
         this.#parentInterface = parentInterface;
+        this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
         this.#readerData = this.#createReaderData(readerObject, readerObject.intId);
         this.#createReaderVisuals();
     }
@@ -30,7 +33,7 @@ class ReaderManager {
         return new ReaderData(
             readerObject,
             new ReaderManagerInterface(this),
-            new ReaderTalk(intId, "satellite")
+            this.#readerSync
         );
     }
     

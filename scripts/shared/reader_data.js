@@ -1,19 +1,17 @@
 import {dissectUrl} from "./url.js"
-import {SubscriberPort} from "../sidebar/subscriber_port.js"
-import {ListeningPort} from "../background/listening_port.js"
+import {ReaderSync} from "./reader_sync.js"
 
 class ReaderData {
     #label;
     #intId;
-    #readerTalk;
+    #readerSync;
     #prefixMask;
     #automatic;
     #manual;
     #parentInterface;
     
-    constructor(data, parentInterface, readerTalk) {
+    constructor(data, parentInterface, readerSync) {
         this.#parentInterface = parentInterface;
-        this.#intId = readerTalk.getId();
         if (data.hasOwnProperty("base_url"))
             data.prefix_mask = String(data.base_url);
         if (data.hasOwnProperty("prefix_mask"))
@@ -27,7 +25,10 @@ class ReaderData {
         if (data.hasOwnProperty("manual"))
             this.#importManualList(data.manual);
         
-        this.#readerTalk = readerTalk.initialize(this);
+        if (typeof readerSync === "number")
+            readerSync = ReaderSync.makeCore(readerSync, this);
+        this.#readerSync = readerSync;
+        this.#intId = this.#readerSync.getId();
     }
     
     #importAutomaticList(list) {
@@ -180,66 +181,6 @@ class ReaderData {
     collapse() {}
 }
 
-class ReaderTalk {
-    #intId;
-    #isCore;
-    #readerData;
-    #port;
-    constructor(intId, strRole) {
-        this.#intId = intId;
-        switch (strRole.toLowerCase()) {
-            case "core":
-                this.#isCore = true;
-                break;
-            case "satellite":
-                this.#isCore = false;
-                break;
-            default:
-                error(`Invalid ReaderTalk role "${strRole}"`);
-        }
-    }
-    
-    initialize(readerData) {
-        this.#readerData = readerData;
-        if (this.#isCore) {
-            this.#setUpCore();
-        } else {
-            this.#setUpSatellite();
-        }
-        return this;
-    }
-    
-    getId() {
-        return this.#intId;
-    }
-    
-    #getStrId() {
-        return `id${this.#intId}`;
-    }
-    
-    #setUpCore() {
-        let fktReceive = (message) => {this.#coreReceive(message);};
-        this.#port = new ListeningPort(fktReceive, this.#getStrId());
-    }
-    
-    #coreReceive(message) {
-        console.log(`Core "${this.#readerData.getLabel()}":`);
-        console.log(message);
-    }
-    
-    #setUpSatellite() {
-        let fktReceive = (message) => {this.#satelliteReceive(message);};
-        this.#port = new SubscriberPort(fktReceive, this.#getStrId());
-        this.#port.sendMessage(`Hello "${this.#readerData.getLabel()}"`);
-    }
-    
-    #satelliteReceive(message) {
-        console.log(`Satellite "${this.#readerData.getLabel()}":`);
-        console.log(message);
-    }
-    
-}
-
 class Bookmark {
     #href = "#";
     #label = undefined;
@@ -285,4 +226,4 @@ class Bookmark {
     }
 }
 
-export {Bookmark, ReaderData, ReaderTalk}
+export {Bookmark, ReaderData}
