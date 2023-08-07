@@ -25,9 +25,6 @@ class ReaderSync {
     getStrId() {
         return `id${this.intId}`;
     }
-    
-    setUp() {}
-    receive(message) {}
 }
 
 class ReaderSyncCore extends ReaderSync {
@@ -42,7 +39,6 @@ class ReaderSyncCore extends ReaderSync {
             return;
         this.#readerData = readerData;
         this.#setUp();
-        return this;
     }
     
     #setUp() {
@@ -51,8 +47,17 @@ class ReaderSyncCore extends ReaderSync {
     }
     
     #receive(message) {
-        console.log(`Core "${this.#readerData.getLabel()}" received:`);
         console.log(message);
+        if (message.hasOwnProperty("pinRequest")) {
+            this.#pinRequestHandler(message.pinRequest);
+            return;
+        }
+    }
+    
+    #pinRequestHandler(url) {
+        if (this.#readerData.addManual(url)) {
+            this.port.sendMessage({pinCommand: url})
+        }
     }
     
 }
@@ -64,12 +69,15 @@ class ReaderSyncSatellite extends ReaderSync {
         this.#setReaderManager(readerManager);
     }
     
+    sendPinRequest(url) {
+        this.port.sendMessage({pinRequest: url});
+    }
+    
     #setReaderManager(readerManager) {
         if (this.#readerManager)
             return;
         this.#readerManager = readerManager;
         this.#setUp();
-        return this;
     }
     
     #setUp() {
@@ -78,8 +86,15 @@ class ReaderSyncSatellite extends ReaderSync {
     }
     
     #receive(message) {
-        console.log(`Satellite "${this.#readerManager.getLabel()}" received:`);
         console.log(message);
+        if (message.hasOwnProperty("pinCommand")) {
+            this.#handlePinCommand(message.pinCommand);
+            return;
+        }
+    }
+    
+    #handlePinCommand(url) {
+        this.#readerManager.addManual(url);
     }
 }
 

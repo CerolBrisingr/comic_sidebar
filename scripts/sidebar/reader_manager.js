@@ -76,6 +76,10 @@ class ReaderManager {
             this.#readerVisuals.updateReaderUrls(this.#readerData);
     }
     
+    sendPinRequest(url) {
+        this.#readerSync.sendPinRequest(url);
+    }
+    
     addManual(url) {
         let bookmark = this.#readerData.addManual(url);
         if (bookmark === undefined)
@@ -150,11 +154,8 @@ class ReaderManagerInterface {
         this.#readerManager.prepareReaderEdit();
     }
     
-    pinBookmark(bookmark) {
-        if (this.#readerManager.addManual(bookmark.href)) {
-            return true;
-        }
-        return false;
+    requestPinBookmark(bookmark) {
+        this.#readerManager.sendPinRequest(bookmark.href);
     }
     
     unpinBookmark(bookmark) {
