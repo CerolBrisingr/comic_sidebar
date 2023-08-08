@@ -118,7 +118,7 @@ class ReaderData {
         return true;
     }
     
-    updateReaderConfig(readerEssentials) {
+    editReader(readerEssentials) {
         this.#label = readerEssentials.label;
         this.#prefixMask = readerEssentials.prefix;
         this.#parentInterface.saveProgress();

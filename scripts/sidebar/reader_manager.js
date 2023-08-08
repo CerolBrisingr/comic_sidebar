@@ -1,6 +1,7 @@
 import {ReaderVisuals} from "./reader_visuals.js"
 import {ReaderData} from "../shared/reader_data.js"
 import {ReaderSync} from "../shared/reader_sync.js"
+import {ReaderEditor} from "./reader_editor.js"
 
 class ReaderManager {
     #readerData;
@@ -48,13 +49,15 @@ class ReaderManager {
     }
     
     prepareReaderEdit() {
-        this.#parentInterface.prepareReaderEdit(this.#readerData);
+        let fktForward = (readerEssentials) => {
+            this.#readerSync.sendEditRequest(readerEssentials);
+        };
+        ReaderEditor.updateLink(this.#readerData, fktForward);
         this.expand();
     }
     
-    updateReaderConfig(readerEssentials) {
-        console.log(readerEssentials);
-        this.#readerData.updateReaderConfig(readerEssentials);
+    editReader(readerEssentials) {
+        this.#readerData.editReader(readerEssentials);
         this.#updateReaderVisuals();
         this.expand();
     }

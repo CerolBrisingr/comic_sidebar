@@ -44,10 +44,6 @@ class WebReader {
         return readerObject.data;
     }
     
-    prepareReaderEdit(readerData) {
-        this.#controller.prepareReaderEdit(readerData);
-    }
-    
     #selectCorrespondingStorage(url) {
         if (this.#currentReader.urlIsCompatible(url))
             return this.#currentReader;
@@ -172,7 +168,7 @@ class WebReader {
     modifyPage(readerEssentials) {
         let readerClass = this.#readerStorage.getObject(readerEssentials.initialUrl);
         if (readerClass)
-            readerClass.updateReaderConfig(readerEssentials);
+            readerClass.editReader(readerEssentials);
     }
 }
 
@@ -250,10 +246,6 @@ class WebReaderInterface {
         this.#webReader = webReader;
     }
     
-    prepareReaderEdit(readerData) {
-        this.#webReader.prepareReaderEdit(readerData);
-    }
-    
     saveProgress() {
         this.#webReader.saveProgress();
     }
@@ -262,20 +254,13 @@ class WebReaderInterface {
 
 class WebReaderController {
     #container;
-    #fktEditor;
     
-    constructor(container = undefined, fktEditor = undefined) {
+    constructor(container = undefined) {
         this.#container = container;
-        this.#fktEditor = fktEditor;
     }
     
     getContainer() {
         return this.#container;
-    }
-    
-    prepareReaderEdit(readerData) {
-        if (this.#fktEditor !== undefined)
-            this.#fktEditor(readerData);
     }
     
     storageAccessGiven() {

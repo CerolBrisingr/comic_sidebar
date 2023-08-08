@@ -66,18 +66,9 @@ function setUpWebReader(readerObjectList) {
     isSetUp = true;
     setUpButtons();
     let container = document.getElementById('container');
-    let webReaderController = new WebReaderController(container, prepareReaderEdit);
+    let webReaderController = new WebReaderController(container);
     webReader = new WebReader(webReaderController);
     webReader.importInterface(readerObjectList);
-}
-
-function prepareReaderEdit(readerData) {
-    let currentPrefix = readerData.getPrefixMask();
-    ReaderEditor.updateLink(readerData, requestReaderEdit);
-}
-
-function requestReaderEdit(readerEssentials) {
-    bsConnection.sendMessage({requestPageEdit: readerEssentials});
 }
 
 function requestUrlRetransmission() {

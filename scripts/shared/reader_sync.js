@@ -47,13 +47,17 @@ class ReaderSyncCore extends ReaderSync {
     }
     
     #receive(message) {
-        console.log(message);
         if (message.hasOwnProperty("pinRequest")) {
             this.#pinRequestHandler(message.pinRequest);
             return;
         }
         if (message.hasOwnProperty("unpinRequest")) {
             this.#unpinRequestHandler(message.unpinRequest);
+            return;
+        }
+        if (message.hasOwnProperty("editRequest")) {
+            this.#editRequestHandler(message.editRequest);
+            return;
         }
     }
     
@@ -67,6 +71,11 @@ class ReaderSyncCore extends ReaderSync {
         if (this.#readerData.removeManual(url)) {
             this.port.sendMessage({unpinCommand: url});
         }
+    }
+    
+    #editRequestHandler(readerEssentials) {
+        this.#readerData.editReader(readerEssentials);
+        this.port.sendMessage({editCommand: readerEssentials});
     }
     
 }
@@ -86,6 +95,11 @@ class ReaderSyncSatellite extends ReaderSync {
         this.port.sendMessage({unpinRequest: url});
     }
     
+    
+    sendEditRequest(readerEssentials) {
+        this.port.sendMessage({editRequest: readerEssentials});
+    }
+    
     #setReaderManager(readerManager) {
         if (this.#readerManager)
             return;
@@ -99,13 +113,16 @@ class ReaderSyncSatellite extends ReaderSync {
     }
     
     #receive(message) {
-        console.log(message);
         if (message.hasOwnProperty("pinCommand")) {
             this.#handlePinCommand(message.pinCommand);
             return;
         }
         if (message.hasOwnProperty("unpinCommand")) {
             this.#handleUnpinCommand(message.unpinCommand);
+            return;
+        }
+        if (message.hasOwnProperty("editCommand")) {
+            this.#handleEditCommand(message.editCommand);
             return;
         }
     }
@@ -116,6 +133,10 @@ class ReaderSyncSatellite extends ReaderSync {
     
     #handleUnpinCommand(url) {
         this.#readerManager.removeManual(url);
+    }
+    
+    #handleEditCommand(readerEssentials) {
+        this.#readerManager.editReader(readerEssentials);
     }
 }
 

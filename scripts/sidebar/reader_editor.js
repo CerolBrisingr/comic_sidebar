@@ -28,7 +28,7 @@ class ReaderEditor {
     static updateLink(readerData, fktFinalize) {
         if (ReaderEditor.editor === undefined)
             return;
-        ReaderEditor.editor.updateLink(readerData.fktFinalize);
+        ReaderEditor.editor.updateLink(readerData, fktFinalize);
     }
     
 }
