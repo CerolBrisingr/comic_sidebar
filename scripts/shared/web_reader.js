@@ -12,6 +12,7 @@ class WebReader {
     #savingSuspended = false;
     #readerStorage = new HtmlContainer();
     #currentReader;
+    #latestId = 0;
     
     constructor(controller) {
         this.#controller = controller;
@@ -96,6 +97,7 @@ class WebReader {
         this.#readerStorage.clearData();
         this.#savingSuspended = true;
         for (let [index, readerObject] of readerObjectList.entries()) {
+            this.#latestId = index;
             let newObject = this.#createReaderClass(readerObject, index);
             if (!newObject.isValid())
                 continue;
@@ -147,22 +149,23 @@ class WebReader {
         this.#container.appendChild(manager.getVisuals());
     }
     
-    registerPage(readerEssentials) {
+    registerPage(readerObject) {
         let storageObject 
-            = this.#selectCorrespondingStorage(readerEssentials.initialUrl);
+            = this.#selectCorrespondingStorage(readerObject.initialUrl);
         if (storageObject.isValid()) {
             console.log("Page already registered as " + storageObject.getLabel());
-            return;
+            return -1;
         }
-        let readerObject = {prefix_mask: readerEssentials.prefix, label: readerEssentials.label};
-        let newManager = this.#createReaderClass(readerObject);
+        this.#latestId += 1;
+        let newManager = this.#createReaderClass(readerObject, this.#latestId);
         if (!newManager.isValid()) {
             console.log("Failed to build comic entry");
-            return;
+            return -1;
         }
         this.#readerStorage.saveObject(newManager);
         this.#addToContainer(newManager);
-        this.updateBookmark(readerEssentials.initialUrl); // This also updates storage
+        this.updateBookmark(readerObject.initialUrl); // This also updates storage
+        return this.#latestId;
     }
     
     modifyPage(readerEssentials) {

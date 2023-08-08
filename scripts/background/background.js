@@ -47,9 +47,12 @@ function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("requestPageAddition")) {
-        let readerEssentials = message.requestPageAddition;
-        webReader.registerPage(readerEssentials);
-        sbConnection.sendMessage({addPage: readerEssentials});
+        let readerObject = message.requestPageAddition;
+        let readerId = webReader.registerPage(readerObject);
+        if (readerId === -1)
+            return;
+        readerObject.intId = readerId;
+        sbConnection.sendMessage({addPage: readerObject});
         return;
     }
     if (message === "requestReaderTransmission") {
