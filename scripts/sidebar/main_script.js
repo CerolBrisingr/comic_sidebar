@@ -57,7 +57,9 @@ function setUpReaderEditor() {
     let errorMsg = document.getElementById('new_comic_error');
     let cancelBtn = document.getElementById('new_comic_cancel');
     let okBtn = document.getElementById('new_comic_finalize');
-    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
+    let startDel = document.getElementById('comic_start_delete');
+    let confirmDel = document.getElementById('comic_confirm_delete');
+    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel);
 }
 
 function setUpWebReader(readerObjectList) {
