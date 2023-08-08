@@ -3,6 +3,9 @@ import {BookmarkButton} from "./bookmark_button.js"
 
 class ReaderVisuals {
     #parentInterface;
+    #listing;
+    #bookmarkList;
+    #bookmarkButtonList = [];
     
     constructor(readerData, parentInterface) {
         this.#parentInterface = parentInterface;
@@ -11,12 +14,16 @@ class ReaderVisuals {
     }
     
     #createListing() {
-        this.listing = document.createElement("li");
-        this.listing.classList.add('comic_listing');
+        this.#listing = document.createElement("li");
+        this.#listing.classList.add('comic_listing');
+    }
+    
+    getListing() {
+        return this.#listing;
     }
     
     updateListing(readerData) {
-        this.listing.replaceChildren();
+        this.#listing.replaceChildren();
         this.#createBaseLink(readerData.getLabel());
         this.#addEditReaderButton();
         this.#addExpandReaderButton();
@@ -32,12 +39,12 @@ class ReaderVisuals {
             openUrlInMyTab(this.baseLink.href);
             return false;
             }
-        this.listing.appendChild(this.baseLink);
+        this.#listing.appendChild(this.baseLink);
     }
     
     #addEditReaderButton() {
         let editButton = createEditButton();
-        this.listing.appendChild(editButton);
+        this.#listing.appendChild(editButton);
         editButton.onclick = () => {
             this.#parentInterface.prepareReaderEdit();
         }
@@ -47,16 +54,16 @@ class ReaderVisuals {
         this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
         this.expandButton.setAttribute("aria-expanded",false);
         this.expandButton.classList.add('first_button');
-        this.listing.appendChild(this.expandButton);
+        this.#listing.appendChild(this.expandButton);
     }
     
     #createBookmarkList(parentElement, myId) {
-        this.bookmarkList = Object.assign(document.createElement("ul"), {id:encodeURI(myId)});
-        this.listing.appendChild(this.bookmarkList);
+        this.#bookmarkList = Object.assign(document.createElement("ul"), {id:encodeURI(myId)});
+        this.#listing.appendChild(this.#bookmarkList);
     }
     
     updateReaderUrls(readerData) {
-        this.bookmarkList.replaceChildren();
+        this.#bookmarkList.replaceChildren();
         this.#addBookmarks(readerData, readerData.getAutomaticBookmarks(), "auto");
         this.#addBookmarks(readerData, readerData.getPinnedBookmarks(), "manual");
         this.#updateBaseLink(readerData);
@@ -73,6 +80,7 @@ class ReaderVisuals {
     }
     
     #addBookmarks(readerData, bookmarkList, strMeta) {
+        this.#bookmarkButtonList.length = 0;
         for (let bookmark of bookmarkList) {
             let prefix = readerData.getPrefixMask(); 
             let bookmarkButton = new BookmarkButton(
@@ -83,18 +91,26 @@ class ReaderVisuals {
             if (strMeta === "manual") {
                 bookmarkObject.appendChild(this.#createEditBookmarkButton(bookmarkButton));
                 bookmarkObject.appendChild(this.#createUnpinUrlButton(bookmark));
+                this.#bookmarkButtonList.push(bookmarkButton);
             } else {
                 bookmarkObject.appendChild(this.#createPinUrlButton(bookmark));
                 
             }
-            this.bookmarkList.appendChild(bookmarkObject);
+            this.#bookmarkList.appendChild(bookmarkObject);
+        }
+    }
+    
+    updateManualLabel(url, newLabel) {
+        for (let bookmarkButton of this.#bookmarkButtonList) {
+            if (bookmarkButton.linkMatches(url))
+                bookmarkButton.updateLabel(newLabel);
         }
     }
     
     #createEditBookmarkButton(bookmarkButton) {
         let editButton = createEditButton();
         editButton.onclick = () => {
-            bookmarkButton.edit();
+            bookmarkButton.editButtonClicked();
         }
         return editButton;
     }
@@ -102,7 +118,7 @@ class ReaderVisuals {
     #createPinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
-            this.#parentInterface.pinBookmark(bookmark);
+            this.#parentInterface.requestPinBookmark(bookmark);
         }
         return pinButton;
     }
@@ -110,24 +126,24 @@ class ReaderVisuals {
     #createUnpinUrlButton(bookmark) {
         let pinButton = createPinButton();
         pinButton.onclick = () => {
-            this.#parentInterface.unpinBookmark(bookmark);
+            this.#parentInterface.requestUnpinBookmark(bookmark);
         }
         return pinButton;
     }
     
     expand () {
-        this.bookmarkList.classList.add('visible');
+        this.#bookmarkList.classList.add('visible');
         this.expandButton.setAttribute('aria-expanded', 'true');
     }
     
     collapse () {
-        this.bookmarkList.classList.remove('visible');
+        this.#bookmarkList.classList.remove('visible');
         this.expandButton.setAttribute('aria-expanded', 'false');
     }
     
     #enableBookmarkExpansion() {
             this.expandButton.onclick = () => {
-            if (this.bookmarkList.classList.contains('visible')) {
+            if (this.#bookmarkList.classList.contains('visible')) {
                 this.collapse();
             } else {
                 this.expand();

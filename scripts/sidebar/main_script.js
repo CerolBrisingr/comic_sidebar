@@ -14,41 +14,38 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 // Tab management
 let myWindowId;
 let webReader;
-let readerEditor;
+let isSetUp = false;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     
-    readerEditor = setUpReaderEditor();
-    setUpWebReader();
-    setUpButtons();
-    setTimeout(() => {requestUrlRetransmission();}, 250);
-    
-    function setUpButtons() {
-        const exportTrigger = document.getElementById('export_trigger');
-        exportTrigger.onclick = function() {
-            if (webReader === undefined)
-                return;
-            webReader.saveBackup();
-            };
-        
-        const inputElement = document.getElementById('file-selector');
-        inputElement.style.display = 'none';
-        inputElement.addEventListener('change', (event) => {
-            if (webReader === undefined)
-                return;
-            webReader.importBackup(event.target.files[0]);
-        });
-        
-        const inputTrigger = document.getElementById('import_trigger');
-        inputTrigger.onclick = function () {inputElement.click()};
-        
-        const addComic = document.getElementById('add_comic');
-        addComic.onclick = function () {addCurrentPage()};
-    }
-    
+    setUpReaderEditor();
+    requestWebReader();
 });
+
+function setUpButtons() {
+    const exportTrigger = document.getElementById('export_trigger');
+    exportTrigger.onclick = function() {
+        if (webReader === undefined)
+            return;
+        webReader.saveBackup();
+        };
+    
+    const inputElement = document.getElementById('file-selector');
+    inputElement.style.display = 'none';
+    inputElement.addEventListener('change', (event) => {
+        if (webReader === undefined)
+            return;
+        webReader.importBackup(event.target.files[0]);
+    });
+    
+    const inputTrigger = document.getElementById('import_trigger');
+    inputTrigger.onclick = function () {inputElement.click()};
+    
+    const addComic = document.getElementById('add_comic');
+    addComic.onclick = function () {addCurrentPage()};
+}
 
 function setUpReaderEditor() {
     let fullFrame = document.getElementById('new_comic_input_frame');
@@ -60,23 +57,18 @@ function setUpReaderEditor() {
     let errorMsg = document.getElementById('new_comic_error');
     let cancelBtn = document.getElementById('new_comic_cancel');
     let okBtn = document.getElementById('new_comic_finalize');
-    let readerEditor = new ReaderEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
-    return readerEditor;
+    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn);
 }
 
-function setUpWebReader() {
+function setUpWebReader(readerObjectList) {
+    if (readerObjectList === undefined)
+        return;
+    isSetUp = true;
+    setUpButtons();
     let container = document.getElementById('container');
-    let webReaderController = new WebReaderController(false, container, prepareReaderEdit);
+    let webReaderController = new WebReaderController(container);
     webReader = new WebReader(webReaderController);
-}
-
-function prepareReaderEdit(readerData) {
-    let currentPrefix = readerData.getPrefixMask();
-    readerEditor.updateLink(readerData, requestReaderEdit);
-}
-
-function requestReaderEdit(readerEssentials) {
-    bsConnection.sendMessage({requestPageEdit: readerEssentials});
+    webReader.importInterface(readerObjectList);
 }
 
 function requestUrlRetransmission() {
@@ -85,6 +77,19 @@ function requestUrlRetransmission() {
 
 function requestPageAddition(readerEssentials) {
     bsConnection.sendMessage({requestPageAddition: readerEssentials});
+}
+
+function requestWebReader() {
+    if (!isSetUp)
+        bsConnection.sendMessage("requestReaderTransmission");
+}
+
+function receiveReaderObjectList(readerObjectList) {
+    if (isSetUp)
+        return;
+    setUpWebReader(readerObjectList);
+    setUpButtons();
+    setTimeout(() => {requestUrlRetransmission();}, 250);
 }
 
 // Add current page to list
@@ -96,7 +101,7 @@ function addCurrentPage() {
         return;
     browser.tabs.query({windowId: myWindowId, active: true})
         .then((tabs) => {
-            readerEditor.importLink(tabs[0].url, requestPageAddition);
+            ReaderEditor.importLink(tabs[0].url, requestPageAddition);
             }
             , onError);
 }
@@ -113,16 +118,20 @@ function updateBookmark(url) {
 }
 
 function receiveMessage(message) {
+    if (message === "test") {
+        console.log("Sidebar script received test message");
+        return;
+    }
+    if (message.hasOwnProperty("webReader")) {
+        setUpWebReader(message.webReader);
+        return;
+    }
     if (message.hasOwnProperty("updateBookmark")) {
         updateBookmark(message.updateBookmark);
         return;
     }
     if (message.hasOwnProperty("addPage")) {
         webReader.registerPage(message.addPage);
-        return;
-    }
-    if (message.hasOwnProperty("editPage")) {
-        webReader.modifyPage(message.editPage);
         return;
     }
     console.log("Don't know how to act on this message:");

@@ -1,13 +1,16 @@
 import {dissectUrl} from "./url.js"
+import {ReaderSync} from "./reader_sync.js"
 
 class ReaderData {
     #label;
+    #intId;
+    #readerSync;
     #prefixMask;
     #automatic;
     #manual;
     #parentInterface;
     
-    constructor(data, parentInterface) {
+    constructor(data, parentInterface, readerSync) {
         this.#parentInterface = parentInterface;
         if (data.hasOwnProperty("base_url"))
             data.prefix_mask = String(data.base_url);
@@ -21,6 +24,11 @@ class ReaderData {
             this.#importAutomaticList(data.automatic);
         if (data.hasOwnProperty("manual"))
             this.#importManualList(data.manual);
+        
+        if (typeof readerSync === "number")
+            readerSync = ReaderSync.makeCore(readerSync, this);
+        this.#readerSync = readerSync;
+        this.#intId = this.#readerSync.getId();
     }
     
     #importAutomaticList(list) {
@@ -110,7 +118,7 @@ class ReaderData {
         return true;
     }
     
-    updateReaderConfig(readerEssentials) {
+    editReader(readerEssentials) {
         this.#label = readerEssentials.label;
         this.#prefixMask = readerEssentials.prefix;
         this.#parentInterface.saveProgress();
@@ -140,8 +148,8 @@ class ReaderData {
         return newBookmark;
     }
     
-    removeManual(bookmark) {
-        let index = this.#manual.indexOf(bookmark);
+    removeManual(url) {
+        let index = this.#findManualBookmark(url);
         if (index === -1) {
             console.log('Could not find requested bookmark in list to remove it');
             return false;
@@ -151,8 +159,25 @@ class ReaderData {
         return true;
     }
     
+    updateManualLabel(url, newLabel) {
+        let index = this.#findManualBookmark(url);
+        if (index === -1)
+            return false;
+        this.#manual[index].setLabel(newLabel);
+        return true;
+    }
+    
+    #findManualBookmark(url) {
+        for (let [index, bookmark] of this.#manual.entries()) {
+            if (bookmark.href === url)
+                return index;
+        }
+        return -1;
+    }
+    
     returnAsObject() {
         let thisAsObject = {
+            intId: this.#intId,
             label:this.#label,
             prefix_mask:this.#prefixMask,
             automatic: [],

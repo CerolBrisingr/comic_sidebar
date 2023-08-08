@@ -5,7 +5,6 @@ import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 
 class WebReader {
-    #readerEditor;
     #controller;
     #container;
     #readerClass;
@@ -20,8 +19,6 @@ class WebReader {
         this.#readerClass = this.#getReaderClass();
         this.#myInterface = new WebReaderInterface(this);
         this.#currentReader = new ReaderClassDummy();
-        
-        this.#loadContent();
     }
     
     importBackup(file) {
@@ -42,8 +39,9 @@ class WebReader {
         saveBackup(this.#readerStorage.getList());
     }
     
-    prepareReaderEdit(readerData) {
-        this.#controller.prepareReaderEdit(readerData);
+    getObjectList() {
+        let readerObject = buildWebReaderObject(this.#readerStorage.getList());
+        return readerObject.data;
     }
     
     #selectCorrespondingStorage(url) {
@@ -73,7 +71,13 @@ class WebReader {
         browser.storage.local.set({comicData: comicDataObject});
     }
     
-    #loadContent() {
+    importInterface(readerObjectList) {
+        if (readerObjectList === undefined)
+            return;
+        this.#importReaderObjectList(readerObjectList);
+    }
+    
+    loadInterface(fktDone) {
         let gettingItem = browser.storage.local.get("comicData");
         gettingItem.then((storageResult) => {
             if (!storageResult.hasOwnProperty("comicData")) {
@@ -82,6 +86,7 @@ class WebReader {
             }
             let readerObjectList = unpackReaderObjectList(storageResult.comicData);
             this.#importReaderObjectList(readerObjectList);
+            fktDone();
             }, 
             () => {console.log("No data stored locally, aborting loading sequence! (1)")});
     }
@@ -89,8 +94,8 @@ class WebReader {
     #importReaderObjectList(readerObjectList){
         this.#readerStorage.clearData();
         this.#savingSuspended = true;
-        for (let readerObject of readerObjectList) {
-            let newObject = this.#createReaderClass(readerObject);
+        for (let [index, readerObject] of readerObjectList.entries()) {
+            let newObject = this.#createReaderClass(readerObject, index);
             if (!newObject.isValid())
                 continue;
             this.#readerStorage.saveObject(newObject);
@@ -100,10 +105,11 @@ class WebReader {
         this.saveProgress();
     }
     
-    #createReaderClass(readerObject) {
+    #createReaderClass(readerObject, intId) {
         return new this.#readerClass(
             readerObject,
             this.#myInterface,
+            intId,
             this.#container
         )
     }
@@ -161,7 +167,7 @@ class WebReader {
     modifyPage(readerEssentials) {
         let readerClass = this.#readerStorage.getObject(readerEssentials.initialUrl);
         if (readerClass)
-            readerClass.updateReaderConfig(readerEssentials);
+            readerClass.editReader(readerEssentials);
     }
 }
 
@@ -239,10 +245,6 @@ class WebReaderInterface {
         this.#webReader = webReader;
     }
     
-    prepareReaderEdit(readerData) {
-        this.#webReader.prepareReaderEdit(readerData);
-    }
-    
     saveProgress() {
         this.#webReader.saveProgress();
     }
@@ -250,27 +252,18 @@ class WebReaderInterface {
 }
 
 class WebReaderController {
-    #savingAllowed;
     #container;
-    #fktEditor;
     
-    constructor(allowSave, container = undefined, fktEditor = undefined) {
-        this.#savingAllowed = allowSave;
+    constructor(container = undefined) {
         this.#container = container;
-        this.#fktEditor = fktEditor;
     }
     
     getContainer() {
         return this.#container;
     }
     
-    prepareReaderEdit(readerData) {
-        if (this.#fktEditor !== undefined)
-            this.#fktEditor(readerData);
-    }
-    
     storageAccessGiven() {
-        return this.#savingAllowed;
+        return this.#container === undefined;
     }
 }
 

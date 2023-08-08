@@ -1,15 +1,20 @@
 import {ReaderVisuals} from "./reader_visuals.js"
 import {ReaderData} from "../shared/reader_data.js"
+import {ReaderSync} from "../shared/reader_sync.js"
+import {ReaderEditor} from "./reader_editor.js"
 
 class ReaderManager {
     #readerData;
     #parentInterface;
-    #container
+    #container;
+    #readerVisuals;
+    #readerSync;
     
-    constructor(readerObject, parentInterface, container) {
+    constructor(readerObject, parentInterface, intId, container) {
         this.#container = container;
         this.#parentInterface = parentInterface;
-        this.#readerData = this.#createReaderData(readerObject);
+        this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
+        this.#readerData = this.#createReaderData(readerObject, readerObject.intId);
         this.#createReaderVisuals();
     }
     
@@ -25,37 +30,40 @@ class ReaderManager {
         return this.#readerData.getPrefixMask();
     }
     
-    #createReaderData(readerObject) {
+    #createReaderData(readerObject, intId) {
         return new ReaderData(
             readerObject,
-            new ReaderManagerInterface(this)
+            new ReaderManagerInterface(this),
+            this.#readerSync
         );
     }
     
     #createReaderVisuals() {
         if (this.#readerData === undefined) {
-            this.readerVisuals = undefined;
+            this.#readerVisuals = undefined;
             console.log("Encountered invalid readerData");
             return;
         }
         let readerManagerInterface = new ReaderManagerInterface(this);
-        this.readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
+        this.#readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
     }
     
     prepareReaderEdit() {
-        this.#parentInterface.prepareReaderEdit(this.#readerData);
+        let fktForward = (readerEssentials) => {
+            this.#readerSync.sendEditRequest(readerEssentials);
+        };
+        ReaderEditor.updateLink(this.#readerData, fktForward);
         this.expand();
     }
     
-    updateReaderConfig(readerEssentials) {
-        console.log(readerEssentials);
-        this.#readerData.updateReaderConfig(readerEssentials);
+    editReader(readerEssentials) {
+        this.#readerData.editReader(readerEssentials);
         this.#updateReaderVisuals();
         this.expand();
     }
     
     #updateReaderVisuals() {
-        this.readerVisuals.updateListing(this.#readerData);
+        this.#readerVisuals.updateListing(this.#readerData);
     }
     
     urlIsCompatible(url) {
@@ -68,36 +76,47 @@ class ReaderManager {
     
     addAutomatic(url) {
         if (this.#readerData.addAutomatic(url))
-            this.readerVisuals.updateReaderUrls(this.#readerData);
+            this.#readerVisuals.updateReaderUrls(this.#readerData);
+    }
+    
+    sendPinRequest(url) {
+        this.#readerSync.sendPinRequest(url);
     }
     
     addManual(url) {
-        let bookmark = this.#readerData.addManual(url);
-        if (bookmark === undefined)
-            return false
-        this.readerVisuals.updateReaderUrls(this.#readerData);
-        return true;
+        if (this.#readerData.addManual(url))
+            this.#readerVisuals.updateReaderUrls(this.#readerData);
+    }
+    
+    updateBookmarkLabel(url, newLabel) {
+        if (this.#readerData.updateManualLabel(url, newLabel)) {
+            this.#readerVisuals.updateManualLabel(url, newLabel);
+        }
+    }
+    
+    sendUnpinRequest(url) {
+        this.#readerSync.sendUnpinRequest(url);
+    }
+    
+    sendBookmarkLabelUpdateRequest(url, newLabel) {
+        this.#readerSync.sendBookmarkLabelUpdateRequest(url, newLabel);
     }
 
-    removeManual(bookmark) {
-        let didRemove = this.#readerData.removeManual(bookmark);
+    removeManual(url) {
+        let didRemove = this.#readerData.removeManual(url);
         if (didRemove)
-            this.readerVisuals.updateReaderUrls(this.#readerData);
+            this.#readerVisuals.updateReaderUrls(this.#readerData);
         return didRemove;
     }
     
     getVisuals() {
-        return this.readerVisuals.listing;
+        return this.#readerVisuals.getListing();
     }
     
     isValid() {
-        if (this.#readerData === undefined || this.readerVisuals === undefined)
+        if (this.#readerData === undefined || this.#readerVisuals === undefined)
             return false;
         return this.#readerData.isValid();
-    }
-    
-    getReaderData() {
-        return this.#readerData;
     }
     
     returnAsObject() {
@@ -105,15 +124,11 @@ class ReaderManager {
     }
     
     expand() {
-        this.readerVisuals.expand();
+        this.#readerVisuals.expand();
     }
     
     collapse() {
-        this.readerVisuals.collapse();
-    }
-    
-    saveProgress() {
-        this.#parentInterface.saveProgress();
+        this.#readerVisuals.collapse();
     }
 }
 
@@ -153,22 +168,19 @@ class ReaderManagerInterface {
         this.#readerManager.prepareReaderEdit();
     }
     
-    pinBookmark(bookmark) {
-        if (this.#readerManager.addManual(bookmark.href)) {
-            return true;
-        }
-        return false;
+    requestPinBookmark(bookmark) {
+        this.#readerManager.sendPinRequest(bookmark.href);
     }
     
-    unpinBookmark(bookmark) {
-        if (this.#readerManager.removeManual(bookmark)) {
-            return true;
-        }
-        return false;
+    requestUnpinBookmark(bookmark) {
+        this.#readerManager.sendUnpinRequest(bookmark.href);
+    }
+    
+    requestBookmarkLabelUpdate(bookmark, newLabel) {
+        this.#readerManager.sendBookmarkLabelUpdateRequest(bookmark.href, newLabel);
     }
     
     saveProgress() {
-        this.#readerManager.saveProgress();
     }
 }
 

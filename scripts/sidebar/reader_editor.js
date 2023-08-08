@@ -1,6 +1,39 @@
 import {dissectUrl} from "../shared/url.js"
 
 class ReaderEditor {
+    constructor() {
+        throw new Error("Static class, do not instantiate!")
+    }
+    
+    static editor;
+    
+    static setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
+        ReaderEditor.editor = new Editor(fullFrame,
+            fullLink,
+            label,
+            prefix,
+            linkLabel,
+            textMsg,
+            errorMsg,
+            cancelBtn,
+            okBtn);
+    }
+    
+    static importLink(url, fktFinalize) {
+        if (ReaderEditor.editor === undefined)
+            return;
+        ReaderEditor.editor.importLink(url, fktFinalize);
+    }
+    
+    static updateLink(readerData, fktFinalize) {
+        if (ReaderEditor.editor === undefined)
+            return;
+        ReaderEditor.editor.updateLink(readerData, fktFinalize);
+    }
+    
+}
+
+class Editor {
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
         for (let arg of arguments) {
             if (arg === undefined) {

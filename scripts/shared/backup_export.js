@@ -18,7 +18,15 @@ function buildWebReaderObject(readerClassList) {
 
 function exportJSON(readerClassList) {
     let webReaderObject = buildWebReaderObject(readerClassList);
-    return JSON.stringify(webReaderObject);
+    return JSON.stringify(webReaderObject, replacer);
+}
+
+function replacer(key, value) {
+    if (key === "intId") {
+        return undefined;
+    } else {
+        return value;
+    }
 }
 
 export {saveBackup, buildWebReaderObject}

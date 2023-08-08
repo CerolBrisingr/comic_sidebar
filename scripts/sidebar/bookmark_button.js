@@ -19,6 +19,10 @@ class BookmarkButton {
         this.#buildContainer();
     }
     
+    linkMatches(url) {
+        return (url === this.#bookmark.href);
+    }
+    
     isValid() {
         return !(this.#container === undefined);
     }
@@ -27,25 +31,31 @@ class BookmarkButton {
         return this.#container;
     }
     
-    edit() {
+    editButtonClicked() {
+        // Clicked once: start editor
+        // Clicked again: apply changes
         if (this.#labelEdit.classList.contains("no_draw")) {
             this.#showEditor();
             this.#labelEdit.select();
         } else {
-            this.#showLabel();
-            this.#updateLabel();
+            this.#requestUpdate();
         }
     }
     
-    #updateLabel() {
+    #requestUpdate() {
+        this.#showLabel();
         let newValue = this.#labelEdit.value;
         newValue.trim();
-        if (newValue == "") {
-            this.#removeLabel();
-            return;
-        }
         if (newValue === this.#clickLink.innerText) {
             console.log("Nothing changed, stepping out");
+            return;
+        }
+        this.#managerInterface.requestBookmarkLabelUpdate(this.#bookmark, newValue);
+    }
+    
+    updateLabel(newValue) {
+        if (newValue == "") {
+            this.#removeLabel();
             return;
         }
         this.#bookmark.setLabel(newValue);
@@ -108,8 +118,7 @@ class BookmarkButton {
         myEdit.classList.add("edit_comic", "no_draw");
         myEdit.onkeydown = (event) => {
             if (event.key == "Enter") {
-                this.#updateLabel();
-                this.#showLabel();
+                this.#requestUpdate();
             }
             if (event.key == "Escape") {
                 this.#showLabel();
