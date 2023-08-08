@@ -104,16 +104,14 @@ class Editor {
     
     #triggerDelete() {
         if (this.startDeleteBtn.getLabel() === "Delete") {
-            console.log('Armed delete functionality');
             this.#setDeleteSectionVisibility("armed");
         } else {
-            console.log('Disarmed delete functionality');
             this.#setDeleteSectionVisibility("idle");
         }
     }
     
     #confirmDelete() {
-        console.log('Confirmed delete');
+        this.terminate();
     }
     
     #setInvisible() {
@@ -197,7 +195,6 @@ class Editor {
             this.openEditor();
             return;
         }
-        
         this.fullLink = url;
         this.label = readerData.getLabel();
         this.setUserMessage("", "");
@@ -208,6 +205,12 @@ class Editor {
     
     finalize() {
         let readerEssentials = this.gatherData();
+        this.fktFinalize(readerEssentials);
+        this.openEditor();
+    }
+    
+    terminate() {
+        let readerEssentials = {deleteMe: true};
         this.fktFinalize(readerEssentials);
         this.openEditor();
     }

@@ -139,16 +139,6 @@ class WebReader {
         this.#container.replaceChildren(...visualsList);
     }
     
-    #addToContainer(manager) {
-        if (this.#container == undefined)
-            return;
-        if (!manager.hasVisuals())
-            return;
-        if (!manager.isValid())
-            return;
-        this.#container.appendChild(manager.getVisuals());
-    }
-    
     registerPage(readerObject) {
         let storageObject 
             = this.#selectCorrespondingStorage(readerObject.initialUrl);
@@ -163,7 +153,7 @@ class WebReader {
             return -1;
         }
         this.#readerStorage.saveObject(newManager);
-        this.#addToContainer(newManager);
+        newManager.addToContainer();
         this.updateBookmark(readerObject.initialUrl); // This also updates storage
         return this.#latestId;
     }
@@ -172,6 +162,13 @@ class WebReader {
         let readerClass = this.#readerStorage.getObject(readerEssentials.initialUrl);
         if (readerClass)
             readerClass.editReader(readerEssentials);
+    }
+    
+    removeReader(prefixMask) {
+        if (this.#currentReader.urlIsCompatible(prefixMask))
+            this.#udateCurrentReader(new ReaderClassDummy());
+        this.#readerStorage.removeObject(prefixMask);
+        console.log(this.#readerStorage.getList());
     }
 }
 
@@ -201,6 +198,24 @@ class HtmlContainer {
     
     clearData() {
         this.#data.clear();
+    }
+    
+    removeObject(url) {
+        let host = this.#getHost(url);
+        if (host === undefined) {
+            console.log('Object selected for removal was not found');
+            return;
+        }
+        let list = this.#data.get(host);
+        for (let [index, object] of list.entries()) {
+            if (object.urlIsCompatible(url)) {
+                list.splice(index, 1);
+                break;
+            }
+        }
+        if (list.length === 0) {
+            this.#data.delete(host);
+        }
     }
     
     getObject(url) {
@@ -251,6 +266,10 @@ class WebReaderInterface {
     
     saveProgress() {
         this.#webReader.saveProgress();
+    }
+    
+    deleteMe(prefixMask) {
+        this.#webReader.removeReader(prefixMask);
     }
     
 }
