@@ -25,6 +25,10 @@ class ReaderSync {
     getStrId() {
         return `id${this.intId}`;
     }
+    
+    disconnect() {
+        this.port.disconnect();
+    }
 }
 
 class ReaderSyncCore extends ReaderSync {
@@ -78,8 +82,20 @@ class ReaderSyncCore extends ReaderSync {
     }
     
     #editRequestHandler(readerEssentials) {
+        if (readerEssentials.hasOwnProperty("deleteMe")) {
+            this.#deleteRequestHandler(readerEssentials.deleteMe);
+            return;
+        }
         this.#readerData.editReader(readerEssentials);
         this.port.sendMessage({editCommand: readerEssentials});
+    }
+    
+    #deleteRequestHandler(deleteMe) {
+        if (!deleteMe)
+            return;
+        this.port.sendMessage("deleteCommand");
+        this.disconnect();
+        this.#readerData.deleteMe();
     }
     
     #updateBookmarkLabelRequestHandler(payload) {
@@ -138,6 +154,10 @@ class ReaderSyncSatellite extends ReaderSync {
             this.#handleEditCommand(message.editCommand);
             return;
         }
+        if (message === "deleteCommand") {
+            this.#handleDeleteCommand();
+            return;
+        }
         if (message.hasOwnProperty("updateBookmarkLabel")) {
             this.#handleUpdateBookmarkLabelCommand(message.updateBookmarkLabel);
             return;
@@ -154,6 +174,11 @@ class ReaderSyncSatellite extends ReaderSync {
     
     #handleEditCommand(readerEssentials) {
         this.#readerManager.editReader(readerEssentials);
+    }
+    
+    #handleDeleteCommand() {
+        this.disconnect();
+        this.#readerManager.deleteMe();
     }
     
     #handleUpdateBookmarkLabelCommand(payload) {

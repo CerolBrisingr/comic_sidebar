@@ -31,14 +31,19 @@ class ListeningPort {
     #registerOpenPort() {
         if (ListeningPort.openConnections.has(this.#connectionName)) {
             console.log(`Conflict: replacing connection "${this.#connectionName}"`);
-            ListeningPort.openConnections.delete(this.#connectionName, ListeningPort);
+            ListeningPort.openConnections.delete(this.#connectionName);
         }
         let fktContacted = (port) => {this.#contacted(port);}
         ListeningPort.openConnections.set(this.#connectionName, fktContacted);
     }
     
+    disconnect() {
+        ListeningPort.openConnections.delete(this.#connectionName);
+        this.#connected.clear();
+    }
+    
     isConnected() {
-        return connectionAlive();
+        return connectionAlive;
     }
     
     sendMessage(message) {

@@ -130,6 +130,15 @@ class ReaderManager {
     collapse() {
         this.#readerVisuals.collapse();
     }
+    
+    addToContainer() {
+        this.#container.appendChild(this.getVisuals());
+    }
+    
+    deleteMe() {
+        this.#container.removeChild(this.getVisuals());
+        this.#parentInterface.deleteMe(this.#readerData.getPrefixMask());
+    }
 }
 
 class ReaderManagerDummy {
@@ -181,6 +190,11 @@ class ReaderManagerInterface {
     }
     
     saveProgress() {
+        // ReaderManager/Sidebar does not autosave
+    }
+    
+    deleteMe(prefixMask) {
+        throw new Error("ReaderData should never be in a position to call delete to ReaderManager!");
     }
 }
 

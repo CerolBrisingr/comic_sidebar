@@ -21,6 +21,10 @@ class SubscriberPort {
             return;
         this.#connection.postMessage(message);
     }
+    
+    disconnect() {
+        this.#connection = undefined;
+    }
 }
 
 export {SubscriberPort}

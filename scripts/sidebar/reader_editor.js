@@ -7,7 +7,7 @@ class ReaderEditor {
     
     static editor;
     
-    static setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
+    static setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
         ReaderEditor.editor = new Editor(fullFrame,
             fullLink,
             label,
@@ -16,7 +16,9 @@ class ReaderEditor {
             textMsg,
             errorMsg,
             cancelBtn,
-            okBtn);
+            okBtn,
+            startDel,
+            confirmDel);
     }
     
     static importLink(url, fktFinalize) {
@@ -34,7 +36,7 @@ class ReaderEditor {
 }
 
 class Editor {
-    constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn) {
+    constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
         for (let arg of arguments) {
             if (arg === undefined) {
                 throw("Constructor input incomplete, cannot build ReaderEditor instance");
@@ -60,6 +62,10 @@ class Editor {
         this.okBtn.onclick = () => {
             this.finalize();
         }
+        let fktStartDel = () => {this.#triggerDelete();};
+        this.startDeleteBtn = new HideShowButton(startDel, fktStartDel, false);
+        let fktConfirmDel = () => {this.#confirmDelete();};
+        this.confirmDeleteBtn = new HideShowButton(confirmDel, fktConfirmDel, false);
         
         this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
         this.openEditor();
@@ -96,12 +102,46 @@ class Editor {
         this.errorMsgObject.innerText = errorMsg;
     }
     
+    #triggerDelete() {
+        if (this.startDeleteBtn.getLabel() === "Delete") {
+            this.#setDeleteSectionVisibility("armed");
+        } else {
+            this.#setDeleteSectionVisibility("idle");
+        }
+    }
+    
+    #confirmDelete() {
+        this.terminate();
+    }
+    
     #setInvisible() {
         this.fullFrame.style.display = "none";
     }
     
     #setVisible() {
         this.fullFrame.style.removeProperty("display");
+    }
+    
+    #setDeleteSectionVisibility(mode) {
+        switch (mode) {
+            case "idle":
+                this.startDeleteBtn.setLabel("Delete");
+                this.startDeleteBtn.setVisible(true);
+                this.confirmDeleteBtn.setVisible(false);
+                break;
+            case "off":
+                this.startDeleteBtn.setVisible(false);
+                this.confirmDeleteBtn.setVisible(false);
+                break;
+            case "armed":
+                this.startDeleteBtn.setLabel("Cancel");
+                this.startDeleteBtn.setVisible(true);
+                this.confirmDeleteBtn.setVisible(true);
+                break;
+            default:
+                this.startDeleteBtn.setVisible(false);
+                this.confirmDeleteBtn.setVisible(false);
+        }
     }
     
     disableInterface() {
@@ -138,6 +178,7 @@ class Editor {
         this.label = urlPieces.host;
         this.setUserMessage("", "");
         this.enableInterface();
+        this.#setDeleteSectionVisibility("off");
         this.prefix = urlPieces.base_url;
     }
     
@@ -154,16 +195,22 @@ class Editor {
             this.openEditor();
             return;
         }
-        
         this.fullLink = url;
         this.label = readerData.getLabel();
         this.setUserMessage("", "");
         this.enableInterface();
+        this.#setDeleteSectionVisibility("idle");
         this.prefix = readerData.getPrefixMask();
     }
     
     finalize() {
         let readerEssentials = this.gatherData();
+        this.fktFinalize(readerEssentials);
+        this.openEditor();
+    }
+    
+    terminate() {
+        let readerEssentials = {deleteMe: true};
         this.fktFinalize(readerEssentials);
         this.openEditor();
     }
@@ -204,6 +251,40 @@ class Editor {
         this.okBtn.disabled = false;
         this.setUserMessage("", "");
         return;
+    }
+}
+
+class HideShowButton {
+    #objButton;
+    
+    constructor(objButton, fktClick, isVisible) {
+        this.#objButton = objButton;
+        objButton.onclick = fktClick;
+        this.setVisible(isVisible);
+    }
+    
+    setVisible(isVisible) {
+        if (isVisible) {
+            this.#setVisible();
+        } else {
+            this.#setInvisible();
+        }
+    }
+    
+    setLabel(newLabel) {
+        this.#objButton.innerText = newLabel;
+    }
+    
+    getLabel() {
+        return this.#objButton.innerText;
+    }
+    
+    #setInvisible() {
+        this.#objButton.style.display = "none";
+    }
+    
+    #setVisible() {
+        this.#objButton.style.removeProperty("display");
     }
 }
 

@@ -195,6 +195,11 @@ class ReaderData {
     // Interface only
     expand() {}
     collapse() {}
+    addToContainer() {}
+    
+    deleteMe() {
+        this.#parentInterface.deleteMe(this.#prefixMask);
+    }
 }
 
 class Bookmark {
