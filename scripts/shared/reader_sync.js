@@ -59,6 +59,10 @@ class ReaderSyncCore extends ReaderSync {
             this.#editRequestHandler(message.editRequest);
             return;
         }
+        if (message.hasOwnProperty("updateBookmarkLabelRequest")) {
+            this.#updateBookmarkLabelRequestHandler(message.updateBookmarkLabelRequest);
+            return;
+        }
     }
     
     #pinRequestHandler(url) {
@@ -78,6 +82,10 @@ class ReaderSyncCore extends ReaderSync {
         this.port.sendMessage({editCommand: readerEssentials});
     }
     
+    #updateBookmarkLabelRequestHandler(payload) {
+        this.#readerData.updateManualLabel(payload.url, payload.newLabel);
+        this.port.sendMessage({updateBookmarkLabel: payload});
+    }
 }
 
 class ReaderSyncSatellite extends ReaderSync {
@@ -98,6 +106,11 @@ class ReaderSyncSatellite extends ReaderSync {
     
     sendEditRequest(readerEssentials) {
         this.port.sendMessage({editRequest: readerEssentials});
+    }
+    
+    sendBookmarkLabelUpdateRequest(url, newLabel) {
+        let payload = {url: url, newLabel: newLabel};
+        this.port.sendMessage({updateBookmarkLabelRequest: payload});
     }
     
     #setReaderManager(readerManager) {
@@ -125,6 +138,10 @@ class ReaderSyncSatellite extends ReaderSync {
             this.#handleEditCommand(message.editCommand);
             return;
         }
+        if (message.hasOwnProperty("updateBookmarkLabel")) {
+            this.#handleUpdateBookmarkLabelCommand(message.updateBookmarkLabel);
+            return;
+        }
     }
     
     #handlePinCommand(url) {
@@ -137,6 +154,10 @@ class ReaderSyncSatellite extends ReaderSync {
     
     #handleEditCommand(readerEssentials) {
         this.#readerManager.editReader(readerEssentials);
+    }
+    
+    #handleUpdateBookmarkLabelCommand(payload) {
+        this.#readerManager.updateBookmarkLabel(payload.url, payload.newLabel);
     }
 }
 

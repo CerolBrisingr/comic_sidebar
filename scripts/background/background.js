@@ -52,12 +52,6 @@ function receiveMessage(message) {
         sbConnection.sendMessage({addPage: readerEssentials});
         return;
     }
-    if (message.hasOwnProperty("requestPageEdit")) {
-        let readerEssentials = message.requestPageEdit;
-        webReader.modifyPage(readerEssentials);
-        sbConnection.sendMessage({editPage: readerEssentials});
-        return;
-    }
     if (message === "requestReaderTransmission") {
         if (!isSetUp) {
             console.log("Core is not ready for data transmission")

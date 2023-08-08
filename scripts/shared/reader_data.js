@@ -159,6 +159,14 @@ class ReaderData {
         return true;
     }
     
+    updateManualLabel(url, newLabel) {
+        let index = this.#findManualBookmark(url);
+        if (index === -1)
+            return false;
+        this.#manual[index].setLabel(newLabel);
+        return true;
+    }
+    
     #findManualBookmark(url) {
         for (let [index, bookmark] of this.#manual.entries()) {
             if (bookmark.href === url)

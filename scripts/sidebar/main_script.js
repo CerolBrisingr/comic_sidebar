@@ -134,10 +134,6 @@ function receiveMessage(message) {
         webReader.registerPage(message.addPage);
         return;
     }
-    if (message.hasOwnProperty("editPage")) {
-        webReader.modifyPage(message.editPage);
-        return;
-    }
     console.log("Don't know how to act on this message:");
     console.log(message);
 }

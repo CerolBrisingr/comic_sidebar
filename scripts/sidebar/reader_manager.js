@@ -88,8 +88,18 @@ class ReaderManager {
             this.#readerVisuals.updateReaderUrls(this.#readerData);
     }
     
+    updateBookmarkLabel(url, newLabel) {
+        if (this.#readerData.updateManualLabel(url, newLabel)) {
+            this.#readerVisuals.updateManualLabel(url, newLabel);
+        }
+    }
+    
     sendUnpinRequest(url) {
         this.#readerSync.sendUnpinRequest(url);
+    }
+    
+    sendBookmarkLabelUpdateRequest(url, newLabel) {
+        this.#readerSync.sendBookmarkLabelUpdateRequest(url, newLabel);
     }
 
     removeManual(url) {
@@ -100,7 +110,7 @@ class ReaderManager {
     }
     
     getVisuals() {
-        return this.#readerVisuals.listing;
+        return this.#readerVisuals.getListing();
     }
     
     isValid() {
@@ -164,6 +174,10 @@ class ReaderManagerInterface {
     
     requestUnpinBookmark(bookmark) {
         this.#readerManager.sendUnpinRequest(bookmark.href);
+    }
+    
+    requestBookmarkLabelUpdate(bookmark, newLabel) {
+        this.#readerManager.sendBookmarkLabelUpdateRequest(bookmark.href, newLabel);
     }
     
     saveProgress() {
