@@ -74,7 +74,8 @@ function requestUrlRetransmission() {
 }
 
 function requestPageAddition(readerEssentials) {
-    bsConnection.sendMessage({requestPageAddition: readerEssentials});
+    let readerObject = {prefix_mask: readerEssentials.prefix, label: readerEssentials.label, initialUrl: readerEssentials.initialUrl};
+    bsConnection.sendMessage({requestPageAddition: readerObject});
 }
 
 function requestWebReader() {
