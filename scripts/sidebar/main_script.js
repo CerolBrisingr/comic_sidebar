@@ -63,8 +63,6 @@ function setUpReaderEditor() {
 function setUpWebReader(readerObjectList) {
     if (readerObjectList === undefined)
         return;
-    isSetUp = true;
-    setUpButtons();
     let container = document.getElementById('container');
     let webReaderController = new WebReaderController(container);
     webReader = new WebReader(webReaderController);
@@ -87,9 +85,12 @@ function requestWebReader() {
 function receiveReaderObjectList(readerObjectList) {
     if (isSetUp)
         return;
-    setUpWebReader(readerObjectList);
+    isSetUp = true;
     setUpButtons();
-    setTimeout(() => {requestUrlRetransmission();}, 250);
+    setUpWebReader(readerObjectList);
+    setTimeout(() => {
+        requestUrlRetransmission();
+        }, 250);
 }
 
 // Add current page to list
@@ -123,7 +124,7 @@ function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("webReader")) {
-        setUpWebReader(message.webReader);
+        receiveReaderObjectList(message.webReader);
         return;
     }
     if (message.hasOwnProperty("updateBookmark")) {
