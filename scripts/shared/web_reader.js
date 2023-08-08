@@ -168,7 +168,6 @@ class WebReader {
         if (this.#currentReader.urlIsCompatible(prefixMask))
             this.#udateCurrentReader(new ReaderClassDummy());
         this.#readerStorage.removeObject(prefixMask);
-        console.log(this.#readerStorage.getList());
     }
 }
 

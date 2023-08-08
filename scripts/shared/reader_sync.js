@@ -83,15 +83,19 @@ class ReaderSyncCore extends ReaderSync {
     
     #editRequestHandler(readerEssentials) {
         if (readerEssentials.hasOwnProperty("deleteMe")) {
-            if (!readerEssentials.deleteMe)
-                return;
-            this.port.sendMessage("deleteCommand");
-            this.disconnect();
-            this.#readerData.deleteMe();
+            this.#deleteRequestHandler(readerEssentials.deleteMe);
             return;
         }
         this.#readerData.editReader(readerEssentials);
         this.port.sendMessage({editCommand: readerEssentials});
+    }
+    
+    #deleteRequestHandler(deleteMe) {
+        if (!deleteMe)
+            return;
+        this.port.sendMessage("deleteCommand");
+        this.disconnect();
+        this.#readerData.deleteMe();
     }
     
     #updateBookmarkLabelRequestHandler(payload) {
