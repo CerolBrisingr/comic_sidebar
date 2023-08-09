@@ -3,42 +3,73 @@ class UrlListener {
     #isActive;
     #fktWebNavEvent;
     #fktTabEvent;
-    #latestUrl;
+    #fktTabUpdateEvent;
+    #lastUrl = "";
+    
+    static async findLatestTabUrl() {
+        let tabs = await browser.tabs.query({currentWindow: true});
+        let url = undefined;
+        let latest = 0;
+        for (let tab of tabs) {
+            if (tab.lastAccessed > latest) {
+                latest = tab.lastAccessed;
+                url = tab.url;
+            }
+        }
+        return url;
+    }
     
     constructor(fktReactToUrl) {
         this.#fktReactToUrl = fktReactToUrl;
         this.#fktWebNavEvent = (event) => {this.#webNavEvent(event);};
         this.#fktTabEvent = (tabInfo) => {this.#tabEvent(tabInfo);};
+        this.#fktTabUpdateEvent = (tabId, info) => {
+            this.#tabUpdateEvent(info);
+            };
         this.activate();
-        this.#connect();
+    }
+    
+    #fireOnlyOnce(url) {
+        if (url === this.#lastUrl)
+            return;
+        this.#lastUrl = url;
+        this.#fktReactToUrl(url);
     }
     
     #connect() {
+        if (this.#isActive)
+            return;
         browser.tabs.onActivated.addListener(this.#fktTabEvent);
         browser.webNavigation.onDOMContentLoaded.addListener(this.#fktWebNavEvent);
         browser.webNavigation.onReferenceFragmentUpdated.addListener(this.#fktWebNavEvent);
+        browser.tabs.onUpdated.addListener(this.#fktTabUpdateEvent);
+        this.#isActive = true;
     }
     
     #disconnect() {
-        // Can use this again if I find out how to do "pushLatestUrl()" then
+        if (!this.#isActive)
+            return;
         browser.tabs.onActivated.removeListener(this.#fktTabEvent);
         browser.webNavigation.onDOMContentLoaded.removeListener(this.#fktWebNavEvent);
         browser.webNavigation.onReferenceFragmentUpdated.removeListener(this.#fktWebNavEvent);
+        browser.tabs.onUpdated.removeListener(this.#fktTabUpdateEvent);
+        this.#isActive = false;
     }
     
     activate() {
-        this.#isActive = true;
+        this.#connect();
         this.retransmit();
     }
     
     deactivate() {
-        this.#isActive = false;
+        this.#disconnect();
     }
     
     retransmit() {
-        if (this.#latestUrl === undefined)
-            return;
-        this.#fktReactToUrl(this.#latestUrl);
+        UrlListener.findLatestTabUrl()
+            .then((url) => {
+                this.#fktReactToUrl(url);
+                }, promiseError);
     }
     
     #webNavEvent(event) {
@@ -46,11 +77,7 @@ class UrlListener {
         if (event.frameId !== 0) {
             return;
         }
-        // Save url for next activation
-        this.#latestUrl = event.url;
-        if (!this.#isActive)
-            return;
-        this.#fktReactToUrl(event.url);
+        this.#fireOnlyOnce(event.url);
     }
     
     #tabEvent(tabInfo) {
@@ -59,14 +86,17 @@ class UrlListener {
         getTab.then(fktReadTab, promiseError);
     }
     
+    #tabUpdateEvent(info) {
+        if (info.hasOwnProperty("url")) {
+            console.log("updated tab url");
+            this.#fireOnlyOnce(info.url);
+        }
+    }
+    
     #readTab(tab) {
         if (tab === undefined)
             return;
-        // Save url for next activation
-        this.#latestUrl = tab.url;
-        if (!this.#isActive)
-            return;
-        this.#fktReactToUrl(tab.url);
+        this.#fireOnlyOnce(tab.url);
     }
 }
     

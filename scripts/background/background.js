@@ -1,4 +1,4 @@
-import {UrlListener} from "./url_listener.js"
+import {UrlListener} from "../shared/url_listener.js"
 import {ListeningPort} from "./listening_port.js"
 import {WebReader, WebReaderController} from "../shared/web_reader.js"
 

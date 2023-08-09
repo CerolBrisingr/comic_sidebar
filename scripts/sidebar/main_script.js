@@ -1,6 +1,7 @@
 import {ReaderEditor} from "./reader_editor.js"
 import {WebReader, WebReaderController} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
+import {UrlListener} from "../shared/url_listener.js"
 
 /* 
 Browser modified during development:
@@ -12,14 +13,12 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 */
 
 // Tab management
-let myWindowId;
 let webReader;
 let isSetUp = false;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
-    
     setUpReaderEditor();
     requestWebReader();
 });
@@ -101,13 +100,10 @@ function addCurrentPage() {
     // Will start configuration dialog and then hand result over to background script
     if (webReader === undefined)
         return;
-    if (myWindowId === undefined)
-        return;
-    browser.tabs.query({windowId: myWindowId, active: true})
-        .then((tabs) => {
-            ReaderEditor.importLink(tabs[0].url, requestPageAddition);
-            }
-            , onError);
+    UrlListener.findLatestTabUrl()
+        .then((url) => {
+            ReaderEditor.importLink(url, requestPageAddition)
+            }, onError);
 }
 
 // Display error for failed promises
@@ -141,9 +137,3 @@ function receiveMessage(message) {
     console.log("Don't know how to act on this message:");
     console.log(message);
 }
-
-// When the sidebar loads, get the ID of its window,
-// and update its content.
-browser.windows.getCurrent({populate: true}).then((windowInfo) => {
-    myWindowId = windowInfo.id;
-});
