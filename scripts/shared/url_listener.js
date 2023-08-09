@@ -88,7 +88,6 @@ class UrlListener {
     
     #tabUpdateEvent(info) {
         if (info.hasOwnProperty("url")) {
-            console.log("updated tab url");
             this.#fireOnlyOnce(info.url);
         }
     }
