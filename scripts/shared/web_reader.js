@@ -64,6 +64,7 @@ class WebReader {
     }
     
     saveProgress() {
+        return;
         if (this.#savingSuspended)
             return;
         if (!this.#controller.storageAccessGiven())

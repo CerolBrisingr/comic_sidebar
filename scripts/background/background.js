@@ -6,6 +6,7 @@ let isActive = true;
 let isSetUp = false;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
+let baConnection = new ListeningPort(receiveBrowserAction, "browser_action");
 let webReader = new WebReader(new WebReaderController());
 
 function initialize() {
@@ -14,22 +15,6 @@ function initialize() {
         transmitWebReaderData();
     }
     webReader.loadInterface(fktDone);
-}
-
-function updateBrowserAction() {
-    browser.browserAction.setIcon({
-        path: isActive ? {
-            48: "../icons/icon_48.png"
-        } : {
-            48: "../icons/icon_gray_48.png"
-        }
-    })
-}
-
-function toggleActive() {
-    isActive = !isActive;
-    updateBrowserAction();
-    updateUrlListener();
 }
 
 function transmitWebReaderData() {
@@ -67,6 +52,39 @@ function receiveMessage(message) {
     console.log(message);
 }
 
+function receiveBrowserAction(message) {
+    if (message === "requestActiveState") {
+        baSendActiveState();
+        return;
+    }
+    if (message === "requestActiveStateChange") {
+        toggleActiveState();
+        return;
+    }
+    console.log(message);
+}
+
+function updateBrowserAction() {
+    browser.browserAction.setIcon({
+        path: isActive ? {
+            48: "../icons/icon_48.png"
+        } : {
+            48: "../icons/icon_gray_48.png"
+        }
+    })
+}
+
+function toggleActiveState() {
+    isActive = !isActive;
+    updateBrowserAction();
+    updateUrlListener();
+    baSendActiveState();
+}
+
+function baSendActiveState() {
+    baConnection.sendMessage({activeState: isActive});
+}
+
 function updateSidebar(url) {
     sbConnection.sendMessage({updateBookmark: url});
     webReader.updateBookmark(url);
@@ -81,6 +99,4 @@ function updateUrlListener() {
 }
 
 initialize();
-// React to toolbar click
-browser.browserAction.onClicked.addListener(toggleActive);
 updateBrowserAction();

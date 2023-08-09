@@ -21,7 +21,8 @@
     "default_icon": {
       "48": "icons/icon_48.png"
     },
-    "default_title": "WebReader Sidebar"
+    "default_title": "WebReader Sidebar",
+    "default_popup": "popup/popup_panel.html"
   },
   
   "background": {

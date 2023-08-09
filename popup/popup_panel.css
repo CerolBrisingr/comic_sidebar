@@ -1,0 +1,25 @@
+html, body {
+  /*width: 180px;*/
+}
+
+img {
+    width: 10pt;
+    height: 10pt;
+}
+
+button {
+  appearance: none;
+  border: none;
+  width: 100%;
+  /*margin: 3% auto;*/
+  padding: 4px;
+  text-align: left;
+  font-size: 12pt;
+  cursor: pointer;
+  background-color: inherit;
+  /*background-color: #E5F2F2;*/
+}
+
+button:hover {
+  background-color: #CFF2F2;
+}
