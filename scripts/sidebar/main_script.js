@@ -24,19 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setUpButtons() {
-    const inputElement = document.getElementById('file-selector');
-    inputElement.style.display = 'none';
-    inputElement.addEventListener('change', (event) => {
-        if (webReader === undefined)
-            return;
-        console.log(event.target.files[0]);
-        //return;
-        //webReader.importBackup(event.target.files[0]);
-    });
-    
-    const inputTrigger = document.getElementById('import_trigger');
-    inputTrigger.onclick = function () {inputElement.click()};
-    
     const addComic = document.getElementById('add_comic');
     addComic.onclick = function () {addCurrentPage()};
 }
