@@ -1,11 +1,11 @@
-let connectionAlive = false;
-
 class ListeningPort {
+    
     static openConnections = new Map();
     
     #connectionName;
     #connected = new Map();
     #fktReceive;
+    #connectionAlive = false;
     
     constructor(fktReceive, connectionName = "port_from_sidebar") {
         this.#fktReceive = fktReceive;
@@ -43,11 +43,11 @@ class ListeningPort {
     }
     
     isConnected() {
-        return connectionAlive;
+        return this.#connectionAlive;
     }
     
     sendMessage(message) {
-        if (!connectionAlive)
+        if (!this.#connectionAlive)
             return;
         for (let connection of this.#connected.values())
             connection.postMessage(message);
@@ -60,13 +60,13 @@ class ListeningPort {
         }
         let contextId = port.sender.contextId;
         this.#connected.set(contextId, port);
-        connectionAlive = true;
+        this.#connectionAlive = true;
         port.onMessage.addListener((message) => {
             this.#fktReceive(message);
         });
         port.onDisconnect.addListener((event) => {
             this.#connected.delete(contextId);
-            connectionAlive = !(this.#connected.size === 0);
+            this.#connectionAlive = !(this.#connected.size === 0);
         });
     }
 }
