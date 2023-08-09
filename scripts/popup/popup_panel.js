@@ -1,5 +1,4 @@
 import {SubscriberPort} from "../sidebar/subscriber_port.js"
-import {FileSelector} from "./file_selector.js"
 
 let bsConnection = new SubscriberPort(receiveMessage, "browser_action");
 let isActive = true;
@@ -18,16 +17,30 @@ function importInterface() {
     iconToggleState = document.getElementById('icon_toggle_enable');
     textToggleState = document.getElementById('text_toggle_enable');
     
+    // Toggle active/inactive tracking (listeners)
     let buttonToggleState = document.getElementById('button_toggle_enable');
     buttonToggleState.onclick = () => {
         requestActiveStateChange();
     };
+    
+    // Save Backup
     let buttonSaveBackup = document.getElementById('button_save_backup');
     buttonSaveBackup.onclick = () => {
         requestSaveBackup();
-    }
+    };
+    
+    // Load Backup
     let buttonLoadBackup = document.getElementById('button_load_backup');
-    fileSelector = new FileSelector(buttonLoadBackup, requestLoadBackup);
+    let inputElement = document.getElementById("file-selector");
+    inputElement.style.display = 'none';
+    inputElement.addEventListener('change', (event) => {
+        console.log('File selected');
+        requestLoadBackup(event.target.files[0]);
+    });    
+    buttonLoadBackup.onclick = () => {
+        console.log('Button click');
+        inputElement.click();
+    };
 }
 
 function requestActiveState() {

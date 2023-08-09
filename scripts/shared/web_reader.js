@@ -41,6 +41,13 @@ class WebReader {
         saveBackup(this.#readerStorage.getList());
     }
     
+    #clearData() {
+        for (let storageObject of this.#readerStorage.getList()) {
+            storageObject.deleteMe();
+        }
+        this.#readerStorage.clearData();
+    }
+    
     getObjectList() {
         let readerObject = buildWebReaderObject(this.#readerStorage.getList());
         return readerObject.data;
@@ -96,7 +103,7 @@ class WebReader {
     }
     
     #importReaderObjectList(readerObjectList){
-        this.#readerStorage.clearData();
+        this.#clearData();
         this.#savingSuspended = true;
         for (let [index, readerObject] of readerObjectList.entries()) {
             this.#latestId = index;
