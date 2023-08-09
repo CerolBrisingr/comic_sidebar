@@ -29,7 +29,9 @@ function setUpButtons() {
     inputElement.addEventListener('change', (event) => {
         if (webReader === undefined)
             return;
-        webReader.importBackup(event.target.files[0]);
+        console.log(event.target.files[0]);
+        //return;
+        //webReader.importBackup(event.target.files[0]);
     });
     
     const inputTrigger = document.getElementById('import_trigger');
@@ -60,7 +62,6 @@ function setUpWebReader(readerObjectList) {
     let container = document.getElementById('container');
     let webReaderController = new WebReaderController(container);
     webReader = new WebReader(webReaderController);
-    webReader.importInterface(readerObjectList);
 }
 
 function requestUrlRetransmission() {
@@ -80,9 +81,18 @@ function requestWebReader() {
 function receiveReaderObjectList(readerObjectList) {
     if (isSetUp)
         return;
+    if (readerObjectList === undefined)
+        return;
     isSetUp = true;
     setUpButtons();
     setUpWebReader(readerObjectList);
+    executeWebReaderLoading(readerObjectList);
+}
+
+function executeWebReaderLoading(readerObjectList) {
+    if (readerObjectList === undefined)
+        return;
+    webReader.importInterface(readerObjectList);
     setTimeout(() => {
         requestUrlRetransmission();
         }, 250);
@@ -117,6 +127,10 @@ function receiveMessage(message) {
     }
     if (message.hasOwnProperty("webReader")) {
         receiveReaderObjectList(message.webReader);
+        return;
+    }
+    if (message.hasOwnProperty("webReaderReload")) {
+        executeWebReaderLoading(message.webReaderReload);
         return;
     }
     if (message.hasOwnProperty("updateBookmark")) {

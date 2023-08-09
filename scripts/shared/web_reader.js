@@ -22,9 +22,10 @@ class WebReader {
         this.#currentReader = new ReaderClassDummy();
     }
     
-    importBackup(file) {
+    importBackup(file, fktDone) {
         let fktImportBackup = (readerObjectList) => {
             this.#importReaderObjectList(readerObjectList);
+            fktDone();
         }
         importBackup(file, fktImportBackup);
     }

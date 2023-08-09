@@ -21,6 +21,10 @@ function transmitWebReaderData() {
     sbConnection.sendMessage({webReader: webReader.getObjectList()})
 }
 
+function enforceWebReaderData() {
+    sbConnection.sendMessage({webReaderReload: webReader.getObjectList()})
+}
+
 function receiveMessage(message) {
     if (message === "test") {
         console.log("Background script received test message");
@@ -65,6 +69,11 @@ function receiveBrowserAction(message) {
         webReader.saveBackup();
         return;
     }
+    if (message.hasOwnProperty("requestLoadBackup")) {
+        triggerLoadBackup(message.requestLoadBackup);
+        return;
+    }
+    console.log("Don't know how to act on this browser action message:");
     console.log(message);
 }
 
@@ -76,6 +85,13 @@ function updateBrowserAction() {
             48: "../icons/icon_gray_48.png"
         }
     })
+}
+
+function triggerLoadBackup(file) {
+    let fktDone = () => {
+        enforceWebReaderData();
+    };
+    webReader.importBackup(file, fktDone);
 }
 
 function toggleActiveState() {

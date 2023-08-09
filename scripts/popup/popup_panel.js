@@ -1,9 +1,13 @@
 import {SubscriberPort} from "../sidebar/subscriber_port.js"
+import {FileSelector} from "./file_selector.js"
 
 let bsConnection = new SubscriberPort(receiveMessage, "browser_action");
 let isActive = true;
 let iconToggleState;
 let textToggleState;
+let fileSelector;
+
+// ui.popup.disable_autohide
 
 document.addEventListener('DOMContentLoaded', function () {
     importInterface();
@@ -23,6 +27,7 @@ function importInterface() {
         requestSaveBackup();
     }
     let buttonLoadBackup = document.getElementById('button_load_backup');
+    fileSelector = new FileSelector(buttonLoadBackup, requestLoadBackup);
 }
 
 function requestActiveState() {
@@ -37,8 +42,8 @@ function requestSaveBackup() {
     bsConnection.sendMessage("requestSaveBackup");
 }
 
-function requestLoadBackup() {
-    bsConnection.sendMessage("requestLoadBackup");
+function requestLoadBackup(file) {
+    bsConnection.sendMessage({requestLoadBackup: file});
 }
 
 function updateActiveState(activeState) {
@@ -61,5 +66,6 @@ function receiveMessage(message) {
         updateActiveState(message.activeState);
         return;
     }
+    console.log("Don't know how to act on this background message:");
     console.log(message);
 }
