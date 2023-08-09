@@ -93,6 +93,7 @@ class WebReader {
         gettingItem.then((storageResult) => {
             if (!storageResult.hasOwnProperty("comicData")) {
                 console.log("No data stored locally, aborting loading sequence! (2)");
+                fktDone();
                 return;
             }
             let readerObjectList = unpackReaderObjectList(storageResult.comicData);
