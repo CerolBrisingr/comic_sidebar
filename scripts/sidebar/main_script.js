@@ -24,13 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setUpButtons() {
-    const exportTrigger = document.getElementById('export_trigger');
-    exportTrigger.onclick = function() {
-        if (webReader === undefined)
-            return;
-        webReader.saveBackup();
-        };
-    
     const inputElement = document.getElementById('file-selector');
     inputElement.style.display = 'none';
     inputElement.addEventListener('change', (event) => {

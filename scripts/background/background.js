@@ -61,6 +61,10 @@ function receiveBrowserAction(message) {
         toggleActiveState();
         return;
     }
+    if (message === "requestSaveBackup") {
+        webReader.saveBackup();
+        return;
+    }
     console.log(message);
 }
 
