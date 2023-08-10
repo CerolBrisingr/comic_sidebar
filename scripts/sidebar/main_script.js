@@ -24,24 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setUpButtons() {
-    const exportTrigger = document.getElementById('export_trigger');
-    exportTrigger.onclick = function() {
-        if (webReader === undefined)
-            return;
-        webReader.saveBackup();
-        };
-    
-    const inputElement = document.getElementById('file-selector');
-    inputElement.style.display = 'none';
-    inputElement.addEventListener('change', (event) => {
-        if (webReader === undefined)
-            return;
-        webReader.importBackup(event.target.files[0]);
-    });
-    
-    const inputTrigger = document.getElementById('import_trigger');
-    inputTrigger.onclick = function () {inputElement.click()};
-    
     const addComic = document.getElementById('add_comic');
     addComic.onclick = function () {addCurrentPage()};
 }
@@ -67,7 +49,6 @@ function setUpWebReader(readerObjectList) {
     let container = document.getElementById('container');
     let webReaderController = new WebReaderController(container);
     webReader = new WebReader(webReaderController);
-    webReader.importInterface(readerObjectList);
 }
 
 function requestUrlRetransmission() {
@@ -87,9 +68,18 @@ function requestWebReader() {
 function receiveReaderObjectList(readerObjectList) {
     if (isSetUp)
         return;
+    if (readerObjectList === undefined)
+        return;
     isSetUp = true;
     setUpButtons();
     setUpWebReader(readerObjectList);
+    executeWebReaderLoading(readerObjectList);
+}
+
+function executeWebReaderLoading(readerObjectList) {
+    if (readerObjectList === undefined)
+        return;
+    webReader.importInterface(readerObjectList);
     setTimeout(() => {
         requestUrlRetransmission();
         }, 250);
@@ -124,6 +114,10 @@ function receiveMessage(message) {
     }
     if (message.hasOwnProperty("webReader")) {
         receiveReaderObjectList(message.webReader);
+        return;
+    }
+    if (message.hasOwnProperty("webReaderReload")) {
+        executeWebReaderLoading(message.webReaderReload);
         return;
     }
     if (message.hasOwnProperty("updateBookmark")) {

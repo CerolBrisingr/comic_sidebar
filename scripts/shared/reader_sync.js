@@ -93,8 +93,6 @@ class ReaderSyncCore extends ReaderSync {
     #deleteRequestHandler(deleteMe) {
         if (!deleteMe)
             return;
-        this.port.sendMessage("deleteCommand");
-        this.disconnect();
         this.#readerData.deleteMe();
     }
     
@@ -177,7 +175,6 @@ class ReaderSyncSatellite extends ReaderSync {
     }
     
     #handleDeleteCommand() {
-        this.disconnect();
         this.#readerManager.deleteMe();
     }
     

@@ -8,6 +8,11 @@ function saveBackup(readerClassList) {
     URL.revokeObjectURL(link.href);
 }
 
+function saveActiveState(activeState) {
+    activeState = Boolean(activeState);
+    browser.storage.local.set({activeState: activeState});
+}
+
 function buildWebReaderObject(readerClassList) {
     let webReaderObject = {data: [], type: "sb_webcomic_sidebar_backup"};
     for (let readerClass of readerClassList) {
@@ -29,4 +34,4 @@ function replacer(key, value) {
     }
 }
 
-export {saveBackup, buildWebReaderObject}
+export {saveBackup, buildWebReaderObject, saveActiveState}

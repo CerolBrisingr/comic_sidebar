@@ -21,13 +21,19 @@
     "default_icon": {
       "48": "icons/icon_48.png"
     },
-    "default_title": "WebReader Sidebar"
+    "default_title": "WebReader Sidebar",
+    "default_popup": "popup/popup_panel.html"
   },
   
   "background": {
     "scripts": ["scripts/background/background.js"],
     "type": "module"
   },
+  
+  "options_ui": {
+    "page": "options/options.html"
+  },
+
 
   "permissions": ["storage", "tabs", "webNavigation"],
 

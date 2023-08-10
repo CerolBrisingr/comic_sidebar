@@ -12,7 +12,7 @@ function dissectUrl(url, prefix, fallback) {
     try {
         currentUrl = new URL(url);
     } catch (error) {
-        console.error(error);
+        console.log(`Invalid url "${String(url)}"`);
         return;
     }
     

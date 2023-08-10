@@ -22,9 +22,10 @@ class WebReader {
         this.#currentReader = new ReaderClassDummy();
     }
     
-    importBackup(file) {
+    importBackup(file, fktDone) {
         let fktImportBackup = (readerObjectList) => {
             this.#importReaderObjectList(readerObjectList);
+            fktDone();
         }
         importBackup(file, fktImportBackup);
     }
@@ -38,6 +39,13 @@ class WebReader {
     
     saveBackup() {
         saveBackup(this.#readerStorage.getList());
+    }
+    
+    #clearData() {
+        for (let storageObject of this.#readerStorage.getList()) {
+            storageObject.deleteMe();
+        }
+        this.#readerStorage.clearData();
     }
     
     getObjectList() {
@@ -83,6 +91,7 @@ class WebReader {
         gettingItem.then((storageResult) => {
             if (!storageResult.hasOwnProperty("comicData")) {
                 console.log("No data stored locally, aborting loading sequence! (2)");
+                fktDone();
                 return;
             }
             let readerObjectList = unpackReaderObjectList(storageResult.comicData);
@@ -93,7 +102,7 @@ class WebReader {
     }
     
     #importReaderObjectList(readerObjectList){
-        this.#readerStorage.clearData();
+        this.#clearData();
         this.#savingSuspended = true;
         for (let [index, readerObject] of readerObjectList.entries()) {
             this.#latestId = index;

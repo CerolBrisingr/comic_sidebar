@@ -1,0 +1,19 @@
+img {
+    width: 10pt;
+    height: 10pt;
+}
+
+button {
+  appearance: none;
+  border: none;
+  width: 100%;
+  padding: 4px;
+  text-align: left;
+  font-size: 12pt;
+  cursor: pointer;
+  background-color: inherit;
+}
+
+button:hover {
+  background-color: #CFF2F2;
+}

@@ -198,6 +198,7 @@ class ReaderData {
     addToContainer() {}
     
     deleteMe() {
+        this.#readerSync.disconnect();
         this.#parentInterface.deleteMe(this.#prefixMask);
     }
 }
