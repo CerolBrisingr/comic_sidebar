@@ -1,6 +1,8 @@
 import {UrlListener} from "../shared/url_listener.js"
 import {ListeningPort} from "./listening_port.js"
 import {WebReader, WebReaderController} from "../shared/web_reader.js"
+import {getActiveState} from "../shared/backup_import.js"
+import {saveActiveState} from "../shared/backup_export.js"
 
 let isActive = true;
 let isSetUp = false;
@@ -10,7 +12,9 @@ let baConnection = new ListeningPort(receiveOptionOrBrowserAction, "browser_acti
 let opConnection = new ListeningPort(receiveOptionOrBrowserAction, "options_script");
 let webReader = new WebReader(new WebReaderController());
 
-function initialize() {
+async function initialize() {
+    isActive = await getActiveState();
+    updateBrowserAction();
     let fktDone = () => {
         isSetUp = true;
         transmitWebReaderData();
@@ -97,6 +101,7 @@ function triggerLoadBackup(file) {
 
 function toggleActiveState() {
     isActive = !isActive;
+    saveActiveState(isActive);
     updateBrowserAction();
     updateUrlListener();
     sendActiveState();
@@ -121,4 +126,3 @@ function updateUrlListener() {
 }
 
 initialize();
-updateBrowserAction();

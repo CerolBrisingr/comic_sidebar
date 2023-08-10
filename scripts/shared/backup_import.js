@@ -21,6 +21,15 @@ async function importBackup(file, fktImportBackup) {
     return;
 }
 
+async function getActiveState() {
+    let data = await browser.storage.local.get("activeState");
+    if (!data.hasOwnProperty("activeState")) {
+        console.log("No data for activeState, enabled by default");
+        return true;
+    }
+    return Boolean(data.activeState);
+}
+
 function fileHasJsonExtension(file) {
     let fileExt = file.name.split('.').pop();
     return (fileExt === "json")
@@ -36,4 +45,4 @@ function unpackReaderObjectList(data) {
     return data.data;
 }
 
-export {importBackup, unpackReaderObjectList}
+export {importBackup, unpackReaderObjectList, getActiveState}
