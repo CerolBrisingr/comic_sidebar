@@ -136,6 +136,7 @@ class ReaderManager {
     }
     
     deleteMe() {
+        this.#readerSync.disconnect();
         this.#container.removeChild(this.getVisuals());
         this.#parentInterface.deleteMe(this.#readerData.getPrefixMask());
     }
