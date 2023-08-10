@@ -13,10 +13,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function importInterface() {
+    // Toggle active/inactive tracking (listeners)
     iconToggleState = document.getElementById('icon_toggle_enable');
     textToggleState = document.getElementById('text_toggle_enable');
-    
-    // Toggle active/inactive tracking (listeners)
     let buttonToggleState = document.getElementById('button_toggle_enable');
     buttonToggleState.onclick = () => {
         requestActiveStateChange();
@@ -31,6 +30,13 @@ function importInterface() {
     // Load Backup
     let buttonLoadBackup = document.getElementById('button_load_backup');
     buttonLoadBackup.onclick = () => {
+        browser.runtime.openOptionsPage();
+        buttonLoadBackup.style.display = "none";
+    };
+    
+    // Show Settings
+    let buttonShowOptions = document.getElementById('button_show_options');
+    buttonShowOptions.onclick = () => {
         browser.runtime.openOptionsPage();
     };
 }

@@ -5,14 +5,20 @@ let isActive = true;
 let iconToggleState;
 let textToggleState;
 
-// ui.popup.disable_autohide
-
 document.addEventListener('DOMContentLoaded', function () {
     importInterface();
-    console.log("works");
+    requestActiveState();
 });
 
 function importInterface() {
+    // Toggle active/inactive tracking (listeners)
+    iconToggleState = document.getElementById('icon_toggle_enable');
+    textToggleState = document.getElementById('text_toggle_enable');
+    let buttonToggleState = document.getElementById('button_toggle_enable');
+    buttonToggleState.onclick = () => {
+        requestActiveStateChange();
+    };
+    
     // File selector
     let fileSelector = document.getElementById("file_selector");
     fileSelector.style.display = "none";
@@ -33,6 +39,14 @@ function importInterface() {
     };
 }
 
+function requestActiveState() {
+    bsConnection.sendMessage("requestActiveState");
+}
+
+function requestActiveStateChange() {
+    bsConnection.sendMessage("requestActiveStateChange");
+}
+
 function requestSaveBackup() {
     bsConnection.sendMessage("requestSaveBackup");
 }
@@ -41,7 +55,26 @@ function requestLoadBackup(file) {
     bsConnection.sendMessage({requestLoadBackup: file});
 }
 
+function updateActiveState(activeState) {
+    isActive = activeState;
+    updateStateControls();
+}
+
+function updateStateControls() {
+    if (isActive) {
+        iconToggleState.src = "../icons/icon_gray_48.png";
+        textToggleState.innerText = "Disable tracking";
+    } else {
+        iconToggleState.src = "../icons/icon_48.png";
+        textToggleState.innerText = "Enable tracking";
+    }
+}
+
 function receiveMessage(message) {
+    if (message.hasOwnProperty("activeState")) {
+        updateActiveState(message.activeState);
+        return;
+    }
     console.log("Don't know how to act on this background message:");
     console.log(message);
 }

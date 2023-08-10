@@ -6,8 +6,8 @@ let isActive = true;
 let isSetUp = false;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
-let baConnection = new ListeningPort(receiveBrowserAction, "browser_action");
-let opConnection = new ListeningPort(receiveOptionsMessage, "options_script");
+let baConnection = new ListeningPort(receiveOptionOrBrowserAction, "browser_action");
+let opConnection = new ListeningPort(receiveOptionOrBrowserAction, "options_script");
 let webReader = new WebReader(new WebReaderController());
 
 function initialize() {
@@ -57,9 +57,9 @@ function receiveMessage(message) {
     console.log(message);
 }
 
-function receiveBrowserAction(message) {
+function receiveOptionOrBrowserAction(message) {
     if (message === "requestActiveState") {
-        baSendActiveState();
+        sendActiveState();
         return;
     }
     if (message === "requestActiveStateChange") {
@@ -70,20 +70,11 @@ function receiveBrowserAction(message) {
         webReader.saveBackup();
         return;
     }
-    console.log("Don't know how to act on this browser action message:");
-    console.log(message);
-}
-
-function receiveOptionsMessage(message) {
-    if (message === "requestSaveBackup") {
-        webReader.saveBackup();
-        return;
-    }
     if (message.hasOwnProperty("requestLoadBackup")) {
         triggerLoadBackup(message.requestLoadBackup);
         return;
     }
-    console.log("Don't know how to act on this options page message:");
+    console.log("Don't know how to act on this message:");
     console.log(message);
 }
 
@@ -108,11 +99,12 @@ function toggleActiveState() {
     isActive = !isActive;
     updateBrowserAction();
     updateUrlListener();
-    baSendActiveState();
+    sendActiveState();
 }
 
-function baSendActiveState() {
+function sendActiveState() {
     baConnection.sendMessage({activeState: isActive});
+    opConnection.sendMessage({activeState: isActive});
 }
 
 function updateSidebar(url) {
