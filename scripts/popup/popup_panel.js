@@ -4,7 +4,6 @@ let bsConnection = new SubscriberPort(receiveMessage, "browser_action");
 let isActive = true;
 let iconToggleState;
 let textToggleState;
-let fileSelector;
 
 // ui.popup.disable_autohide
 
@@ -31,15 +30,8 @@ function importInterface() {
     
     // Load Backup
     let buttonLoadBackup = document.getElementById('button_load_backup');
-    let inputElement = document.getElementById("file-selector");
-    inputElement.style.display = 'none';
-    inputElement.addEventListener('change', (event) => {
-        console.log('File selected');
-        requestLoadBackup(event.target.files[0]);
-    });    
     buttonLoadBackup.onclick = () => {
-        console.log('Button click');
-        inputElement.click();
+        browser.runtime.openOptionsPage();
     };
 }
 
@@ -53,10 +45,6 @@ function requestActiveStateChange() {
 
 function requestSaveBackup() {
     bsConnection.sendMessage("requestSaveBackup");
-}
-
-function requestLoadBackup(file) {
-    bsConnection.sendMessage({requestLoadBackup: file});
 }
 
 function updateActiveState(activeState) {

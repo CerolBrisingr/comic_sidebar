@@ -7,6 +7,7 @@ let isSetUp = false;
 let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
 let baConnection = new ListeningPort(receiveBrowserAction, "browser_action");
+let opConnection = new ListeningPort(receiveOptionsMessage, "options_script");
 let webReader = new WebReader(new WebReaderController());
 
 function initialize() {
@@ -69,11 +70,20 @@ function receiveBrowserAction(message) {
         webReader.saveBackup();
         return;
     }
+    console.log("Don't know how to act on this browser action message:");
+    console.log(message);
+}
+
+function receiveOptionsMessage(message) {
+    if (message === "requestSaveBackup") {
+        webReader.saveBackup();
+        return;
+    }
     if (message.hasOwnProperty("requestLoadBackup")) {
         triggerLoadBackup(message.requestLoadBackup);
         return;
     }
-    console.log("Don't know how to act on this browser action message:");
+    console.log("Don't know how to act on this options page message:");
     console.log(message);
 }
 

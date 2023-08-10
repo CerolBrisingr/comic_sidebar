@@ -7,14 +7,8 @@
   </head>
 
 <body>
-  <div id="popup-content">
+  <div id="options-content">
   <table>
-        <tr><td>
-            <button id="button_toggle_enable">
-                <img id="icon_toggle_enable" src="../icons/icon_gray_48.png" />
-                <span id="text_toggle_enable">Disable tracking</span>
-            </button>
-        </td></tr>
         <tr><td>
             <button id="button_save_backup">
                 <img src="../icons/download.svg" />
@@ -29,7 +23,8 @@
         </td></tr>
   </table>
   </div>
-  <script type="module" src="../scripts/popup/popup_panel.js"></script>
+  <input type="file" id="file_selector" />
+  <script type="module" src="../scripts/options/options.js"></script>
 </body>
 
 </html>
