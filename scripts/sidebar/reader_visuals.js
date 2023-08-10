@@ -43,7 +43,7 @@ class ReaderVisuals {
     }
     
     #addEditReaderButton() {
-        let editButton = createEditButton();
+        let editButton = createSettingsButton();
         this.#listing.appendChild(editButton);
         editButton.onclick = () => {
             this.#parentInterface.prepareReaderEdit();
@@ -124,7 +124,7 @@ class ReaderVisuals {
     }
     
     #createUnpinUrlButton(bookmark) {
-        let pinButton = createPinButton();
+        let pinButton = createUnPinButton();
         pinButton.onclick = () => {
             this.#parentInterface.requestUnpinBookmark(bookmark);
         }
@@ -152,18 +152,43 @@ class ReaderVisuals {
     }
 }
 
+function createSettingsButton() {
+    let editButton = createImgButton('../../icons/settings.svg');
+    editButton.classList.add('svg_button');
+    editButton.classList.add('second_button');
+    return editButton;
+}
+
 function createEditButton() {
-    let editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
+    let editButton = createImgButton('../../icons/edit.svg');
     editButton.classList.add('svg_button');
     editButton.classList.add('second_button');
     return editButton;
 }
 
 function createPinButton() {
-    let pinButton = createSvgButton('M0.3,0.9 0.9,0.3 0.7,0.1z');
+    let pinButton = createImgButton('../../icons/pin_fill.svg');
     pinButton.classList.add('svg_button');
     pinButton.classList.add('first_button');
     return pinButton;
+}
+
+function createUnPinButton() {
+    let pinButton = createImgButton('../../icons/pin_slash.svg');
+    pinButton.classList.add('svg_button');
+    pinButton.classList.add('first_button');
+    return pinButton;
+}
+
+function createImgButton(source) {
+    let imgButton = document.createElement("button");
+    
+    let pic = document.createElement("img");
+    pic.src = source;
+    pic.classList.add("icon");
+    imgButton.appendChild(pic);
+    
+    return imgButton;
 }
 
 function createSvgButton(pathString, viewBox='0 0 1 1') {
