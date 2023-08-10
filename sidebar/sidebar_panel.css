@@ -110,6 +110,7 @@ nav ul li {
 	z-index: 10;
 }
 
+.icon:hover,
 .svg_button:hover svg,
 [aria-expanded]:hover svg {
 	fill: var(--background-color);
