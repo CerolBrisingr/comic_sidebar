@@ -114,7 +114,7 @@ nav ul li {
 /* Add comic button */
 .edit_comic,
 .add_comic {
-	height: 2em;
+	/*height: 2em;*/
     width: 100%;
     margin: 0;
     padding: 0;
