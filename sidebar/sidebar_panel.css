@@ -12,7 +12,6 @@ nav > ul {
 nav li {
 	margin: 1px;
 	padding: 0;
-	font-size: 1.5rem;
 	flex: 1 1 0%;
 	position: relative;
 }
@@ -24,7 +23,6 @@ nav li {
 	}
 	nav li {
 		flex: 1;
-		font-size: 1em;
 	}
 }
 
@@ -32,7 +30,6 @@ nav a {
 	display: flex;
 	padding: 0;
 	text-decoration: none;
-	font-weight: bold;
 	text-align: center;
 	border: thin solid var(--background-color);
 	/*border-radius: .5em;*/
@@ -123,7 +120,6 @@ nav ul li {
     padding: 0;
     background-color: var(--background-color);
     text-align: center;
-	font-weight: bold;
     color: var(--accent1-color);
 }
 .add_comic:hover {
