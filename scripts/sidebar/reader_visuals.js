@@ -43,7 +43,7 @@ class ReaderVisuals {
     }
     
     #addEditReaderButton() {
-        let editButton = createEditButton();
+        let editButton = createSettingsButton();
         this.#listing.appendChild(editButton);
         editButton.onclick = () => {
             this.#parentInterface.prepareReaderEdit();
@@ -51,8 +51,9 @@ class ReaderVisuals {
     }
     
     #addExpandReaderButton() {
-        this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
-        this.expandButton.setAttribute("aria-expanded",false);
+        let expandInterface = createImgButton("../../icons/chevron_right.svg");
+        this.expandIcon = expandInterface.img;
+        this.expandButton = expandInterface.button;
         this.expandButton.classList.add('first_button');
         this.#listing.appendChild(this.expandButton);
     }
@@ -124,7 +125,7 @@ class ReaderVisuals {
     }
     
     #createUnpinUrlButton(bookmark) {
-        let pinButton = createPinButton();
+        let pinButton = createUnPinButton();
         pinButton.onclick = () => {
             this.#parentInterface.requestUnpinBookmark(bookmark);
         }
@@ -133,12 +134,12 @@ class ReaderVisuals {
     
     expand () {
         this.#bookmarkList.classList.add('visible');
-        this.expandButton.setAttribute('aria-expanded', 'true');
+        this.expandIcon.src = "../../icons/chevron_down.svg";
     }
     
     collapse () {
         this.#bookmarkList.classList.remove('visible');
-        this.expandButton.setAttribute('aria-expanded', 'false');
+        this.expandIcon.src = "../../icons/chevron_right.svg";
     }
     
     #enableBookmarkExpansion() {
@@ -152,32 +153,40 @@ class ReaderVisuals {
     }
 }
 
+function createSettingsButton() {
+    let editButton = createImgButton('../../icons/settings.svg');
+    editButton.button.classList.add('second_button');
+    return editButton.button;
+}
+
 function createEditButton() {
-    let editButton = createSvgButton('M0.1,0.1 0.9,0.1 0.1,0.9 0.9,0.9z');
-    editButton.classList.add('svg_button');
-    editButton.classList.add('second_button');
-    return editButton;
+    let editButton = createImgButton('../../icons/edit.svg');
+    editButton.button.classList.add('second_button');
+    return editButton.button;
 }
 
 function createPinButton() {
-    let pinButton = createSvgButton('M0.3,0.9 0.9,0.3 0.7,0.1z');
-    pinButton.classList.add('svg_button');
-    pinButton.classList.add('first_button');
-    return pinButton;
+    let pinButton = createImgButton('../../icons/pin_fill.svg');
+    pinButton.button.classList.add('first_button');
+    return pinButton.button;
 }
 
-function createSvgButton(pathString, viewBox='0 0 1 1') {
-    let svgButton = document.createElement("button");
+function createUnPinButton() {
+    let pinButton = createImgButton('../../icons/pin_slash.svg');
+    pinButton.button.classList.add('first_button');
+    return pinButton.button;
+}
+
+function createImgButton(source) {
+    let imgButton = document.createElement("button");
+    imgButton.classList.add("icon_button");
     
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttributeNS(null, "viewBox", viewBox);
-    svgButton.appendChild(svg);
+    let pic = document.createElement("img");
+    pic.src = source;
+    pic.classList.add("icon");
+    imgButton.appendChild(pic);
     
-    let path = document.createElementNS('http://www.w3.org/2000/svg', "path");
-    path.setAttributeNS(null, "d", pathString);
-    svg.append(path);
-    
-    return svgButton;
+    return {button: imgButton, img: pic};
 }
 
 function buildBookmarkObject(bookmarkButton) {
