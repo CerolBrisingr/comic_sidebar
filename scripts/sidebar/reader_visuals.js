@@ -51,8 +51,9 @@ class ReaderVisuals {
     }
     
     #addExpandReaderButton() {
-        this.expandButton = createSvgButton('M0.3,0.1 0.3,0.9 0.8,0.5z');
-        this.expandButton.setAttribute("aria-expanded",false);
+        let expandInterface = createImgButton("../../icons/chevron_right.svg");
+        this.expandIcon = expandInterface.img;
+        this.expandButton = expandInterface.button;
         this.expandButton.classList.add('first_button');
         this.#listing.appendChild(this.expandButton);
     }
@@ -133,12 +134,12 @@ class ReaderVisuals {
     
     expand () {
         this.#bookmarkList.classList.add('visible');
-        this.expandButton.setAttribute('aria-expanded', 'true');
+        this.expandIcon.src = "../../icons/chevron_down.svg";
     }
     
     collapse () {
         this.#bookmarkList.classList.remove('visible');
-        this.expandButton.setAttribute('aria-expanded', 'false');
+        this.expandIcon.src = "../../icons/chevron_right.svg";
     }
     
     #enableBookmarkExpansion() {
@@ -154,55 +155,38 @@ class ReaderVisuals {
 
 function createSettingsButton() {
     let editButton = createImgButton('../../icons/settings.svg');
-    editButton.classList.add('svg_button');
-    editButton.classList.add('second_button');
-    return editButton;
+    editButton.button.classList.add('second_button');
+    return editButton.button;
 }
 
 function createEditButton() {
     let editButton = createImgButton('../../icons/edit.svg');
-    editButton.classList.add('svg_button');
-    editButton.classList.add('second_button');
-    return editButton;
+    editButton.button.classList.add('second_button');
+    return editButton.button;
 }
 
 function createPinButton() {
     let pinButton = createImgButton('../../icons/pin_fill.svg');
-    pinButton.classList.add('svg_button');
-    pinButton.classList.add('first_button');
-    return pinButton;
+    pinButton.button.classList.add('first_button');
+    return pinButton.button;
 }
 
 function createUnPinButton() {
     let pinButton = createImgButton('../../icons/pin_slash.svg');
-    pinButton.classList.add('svg_button');
-    pinButton.classList.add('first_button');
-    return pinButton;
+    pinButton.button.classList.add('first_button');
+    return pinButton.button;
 }
 
 function createImgButton(source) {
     let imgButton = document.createElement("button");
+    imgButton.classList.add("icon_button");
     
     let pic = document.createElement("img");
     pic.src = source;
     pic.classList.add("icon");
     imgButton.appendChild(pic);
     
-    return imgButton;
-}
-
-function createSvgButton(pathString, viewBox='0 0 1 1') {
-    let svgButton = document.createElement("button");
-    
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttributeNS(null, "viewBox", viewBox);
-    svgButton.appendChild(svg);
-    
-    let path = document.createElementNS('http://www.w3.org/2000/svg', "path");
-    path.setAttributeNS(null, "d", pathString);
-    svg.append(path);
-    
-    return svgButton;
+    return {button: imgButton, img: pic};
 }
 
 function buildBookmarkObject(bookmarkButton) {
