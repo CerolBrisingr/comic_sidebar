@@ -8,7 +8,7 @@ Browser modified during development:
 about:config
     extensions.webextensions.keepStorageOnUninstall -> true (was false)
     extensions.webextensions.keepUuidOnUninstall    -> true (was false)
-  Not yet: xpinstall.signatures.required            -> false (still is true)
+  Not yet: xpinstall.signatures.required            -> false (only works in dev build)
 Source: https://extensionworkshop.com/documentation/develop/testing-persistent-and-restart-features/#what-do-i-do-to-ensure-i-can-test-my-extension
 */
 
