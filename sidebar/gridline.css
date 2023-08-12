@@ -1,0 +1,55 @@
+.gridline {
+    width: 100%;
+    display: inline-grid;
+    padding: 0;
+    margin: 0;
+}
+
+.reader {
+    grid-template-columns: auto 1fr auto;
+}
+
+.auto_bookmark {
+    grid-template-columns: 1fr auto;
+}
+
+.manual_bookmark {
+    grid-template-columns: 1fr auto auto;
+}
+
+.gridline:hover {
+    background-color: lime;
+}
+
+.bookmarks {
+    /*display:none;*/
+}
+
+.bookmark_icon {
+    padding-left: 2.5em;
+    height: 75%;
+    width: auto;
+}
+
+.thumbnail_icon {
+    height: 75%;
+    width: auto;
+}
+
+a {
+    text-decoration: none;
+    width = 100%;
+    color: black;
+}
+
+.icon_button {
+    outline: transparent;
+    border: none;
+    border-radius: 0.3em;
+    background: #FFFFFF;
+    z-index: 10;
+}
+
+.icon_button:hover  {
+    background: yellow;
+}
