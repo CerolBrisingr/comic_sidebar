@@ -1,159 +1,91 @@
-nav > ul {
-	list-style: none;
-	// Safari hack, see https://www.scottohara.me/blog/2019/01/12/lists-and-safari.html
-	/* list-style: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"); */
-	margin: 0;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
-	position: relative;
+:root {
+    --main-hover-color: #cecece;
+    --button-hover-color: #abcc7a;
 }
 
-nav li {
-	margin: 1px;
-	padding: 0;
-	font-size: 1.5rem;
-	flex: 1 1 0%;
-	position: relative;
+.gridline {
+    width: 100%;
+    display: grid;
+    padding: 0;
+    margin: 0;
 }
 
-@media (min-width: 45em) {
-	nav > ul {
-		flex-direction: row;
-		height: 3em;
-	}
-	nav li {
-		flex: 1;
-		font-size: 1em;
-	}
+.reader {
+    grid-template-columns: auto 1fr auto;
 }
 
-nav a {
-	display: flex;
-	padding: 0;
-	text-decoration: none;
-	font-weight: bold;
-	text-align: center;
-	border: thin solid var(--background-color);
-	/*border-radius: .5em;*/
-	color: var(--link-color);
-	--link-color: gold;
-	background-color: var(--background-color);
-	position: relative;
+.auto_bookmark {
+    grid-template-columns: 1fr auto;
 }
 
-nav a.auto {
-	background-color: var(--accent2-color);
+.manual_bookmark {
+    grid-template-columns: 1fr auto auto;
 }
 
-nav li[aria-current] a {
-	background-color: var(--accent2-color);
-	color: var(--accent1-color);
-}
-
-nav a:focus,
-nav a:hover,
-nav li[aria-current] a:focus,
-nav li[aria-current] a:hover {
-	color: var(--background-color);
-	background-color: var(--accent1-color);
-}
-/*     submenu navigation links      */
-
-nav ul ul {
-	visibility: hidden;
-	height: 0;
-	z-index: 1000;
-}
-
-nav ul li {
-	display: block;
-}
-
-.visible {
-	visibility: visible;
-	height: auto;
-}
-
-.svg_button,
-[aria-expanded] {
-	position: absolute;
-    /*right: 0.5em*/
-	top: 0.25em;
-	width: 1.5em;
-	height: 1.5em;
-	padding: 0;
-	background: var(--background-color);
-	
-	outline: transparent;
-	border: none;
-	border-radius: 0.3em;
+.gridline:hover {
+    background-color: var(--main-hover-color);
 }
 
 .no_draw {
-    display: none;
+    display:none;
 }
 
-.first_button {
-	right: 0.5em;
+.bookmark_icon {
+    padding-left: 2.5em;
+    padding-right: 0.1em;
+    height: 75%;
+    width: auto;
 }
 
-.second_button {
-	right: 2.5em;
+.thumbnail_icon {
+    padding-right: 0.25em;
+    height: 75%;
+    width: auto;
 }
 
-.svg_button svg,
-[aria-expanded] svg {
-	pointer-events: none;
-	fill: var(--accent1-color);
-	border-radius: 0.3em;
-	z-index: 10;
+.undecorated_link {
+    text-decoration: none;
+    color: black;
 }
 
-.svg_button:hover svg,
-[aria-expanded]:hover svg {
-	fill: var(--background-color);
-	background: var(--accent1-color);
+.icon_button {
+    outline: transparent;
+    border: none;
+    border-radius: 0.3em;
+    background: #FFFFFF;
+    z-index: 10;
 }
 
-[aria-expanded="true"] svg {
-	transform: translate(0, 0) rotate(90deg);
+.icon_button:hover  {
+    background: var(--button-hover-color);
 }
 
-.visually-hidden,
-[visually-hidden="true"] {
-	position: absolute !important;
-	clip-path: rect(1px, 1px, 1px, 1px) !important;
-	padding: 0 !important;
-	border: 0 !important;
-	height: 1px !important;
-	width: 1px !important;
-	overflow: hidden !important;
+.label_input {
+    border: none;
+    outline: none;
 }
 
-:root {
-	--background-color: midnightblue;
-	--accent1-color: gold;
-	--accent2-color: darkred;
-	--text-color: black;
+.gridline:hover div > .label_input {
+    background: var(--main-hover-color);
+}
+
+.labelled_link {
+    display: flex;
 }
 
 /* Add comic button */
-.edit_comic,
-.add_comic {
-	height: 2em;
+.add_reader {
+	/*height: 2em;*/
     width: 100%;
     margin: 0;
     padding: 0;
-    background-color: var(--background-color);
+    background-color:white;
     text-align: center;
-	font-weight: bold;
-    color: var(--accent1-color);
+    color: black;
 }
-.add_comic:hover {
-    color: var(--background-color);
-    background-color: var(--accent1-color);
-    
+.add_reader:hover {
+    color: black;
+    background-color: var(--button-hover-color);
 }
 
 /* comic edit frame */

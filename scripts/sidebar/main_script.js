@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setUpButtons() {
-    const addComic = document.getElementById('add_comic');
+    const addComic = document.getElementById('add_reader');
     addComic.onclick = function () {addCurrentPage()};
 }
 
