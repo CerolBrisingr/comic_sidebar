@@ -235,13 +235,14 @@ class EditableLabel {
 
     #showEditor() {
         this.#editButton.setIcon("../../icons/edit_squiggle.svg");
-        this.#link.classList.add("no_draw");
+        this.#link.addClass("no_draw");
         this.#input.classList.remove("no_draw");
         this.#input.value = this.#bookmark.getLabel("< Edit Label Here >");
     }
 
     #showLabel() {
-        this.#link.classList.remove("no_draw");
+        this.#editButton.setIcon("../../icons/edit.svg");
+        this.#link.removeClass("no_draw");
         this.#input.classList.add("no_draw");
     }
     
@@ -290,40 +291,42 @@ class EditableLabel {
 class IconLink {
     #icon;
     #link;
+    #label;
 
     static getReader(label) {
         let href = "#";
-        let iconLink = new IconLink(href, label);
+        let iconLink = new IconLink(href, label, "../../icons/globe.svg");
         iconLink.setImgClass("thumbnail_icon");
-        iconLink.setImg("../../icons/globe.svg");
         return iconLink;
     }
 
     static getAutoBookmark(href, label) {
-        let iconLink = new IconLink(href, label);
+        let iconLink = new IconLink(href, label, "../../icons/bookmark.svg");
         iconLink.setImgClass("bookmark_icon");
-        iconLink.setImg("../../icons/bookmark.svg");
         return iconLink;
     }
 
     static getManualBookmark(href, label) {
-        let iconLink = new IconLink(href, label);
+        let iconLink = new IconLink(href, label, "../../icons/bookmark-fill.svg");
         iconLink.setImgClass("bookmark_icon");
-        iconLink.setImg("../../icons/bookmark-fill.svg");
         return iconLink;
     }
 
     constructor(href, label, imgPath) {
         this.#link = document.createElement("a");
         this.#icon = document.createElement("img");
+        this.#label = document.createElement("span");
         this.#link.appendChild(this.#icon);
+        this.#link.appendChild(this.#label);
 
         this.#link.href = String(href);
-        this.#link.innerText = String(label);
         this.#link.onclick = () => {
             openUrlInMyTab(this.#link.href);
             return false;
             }
+
+        this.#label.classList.add("undecorated_link")
+        this.#label.innerText = String(label);
 
         this.#icon.src = String(imgPath);
     }
@@ -340,12 +343,20 @@ class IconLink {
         this.#icon.classList.add(String(strClass));
     }
 
+    addClass(strClass) {
+        this.#link.classList.add(strClass);
+    }
+
+    removeClass(strClass) {
+        this.#link.classList.remove(strClass);
+    }
+
     setLabel(label) {
-        this.#link.innerText = String(label);
+        this.#label.innerText = String(label);
     }
 
     getLabel() {
-        return this.#link.innerText;
+        return this.#label.innerText;
     }
 
     setLink(href) {

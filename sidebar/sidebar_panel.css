@@ -27,16 +27,18 @@
 
 .bookmark_icon {
     padding-left: 2.5em;
+    padding-right: 0.1em;
     height: 75%;
     width: auto;
 }
 
 .thumbnail_icon {
+    padding-right: 0.25em;
     height: 75%;
     width: auto;
 }
 
-.gridline a {
+a {
     text-decoration: none;
     color: black;
 }
