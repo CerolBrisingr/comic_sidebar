@@ -55,9 +55,21 @@ a {
     background: yellow;
 }
 
+.label_input {
+    border: none;
+    outline: none;
+}
+
+.gridline:hover div > .label_input {
+    background: lime;
+}
+
+.labelled_link {
+    display: flex;
+}
+
 /* Add comic button */
-.edit_comic,
-.add_comic {
+.add_reader {
 	/*height: 2em;*/
     width: 100%;
     margin: 0;
@@ -66,10 +78,9 @@ a {
     text-align: center;
     color: black;
 }
-.add_comic:hover {
+.add_reader:hover {
     color: black;
     background-color: yellow;
-    
 }
 
 /* comic edit frame */

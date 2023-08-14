@@ -178,7 +178,8 @@ class EditableLabel {
     #prefix;
 
     #container;
-    #image;
+    #container_link;
+    #container_edit;
     #link;
     #editButton;
     #input;
@@ -187,7 +188,7 @@ class EditableLabel {
         this.#bookmark = bookmark;
         this.#prefix = prefix;
         this.#managerInterface = managerInterface;
-        this.#buildContainer();
+        this.#buildContainers();
         this.#addLink();
         this.#addInput();
         this.#addEditButton();
@@ -195,14 +196,14 @@ class EditableLabel {
 
     #addLink() {
         this.#link = IconLink.getManualBookmark(this.#bookmark.href, this.#extractLabel());
-        this.#link.appendTo(this.#container);
-        this.#image = this.#link.getImage();
+        this.#link.addClass("labelled_link");
+        this.#link.appendTo(this.#container_link);
     }
 
     #addInput() {
         let myEdit = document.createElement("input");
+        myEdit.classList.add("label_input");
         myEdit.setAttribute("type", "text");
-        myEdit.classList.add("edit_label", "no_draw");
         myEdit.onkeydown = (event) => {
             if (event.key == "Enter") {
                 this.#requestUpdate();
@@ -211,9 +212,14 @@ class EditableLabel {
                 this.#showLabel();
             }
         }
+
+        let img = document.createElement("img");
+        img.src = "../../icons/bookmark-fill.svg";
+        img.classList.add("bookmark_icon");
         
         this.#input = myEdit;
-        this.#container.appendChild(this.#input);
+        this.#container_edit.appendChild(img);
+        this.#container_edit.appendChild(this.#input);
     }
 
     #addEditButton() {
@@ -226,7 +232,7 @@ class EditableLabel {
     #editButtonClicked() {
         // Clicked once: start editor
         // Clicked again: apply changes
-        if (this.#input.classList.contains("no_draw")) {
+        if (this.#container_edit.classList.contains("no_draw")) {
             this.#showEditor();
             this.#input.select();
         } else {
@@ -236,15 +242,15 @@ class EditableLabel {
 
     #showEditor() {
         this.#editButton.setIcon("../../icons/edit_squiggle.svg");
-        this.#link.addClass("no_draw");
-        this.#input.classList.remove("no_draw");
+        this.#container_link.classList.add("no_draw");
+        this.#container_edit.classList.remove("no_draw");
         this.#input.value = this.#bookmark.getLabel("< Edit Label Here >");
     }
 
     #showLabel() {
         this.#editButton.setIcon("../../icons/edit.svg");
-        this.#link.removeClass("no_draw");
-        this.#input.classList.add("no_draw");
+        this.#container_link.classList.remove("no_draw");
+        this.#container_edit.classList.add("no_draw");
     }
     
     #requestUpdate() {
@@ -258,9 +264,17 @@ class EditableLabel {
         this.#managerInterface.requestBookmarkLabelUpdate(this.#bookmark, newValue);
     }
 
-    #buildContainer() {
+    #buildContainers() {
         this.#container = document.createElement("div");
         this.#container.classList.add("edit_link");
+        this.#container_edit = document.createElement("div");
+        this.#container_edit.classList.add("edit_link_editor");
+        this.#container_edit.classList.add("no_draw");
+        this.#container_link = document.createElement("div");
+        this.#container_link.classList.add("edit_link_link");
+
+        this.#container.appendChild(this.#container_edit);
+        this.#container.appendChild(this.#container_link);
     }
 
     #extractLabel() {
@@ -297,19 +311,19 @@ class IconLink {
     static getReader(label) {
         let href = "#";
         let iconLink = new IconLink(href, label, "../../icons/globe.svg");
-        iconLink.setImgClass("thumbnail_icon");
+        iconLink.addImgClass("thumbnail_icon");
         return iconLink;
     }
 
     static getAutoBookmark(href, label) {
         let iconLink = new IconLink(href, label, "../../icons/bookmark.svg");
-        iconLink.setImgClass("bookmark_icon");
+        iconLink.addImgClass("bookmark_icon");
         return iconLink;
     }
 
     static getManualBookmark(href, label) {
         let iconLink = new IconLink(href, label, "../../icons/bookmark-fill.svg");
-        iconLink.setImgClass("bookmark_icon");
+        iconLink.addImgClass("bookmark_icon");
         return iconLink;
     }
 
@@ -332,16 +346,16 @@ class IconLink {
         this.#icon.src = String(imgPath);
     }
 
-    getImage() {
-        return this.#icon;
-    }
-
     setImg(imgPath) {
         this.#icon.src = String(imgPath);
     }
 
-    setImgClass(strClass) {
+    addImgClass(strClass) {
         this.#icon.classList.add(String(strClass));
+    }
+
+    addLabelClass(strClass) {
+        this.#label.classList.add(String(strClass));
     }
 
     addClass(strClass) {
