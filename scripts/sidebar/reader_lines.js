@@ -340,7 +340,7 @@ class IconLink {
             return false;
             }
 
-        this.#label.classList.add("undecorated_link")
+        this.#link.classList.add("undecorated_link")
         this.#label.innerText = String(label);
 
         this.#icon.src = String(imgPath);

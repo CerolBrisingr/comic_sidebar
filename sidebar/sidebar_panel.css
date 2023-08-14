@@ -5,7 +5,7 @@
 
 .gridline {
     width: 100%;
-    display: inline-grid;
+    display: grid;
     padding: 0;
     margin: 0;
 }
@@ -43,7 +43,7 @@
     width: auto;
 }
 
-a {
+.undecorated_link {
     text-decoration: none;
     color: black;
 }
