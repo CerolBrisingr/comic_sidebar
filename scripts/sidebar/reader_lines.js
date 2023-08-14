@@ -6,7 +6,7 @@ class ReaderLine {
     #expandButton;
     #link;
     #frame;
-    #bookmarks;
+    #bookmarkContainer;
 
     constructor(managerInterface, label) {
         this.#managerInterface = managerInterface;
@@ -17,6 +17,7 @@ class ReaderLine {
         this.#addSettingsButton();
 
         this.#addBookmarkContainer();
+        this.collapse();
     }
 
     #buildFrame() {
@@ -46,12 +47,12 @@ class ReaderLine {
     }
 
     #addBookmarkContainer() {
-        this.#bookmarks = document.createElement("div");
-        this.#frame.appendChild(this.#bookmarks);
+        this.#bookmarkContainer = document.createElement("div");
+        this.#frame.appendChild(this.#bookmarkContainer);
     }
 
     #toggleExpand() {
-        if (this.#bookmarks.classList.contains('no_draw')) {
+        if (this.#bookmarkContainer.classList.contains('no_draw')) {
             this.expand();
         } else {
             this.collapse();
@@ -63,22 +64,22 @@ class ReaderLine {
     }
 
     expand () {
-        this.#bookmarks.classList.remove('no_draw');
+        this.#bookmarkContainer.classList.remove('no_draw');
         this.#expandButton.setIcon("../../icons/chevron_down.svg");
     }
 
     collapse () {
-        this.#bookmarks.classList.add('no_draw');
+        this.#bookmarkContainer.classList.add('no_draw');
         this.#expandButton.setIcon("../../icons/chevron_right.svg");
     }
 
     appendTo(target) {
         target.appendChild(this.#frame);
-        target.appendChild(this.#bookmarks);
+        target.appendChild(this.#bookmarkContainer);
     }
 
     getBookmarkContainer() {
-        return this.#bookmarks;
+        return this.#bookmarkContainer;
     }
 }
 
@@ -371,7 +372,7 @@ class IconButton {
     }
 
     setOnClick(fkt) {
-        this.#button.onClick = fkt;
+        this.#button.onclick = fkt;
     }
 
     setIcon(iconPath) {
