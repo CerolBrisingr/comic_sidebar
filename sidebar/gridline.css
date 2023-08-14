@@ -21,9 +21,11 @@
     background-color: lime;
 }
 
+/*
 .bookmarks {
-    /*display:none;*/
+    display:none;
 }
+*/
 
 .bookmark_icon {
     padding-left: 2.5em;
@@ -36,9 +38,8 @@
     width: auto;
 }
 
-a {
+.gridline a {
     text-decoration: none;
-    width = 100%;
     color: black;
 }
 
