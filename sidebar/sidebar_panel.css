@@ -62,13 +62,13 @@ a {
     width: 100%;
     margin: 0;
     padding: 0;
-    background-color: var(--background-color);
+    background-color:white;
     text-align: center;
-    color: var(--accent1-color);
+    color: black;
 }
 .add_comic:hover {
-    color: var(--background-color);
-    background-color: var(--accent1-color);
+    color: black;
+    background-color: yellow;
     
 }
 

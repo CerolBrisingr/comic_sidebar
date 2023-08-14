@@ -213,6 +213,7 @@ class EditableLabel {
         }
         
         this.#input = myEdit;
+        this.#container.appendChild(this.#input);
     }
 
     #addEditButton() {
