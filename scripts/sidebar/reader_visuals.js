@@ -57,10 +57,10 @@ class ReaderVisuals {
         for (let bookmark of bookmarkList) {
             let bookmarkLine;
             if (strMeta === "manual") {
-                bookmarkLine = ManualBookmarkLine(this.#managerInterface, bookmark, prefix);
+                bookmarkLine = new ManualBookmarkLine(this.#managerInterface, bookmark, prefix);
                 this.#manualBookmarkLines.push(bookmarkLine);
             } else {
-                bookmarkLine = AutoBookmarkLine(this.#managerInterface, bookmark, prefix);
+                bookmarkLine = new AutoBookmarkLine(this.#managerInterface, bookmark, prefix);
             }
             bookmarkLine.appendTo(this.#bookmarkContainer);
         }

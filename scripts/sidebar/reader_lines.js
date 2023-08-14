@@ -1,4 +1,4 @@
-import { openUrlInMyTab, dissectUrl } from "../shared/url";
+import { openUrlInMyTab, dissectUrl } from "../shared/url.js";
 
 class ReaderLine {
     #managerInterface;
@@ -104,7 +104,7 @@ class AutoBookmarkLine {
 
     #addLink(href, prefix) {
         this.#link = IconLink.getAutoBookmark(href, getBookmarkLabel(href, prefix));
-        this.#link.appendto(this.#frame);
+        this.#link.appendTo(this.#frame);
     }
 
     #addPinButton() {
@@ -193,8 +193,8 @@ class EditableLabel {
     }
 
     #addLink() {
-        this.#link = IconLink.getManualBookmark(href, this.#extractLabel());
-        this.#link.appendto(this.#container);
+        this.#link = IconLink.getManualBookmark(this.#bookmark.href, this.#extractLabel());
+        this.#link.appendTo(this.#container);
         this.#image = this.#link.getImage();
     }
 
@@ -282,7 +282,7 @@ class EditableLabel {
 
     appendTo(target) {
         target.appendChild(this.#container);
-        target.appendChild(this.#editButton);
+        this.#editButton.appendTo(target);
     }
 }
 
@@ -291,7 +291,7 @@ class IconLink {
     #link;
 
     static getReader(label) {
-        href = "#";
+        let href = "#";
         let iconLink = new IconLink(href, label);
         iconLink.setImgClass("thumbnail_icon");
         iconLink.setImg("../../icons/globe.svg");
