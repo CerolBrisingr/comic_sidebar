@@ -60,6 +60,7 @@ class ReaderManager {
         this.#readerData.editReader(readerEssentials);
         this.#updateReaderVisuals();
         this.expand();
+        this.#parentInterface.updateViewerDisplay();
     }
     
     #updateReaderVisuals() {
@@ -129,10 +130,6 @@ class ReaderManager {
     
     collapse() {
         this.#readerVisuals.collapse();
-    }
-    
-    addToContainer() {
-        this.#container.appendChild(this.getVisuals());
     }
     
     deleteMe() {

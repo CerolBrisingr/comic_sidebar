@@ -195,7 +195,6 @@ class ReaderData {
     // Interface only
     expand() {}
     collapse() {}
-    addToContainer() {}
     
     deleteMe() {
         this.#readerSync.disconnect();

@@ -173,15 +173,9 @@ class WebReader {
             return -1;
         }
         this.#readerStorage.saveObject(newManager);
-        newManager.addToContainer();
         this.updateBookmark(readerObject.initialUrl); // This also updates storage
+        this.reloadVisuals();
         return this.#latestId;
-    }
-    
-    modifyPage(readerEssentials) {
-        let readerClass = this.#readerStorage.getObject(readerEssentials.initialUrl);
-        if (readerClass)
-            readerClass.editReader(readerEssentials);
     }
     
     removeReader(prefixMask) {
@@ -291,6 +285,9 @@ class WebReaderInterface {
         this.#webReader.removeReader(prefixMask);
     }
     
+    updateViewerDisplay() {
+        this.#webReader.reloadVisuals();
+    }
 }
 
 class WebReaderController {
