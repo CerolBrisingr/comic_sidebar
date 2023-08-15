@@ -4,6 +4,7 @@ import {ReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
+import { ReaderSort } from "../sidebar/reader_sort.js"
 
 class WebReader {
     #controller;
@@ -188,36 +189,6 @@ class WebReader {
             this.#updateCurrentReader(new ReaderClassDummy());
         this.#readerStorage.removeObject(prefixMask);
     }
-}
-
-class ReaderSort {
-    static #rule = "Name";
-    static #possible_rules = ["Name"];
-
-    static setRule(strRule) {
-        if (!ReaderSort.#possible_rules.contains(strRule))
-            throw new Error(`Invalid sorting rule "${strRule}"`);
-            ReaderSort.#rule = strRule;
-    }
-
-    static apply(readerStorageList) {
-        let sortFcn;
-        switch (ReaderSort.#rule) {
-            case "Name": {
-                sortFcn = (a,b) => {return compare(a.getLabel(), b.getLabel());};
-                break;
-            }
-        }
-        return readerStorageList.sort(sortFcn);
-    }
-}
-
-function compare(a, b) {
-    if (a > b)
-        return 1;
-    if (a == b)
-        return 0;
-    return -1;
 }
 
 class HtmlContainer {

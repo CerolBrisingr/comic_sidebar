@@ -83,6 +83,30 @@
     display: flex;
 }
 
+/* Sorting dropdown */
+.dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+.dropdown_options {
+    display: none;
+    position: absolute;
+    overflow: auto;
+    z-index: 20;
+}
+
+.dropdown:hover .dropdown_options {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.dropdown_button {
+    cursor: pointer;
+    width: 100%;
+}
+
 /* Add comic button */
 .add_reader {
 	/*height: 2em;*/

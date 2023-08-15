@@ -10,11 +10,11 @@ class ReaderManager {
     #readerVisuals;
     #readerSync;
     
-    constructor(readerObject, parentInterface, intId, container) {
+    constructor(readerObject, parentInterface, intId_ignored, container) {
         this.#container = container;
         this.#parentInterface = parentInterface;
         this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
-        this.#readerData = this.#createReaderData(readerObject, readerObject.intId);
+        this.#readerData = this.#createReaderData(readerObject);
         this.#createReaderVisuals();
     }
     
@@ -30,7 +30,7 @@ class ReaderManager {
         return this.#readerData.getPrefixMask();
     }
     
-    #createReaderData(readerObject, intId) {
+    #createReaderData(readerObject) {
         return new ReaderData(
             readerObject,
             new ReaderManagerInterface(this),
