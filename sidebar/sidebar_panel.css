@@ -48,6 +48,8 @@
 }
 
 .undecorated_link {
+    display: grid;
+    grid-template-columns: auto 1fr;
     text-decoration: none;
     color: black;
 }
@@ -69,11 +71,13 @@
     outline: none;
 }
 
-/* Does not help with overflow :/
-.label_span {
-    overflow: clip;
-    overflow-wrap: anywhere;
-} */
+/* Does help with overflow */
+.gridline_label {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+} 
 
 .gridline:hover div > .label_input {
     background: var(--main-hover-color);

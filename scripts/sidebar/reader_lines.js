@@ -330,11 +330,11 @@ class IconLink {
     constructor(href, label, imgPath) {
         this.#link = document.createElement("a");
         this.#icon = document.createElement("img");
-        this.#label = document.createElement("span");
+        this.#label = document.createElement("div");
         this.#link.appendChild(this.#icon);
         this.#link.appendChild(this.#label);
 
-        this.#label.classList.add("label_span");
+        this.#label.classList.add("gridline_label");
 
         this.#link.href = String(href);
         this.#link.onclick = () => {
