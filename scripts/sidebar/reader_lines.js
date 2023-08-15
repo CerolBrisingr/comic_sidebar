@@ -334,6 +334,8 @@ class IconLink {
         this.#link.appendChild(this.#icon);
         this.#link.appendChild(this.#label);
 
+        this.#label.classList.add("label_span");
+
         this.#link.href = String(href);
         this.#link.onclick = () => {
             openUrlInMyTab(this.#link.href);

@@ -3,6 +3,8 @@ import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
+import { ReaderFilter } from "../sidebar/reader_filter.js"
+import { ReaderSort } from "../sidebar/reader_sort.js"
 
 class WebReader {
     #controller;
@@ -38,7 +40,7 @@ class WebReader {
     }
     
     saveBackup() {
-        saveBackup(this.#readerStorage.getList());
+        saveBackup(this.#getSortedStorage());
     }
     
     #clearData() {
@@ -47,9 +49,13 @@ class WebReader {
         }
         this.#readerStorage.clearData();
     }
+
+    #getSortedStorage() {
+        return ReaderSort.apply(this.#readerStorage.getList());
+    }
     
     getObjectList() {
-        let readerObject = buildWebReaderObject(this.#readerStorage.getList());
+        let readerObject = buildWebReaderObject(this.#getSortedStorage());
         return readerObject.data;
     }
     
@@ -58,14 +64,14 @@ class WebReader {
             return this.#currentReader;
         let object = this.#readerStorage.getObject(url);
         if (object === undefined) {
-            this.#udateCurrentReader(new ReaderClassDummy());
+            this.#updateCurrentReader(new ReaderClassDummy());
             return this.#currentReader;
         }
-        this.#udateCurrentReader(object);
+        this.#updateCurrentReader(object);
         return object;
     }
     
-    #udateCurrentReader(newObject) {
+    #updateCurrentReader(newObject) {
         this.#currentReader.collapse();
         newObject.expand();
         this.#currentReader = newObject;
@@ -78,6 +84,10 @@ class WebReader {
             return;
         let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
         browser.storage.local.set({comicData: comicDataObject});
+    }
+
+    reloadVisuals() {
+        this.#setContainerContent();
     }
     
     importInterface(readerObjectList) {
@@ -137,10 +147,12 @@ class WebReader {
         if (this.#container == undefined)
             return;
         let visualsList = [];
-        for (let manager of this.#readerStorage.getList()) {
+        for (let manager of this.#getSortedStorage()) {
             if (!manager.hasVisuals())
                 continue; // not a manager then
             if (!manager.isValid())
+                continue;
+            if (!ReaderFilter.fits(manager))
                 continue;
             visualsList.push(manager.getVisuals());
         }
@@ -174,7 +186,7 @@ class WebReader {
     
     removeReader(prefixMask) {
         if (this.#currentReader.urlIsCompatible(prefixMask))
-            this.#udateCurrentReader(new ReaderClassDummy());
+            this.#updateCurrentReader(new ReaderClassDummy());
         this.#readerStorage.removeObject(prefixMask);
     }
 }
@@ -312,4 +324,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReader, WebReaderController}
+export {WebReader, WebReaderController, ReaderSort}

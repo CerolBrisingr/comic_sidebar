@@ -2,6 +2,8 @@ import {ReaderEditor} from "./reader_editor.js"
 import {WebReader, WebReaderController} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
+import { ReaderFilter } from "./reader_filter.js"
+import { SortControls } from "./reader_sort.js"
 
 /* 
 Browser modified during development:
@@ -14,6 +16,7 @@ Source: https://extensionworkshop.com/documentation/develop/testing-persistent-a
 
 // Tab management
 let webReader;
+let sortControls;
 let isSetUp = false;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
@@ -26,6 +29,20 @@ document.addEventListener('DOMContentLoaded', function () {
 function setUpButtons() {
     const addComic = document.getElementById('add_reader');
     addComic.onclick = function () {addCurrentPage()};
+
+    const searchBox = document.getElementById('search_box');
+    searchBox.addEventListener("input", (event) => {
+        ReaderFilter.setFilter(event.target.value);
+        webReader.reloadVisuals();
+    });
+
+    const fcnUpdate = () => {
+        webReader.reloadVisuals();
+    };
+    const btnToggle = document.getElementById("dropdown_toggle");
+    const btnName = document.getElementById("dropdown_name");
+    const btnUrl = document.getElementById("dropdown_url");
+    sortControls = new SortControls(fcnUpdate, btnToggle, btnName, btnUrl);
 }
 
 function setUpReaderEditor() {
