@@ -115,11 +115,11 @@ class Editor {
     }
     
     #setInvisible() {
-        this.fullFrame.style.display = "none";
+        this.fullFrame.classList.add("no_draw");
     }
     
     #setVisible() {
-        this.fullFrame.style.removeProperty("display");
+        this.fullFrame.classList.remove("no_draw");
     }
     
     #setDeleteSectionVisibility(mode) {
