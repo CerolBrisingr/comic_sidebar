@@ -38,7 +38,7 @@ class WebReader {
     }
     
     saveBackup() {
-        saveBackup(this.#readerStorage.getList());
+        saveBackup(this.#getSortedStorage());
     }
     
     #clearData() {
@@ -47,9 +47,13 @@ class WebReader {
         }
         this.#readerStorage.clearData();
     }
+
+    #getSortedStorage() {
+        return ReaderSort.apply(this.#readerStorage.getList());
+    }
     
     getObjectList() {
-        let readerObject = buildWebReaderObject(this.#readerStorage.getList());
+        let readerObject = buildWebReaderObject(this.#getSortedStorage());
         return readerObject.data;
     }
     
@@ -58,14 +62,14 @@ class WebReader {
             return this.#currentReader;
         let object = this.#readerStorage.getObject(url);
         if (object === undefined) {
-            this.#udateCurrentReader(new ReaderClassDummy());
+            this.#updateCurrentReader(new ReaderClassDummy());
             return this.#currentReader;
         }
-        this.#udateCurrentReader(object);
+        this.#updateCurrentReader(object);
         return object;
     }
     
-    #udateCurrentReader(newObject) {
+    #updateCurrentReader(newObject) {
         this.#currentReader.collapse();
         newObject.expand();
         this.#currentReader = newObject;
@@ -78,6 +82,10 @@ class WebReader {
             return;
         let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
         browser.storage.local.set({comicData: comicDataObject});
+    }
+
+    resort() {
+        this.#setContainerContent();
     }
     
     importInterface(readerObjectList) {
@@ -137,7 +145,7 @@ class WebReader {
         if (this.#container == undefined)
             return;
         let visualsList = [];
-        for (let manager of this.#readerStorage.getList()) {
+        for (let manager of this.#getSortedStorage()) {
             if (!manager.hasVisuals())
                 continue; // not a manager then
             if (!manager.isValid())
@@ -174,9 +182,39 @@ class WebReader {
     
     removeReader(prefixMask) {
         if (this.#currentReader.urlIsCompatible(prefixMask))
-            this.#udateCurrentReader(new ReaderClassDummy());
+            this.#updateCurrentReader(new ReaderClassDummy());
         this.#readerStorage.removeObject(prefixMask);
     }
+}
+
+class ReaderSort {
+    static #rule = "Name";
+    static #possible_rules = ["Name"];
+
+    static setRule(strRule) {
+        if (!ReaderSort.#possible_rules.contains(strRule))
+            throw new Error(`Invalid sorting rule "${strRule}"`);
+            ReaderSort.#rule = strRule;
+    }
+
+    static apply(readerStorageList) {
+        let sortFcn;
+        switch (ReaderSort.#rule) {
+            case "Name": {
+                sortFcn = (a,b) => {return compare(a.getLabel(), b.getLabel());};
+                break;
+            }
+        }
+        return readerStorageList.sort(sortFcn);
+    }
+}
+
+function compare(a, b) {
+    if (a > b)
+        return 1;
+    if (a == b)
+        return 0;
+    return -1;
 }
 
 class HtmlContainer {
@@ -312,4 +350,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReader, WebReaderController}
+export {WebReader, WebReaderController, ReaderSort}

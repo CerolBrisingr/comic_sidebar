@@ -10,6 +10,10 @@
     margin: 0;
 }
 
+.search_line {
+    grid-template-columns: 1fr auto;
+}
+
 .reader {
     grid-template-columns: auto 1fr auto;
 }
@@ -64,6 +68,12 @@
     border: none;
     outline: none;
 }
+
+/* Does not help with overflow :/
+.label_span {
+    overflow: clip;
+    overflow-wrap: anywhere;
+} */
 
 .gridline:hover div > .label_input {
     background: var(--main-hover-color);

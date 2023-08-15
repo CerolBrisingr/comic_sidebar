@@ -1,5 +1,5 @@
 import {ReaderEditor} from "./reader_editor.js"
-import {WebReader, WebReaderController} from "../shared/web_reader.js"
+import {WebReader, WebReaderController, ReaderSort} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
 
