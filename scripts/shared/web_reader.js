@@ -3,6 +3,7 @@ import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
+import { ReaderFilter } from "../sidebar/reader_filter.js"
 
 class WebReader {
     #controller;
@@ -84,7 +85,7 @@ class WebReader {
         browser.storage.local.set({comicData: comicDataObject});
     }
 
-    resort() {
+    reloadVisuals() {
         this.#setContainerContent();
     }
     
@@ -149,6 +150,8 @@ class WebReader {
             if (!manager.hasVisuals())
                 continue; // not a manager then
             if (!manager.isValid())
+                continue;
+            if (!ReaderFilter.fits(manager))
                 continue;
             visualsList.push(manager.getVisuals());
         }

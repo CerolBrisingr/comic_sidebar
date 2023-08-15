@@ -2,6 +2,7 @@ import {ReaderEditor} from "./reader_editor.js"
 import {WebReader, WebReaderController, ReaderSort} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
+import { ReaderFilter } from "./reader_filter.js"
 
 /* 
 Browser modified during development:
@@ -26,6 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
 function setUpButtons() {
     const addComic = document.getElementById('add_reader');
     addComic.onclick = function () {addCurrentPage()};
+
+    const searchBox = document.getElementById('search_box');
+    searchBox.addEventListener("input", (event) => {
+        ReaderFilter.setFilter(event.target.value);
+        webReader.reloadVisuals();
+    });
 }
 
 function setUpReaderEditor() {
