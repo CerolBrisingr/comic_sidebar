@@ -33,11 +33,11 @@ function setUpButtons() {
     const searchBox = document.getElementById('search_box');
     searchBox.addEventListener("input", (event) => {
         ReaderFilter.setFilter(event.target.value);
-        webReader.reloadVisuals();
+        webReader.relistViewers();
     });
 
     const fcnUpdate = () => {
-        webReader.reloadVisuals();
+        webReader.relistViewers();
     };
     const btnToggle = document.getElementById("dropdown_toggle");
     const btnName = document.getElementById("dropdown_name");

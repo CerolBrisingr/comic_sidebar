@@ -60,7 +60,7 @@ class ReaderManager {
         this.#readerData.editReader(readerEssentials);
         this.#updateReaderVisuals();
         this.expand();
-        this.#parentInterface.updateViewerDisplay();
+        this.#parentInterface.relistViewerDisplay();
     }
     
     #updateReaderVisuals() {
@@ -75,9 +75,11 @@ class ReaderManager {
         return this.#readerData.getMostRecentAutomaticUrl();
     }
     
-    addAutomatic(url) {
-        if (this.#readerData.addAutomatic(url))
+    addAutomatic(data) {
+        if (this.#readerData.addAutomatic(data))
             this.#readerVisuals.updateReaderUrls(this.#readerData);
+        if (data.time)
+            this.#parentInterface.relistViewerDisplay();
     }
 
     getLatestInputTime() {

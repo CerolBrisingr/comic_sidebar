@@ -89,8 +89,9 @@ class ReaderData {
     }
 
     addAutomatic(data) {
-        this.#registerInteraction(data.time);
-        if (this.#registerAutomatic(data.url)) {
+        let changeHappened = this.#registerInteraction(data.time);
+        changeHappened |= this.#registerAutomatic(data.url);
+        if (changeHappened) {
             this.#parentInterface.saveProgress();
             return true;
         }
@@ -100,8 +101,9 @@ class ReaderData {
     #registerInteraction(time) {
         if (time) {
             this.#latestInteraction = time;
-            return;
+            return true;
         }
+        false;
     }
     
     #registerAutomatic(url) {

@@ -86,7 +86,7 @@ class WebReader {
         browser.storage.local.set({comicData: comicDataObject});
     }
 
-    reloadVisuals() {
+    relistViewers() {
         this.#setContainerContent();
     }
     
@@ -174,7 +174,7 @@ class WebReader {
         }
         this.#readerStorage.saveObject(newManager);
         this.updateBookmark(readerObject.initialUrl); // This also updates storage
-        this.reloadVisuals();
+        this.relistViewers();
         return this.#latestId;
     }
     
@@ -285,8 +285,8 @@ class WebReaderInterface {
         this.#webReader.removeReader(prefixMask);
     }
     
-    updateViewerDisplay() {
-        this.#webReader.reloadVisuals();
+    relistViewerDisplay() {
+        this.#webReader.relistViewers();
     }
 }
 
