@@ -79,6 +79,10 @@ class ReaderManager {
         if (this.#readerData.addAutomatic(url))
             this.#readerVisuals.updateReaderUrls(this.#readerData);
     }
+
+    getLatestInputTime() {
+        this.#readerData.getLatestInputTime();
+    }
     
     sendPinRequest(url) {
         this.#readerSync.sendPinRequest(url);

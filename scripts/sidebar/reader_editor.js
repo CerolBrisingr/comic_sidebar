@@ -21,10 +21,10 @@ class ReaderEditor {
             confirmDel);
     }
     
-    static importLink(url, fktFinalize) {
+    static importLink(data, fktFinalize) {
         if (ReaderEditor.editor === undefined)
             return;
-        ReaderEditor.editor.importLink(url, fktFinalize);
+        ReaderEditor.editor.importLink(data, fktFinalize);
     }
     
     static updateLink(readerData, fktFinalize) {
@@ -36,6 +36,8 @@ class ReaderEditor {
 }
 
 class Editor {
+    #timestamp;
+
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
         for (let arg of arguments) {
             if (arg === undefined) {
@@ -160,21 +162,23 @@ class Editor {
         this.prefixObject.disabled = false;
     }
     
-    importLink(url, fktFinalize) {
+    importLink(data, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
         }
         this.occupyEditor(fktFinalize);
+
         this.okBtn.innerText = "Add Reader";
+        this.#timestamp = data.time;
         
-        let urlPieces = dissectUrl(url);
+        let urlPieces = dissectUrl(data.url);
         if (urlPieces === undefined) {
             this.disableInterface();
             this.setUserMessage("Error: ", "Invalid Link provided");
             return;
         }
-        this.fullLink = url;
+        this.fullLink = data.url;
         this.label = urlPieces.host;
         this.setUserMessage("", "");
         this.enableInterface();
@@ -188,7 +192,9 @@ class Editor {
             return;
         }
         this.occupyEditor(fktFinalize);
+
         this.okBtn.innerText = "Update Reader";
+        this.#timestamp = undefined;
         
         let url = readerData.getMostRecentAutomaticUrl();
         if (url === undefined) {
@@ -219,7 +225,8 @@ class Editor {
         return {
             initialUrl: this.fullLink,
             label: this.label,
-            prefix: this.prefix
+            prefix: this.prefix,
+            time: this.#timestamp
         }
     }
     

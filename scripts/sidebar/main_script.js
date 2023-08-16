@@ -42,7 +42,8 @@ function setUpButtons() {
     const btnToggle = document.getElementById("dropdown_toggle");
     const btnName = document.getElementById("dropdown_name");
     const btnUrl = document.getElementById("dropdown_url");
-    sortControls = new SortControls(fcnUpdate, btnToggle, btnName, btnUrl);
+    const btnTime = document.getElementById("dropdown_time");
+    sortControls = new SortControls(fcnUpdate, btnToggle, btnName, btnUrl, btnTime);
 }
 
 function setUpReaderEditor() {
@@ -73,7 +74,11 @@ function requestUrlRetransmission() {
 }
 
 function requestPageAddition(readerEssentials) {
-    let readerObject = {prefix_mask: readerEssentials.prefix, label: readerEssentials.label, initialUrl: readerEssentials.initialUrl};
+    let readerObject = {
+        prefix_mask: readerEssentials.prefix,
+        label: readerEssentials.label,
+        initialUrl: readerEssentials.initialUrl,
+        time: readerEssentials.time};
     bsConnection.sendMessage({requestPageAddition: readerObject});
 }
 
@@ -108,20 +113,20 @@ function addCurrentPage() {
     if (webReader === undefined)
         return;
     UrlListener.findLatestTabUrl()
-        .then((url) => {
-            ReaderEditor.importLink(url, requestPageAddition)
+        .then((data) => {
+            ReaderEditor.importLink(data, requestPageAddition)
             }, onError);
 }
 
 // Display error for failed promises
 function onError(error) {
-    console.log("Error: ${error}");
+    console.log(`Error: ${error}`);
 }
 
-function updateBookmark(url) {
+function updateBookmark(data) {
     if (webReader === undefined)
         return;
-    webReader.updateBookmark(url);
+    webReader.updateBookmark(data);
 }
 
 function receiveMessage(message) {

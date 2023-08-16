@@ -1,6 +1,6 @@
 class ReaderSort {
     static #rule = "Name";
-    static #possible_rules = ["Name", "URL"];
+    static #possible_rules = ["Name", "URL", "Time"];
 
     static setRule(strRule) {
         if (!ReaderSort.#possible_rules.includes(strRule))
@@ -12,11 +12,15 @@ class ReaderSort {
         let sortFcn;
         switch (ReaderSort.#rule) {
             case "Name": {
-                sortFcn = (a,b) => {return compare(a.getLabel(), b.getLabel());};
+                sortFcn = (a,b) => {return compareLower(a.getLabel(), b.getLabel());};
                 break;
             }
             case "URL": {
-                sortFcn = (a,b) => {return compare(a.getPrefixMask(), b.getPrefixMask());};
+                sortFcn = (a,b) => {return compareLower(a.getPrefixMask(), b.getPrefixMask());};
+                break;
+            }
+            case "Time": {
+                sortFcn = (a,b) => {return compare(a.getLatestInputTime(), b.getLatestInputTime());};
                 break;
             }
         }
@@ -24,9 +28,13 @@ class ReaderSort {
     }
 }
 
-function compare(a, b) {
+function compareLower(a, b) {
     a = a.toLowerCase();
     b = b.toLowerCase();
+    return compare(a,b);
+}
+
+function compare(a, b) {
     if (a > b)
         return 1;
     if (a == b)
@@ -39,12 +47,14 @@ class SortControls {
     #btnToggle;
     #btnName;
     #btnUrl;
+    #btnTime;
 
-    constructor(fcnUpdate, btnToggle, btnName, btnUrl) {
+    constructor(fcnUpdate, btnToggle, btnName, btnUrl, btnTime) {
         this.#fcnUpdate = fcnUpdate;
         this.#btnToggle = btnToggle; // sticking to hover for now
         this.#btnName = btnName;
         this.#btnUrl = btnUrl;
+        this.#btnTime = btnTime;
         this.#configureButtons();
     }
 
@@ -57,6 +67,10 @@ class SortControls {
             ReaderSort.setRule("URL");
             this.#fcnUpdate();
         };
+        this.#btnTime.onclick = () => {
+            ReaderSort.setRule("Time");
+            this.#fcnUpdate();
+        }
     }
 
 }

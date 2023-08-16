@@ -32,11 +32,11 @@ class WebReader {
         importBackup(file, fktImportBackup);
     }
     
-    updateBookmark(url) {
-        let object = this.#selectCorrespondingStorage(url);
+    updateBookmark(data) {
+        let object = this.#selectCorrespondingStorage(data.url);
         if (!object.isValid())
             return;
-        object.addAutomatic(url);
+        object.addAutomatic(data);
     }
     
     saveBackup() {
