@@ -5,6 +5,10 @@ class UrlListener {
     #fktTabEvent;
     #fktTabUpdateEvent;
     #lastUrl = "";
+
+    static #bundleUrl(url) {
+        return {url:url, time: Date.now()};
+    }
     
     static async findLatestTabUrl() {
         let tabs = await browser.tabs.query({currentWindow: true});
@@ -16,7 +20,7 @@ class UrlListener {
                 url = tab.url;
             }
         }
-        return url;
+        return UrlListener.#bundleUrl(url);
     }
     
     constructor(fktReactToUrl) {
@@ -28,12 +32,16 @@ class UrlListener {
             };
         this.activate();
     }
+
+    #sendUrl(url) {
+        this.#fktReactToUrl(UrlListener.#bundleUrl(url));
+    }
     
     #fireOnlyOnce(url) {
         if (url === this.#lastUrl)
             return;
         this.#lastUrl = url;
-        this.#fktReactToUrl(url);
+        this.#sendUrl(url);
     }
     
     #connect() {
@@ -68,7 +76,7 @@ class UrlListener {
     retransmit() {
         UrlListener.findLatestTabUrl()
             .then((url) => {
-                this.#fktReactToUrl(url);
+                this.#sendUrl(url);
                 }, promiseError);
     }
     

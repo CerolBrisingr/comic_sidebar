@@ -112,9 +112,9 @@ function sendActiveState() {
     opConnection.sendMessage({activeState: isActive});
 }
 
-function updateSidebar(url) {
-    sbConnection.sendMessage({updateBookmark: url});
-    webReader.updateBookmark(url);
+function updateSidebar(data) {
+    sbConnection.sendMessage({updateBookmark: data});
+    webReader.updateBookmark(data);
 }
 
 function updateUrlListener() {

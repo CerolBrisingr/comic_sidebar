@@ -4,6 +4,7 @@ import {ReaderSync} from "./reader_sync.js"
 class ReaderData {
     #label;
     #intId;
+    #latestInteraction = 0;
     #readerSync;
     #prefixMask;
     #automatic;
@@ -12,6 +13,7 @@ class ReaderData {
     
     constructor(data, parentInterface, readerSync) {
         this.#parentInterface = parentInterface;
+        this.#registerInteraction(data.time);
         if (data.hasOwnProperty("base_url"))
             data.prefix_mask = String(data.base_url);
         if (data.hasOwnProperty("prefix_mask"))
@@ -36,7 +38,7 @@ class ReaderData {
             return
         for (let entry of list) {
             if (entry.hasOwnProperty("href"))
-                this.addAutomatic(String(entry.href));
+                this.#registerAutomatic(String(entry.href));
         }
     }
     
@@ -71,6 +73,10 @@ class ReaderData {
     getAutomaticBookmarks() {
         return this.#automatic;
     }
+
+    getLatestInputTime() {
+        return this.#latestInteraction;
+    }
     
     isValid() {
         return ((this.#prefixMask !== undefined) && (this.#label !== undefined));
@@ -81,8 +87,26 @@ class ReaderData {
             return false;
         return url_string.startsWith(this.#prefixMask);
     }
+
+    addAutomatic(data) {
+        let changeHappened = this.#registerInteraction(data.time);
+        changeHappened |= this.#registerAutomatic(data.url);
+        if (changeHappened) {
+            this.#parentInterface.saveProgress();
+            return true;
+        }
+        return false;
+    }
+
+    #registerInteraction(time) {
+        if (time) {
+            this.#latestInteraction = time;
+            return true;
+        }
+        false;
+    }
     
-    addAutomatic(url) {
+    #registerAutomatic(url) {
         if (!this.#isValidNewUrl(url))
             return false;
         let newBoockmark = new Bookmark(url);
@@ -103,7 +127,6 @@ class ReaderData {
         if (this.#automatic.length > 4)
             this.#automatic.shift();
         
-        this.#parentInterface.saveProgress();
         return true;
     }
     
@@ -178,6 +201,7 @@ class ReaderData {
     returnAsObject() {
         let thisAsObject = {
             intId: this.#intId,
+            time: this.#latestInteraction,
             label:this.#label,
             prefix_mask:this.#prefixMask,
             automatic: [],
