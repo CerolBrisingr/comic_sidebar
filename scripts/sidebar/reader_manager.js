@@ -83,7 +83,7 @@ class ReaderManager {
     }
 
     getLatestInputTime() {
-        this.#readerData.getLatestInputTime();
+        return this.#readerData.getLatestInputTime();
     }
     
     sendPinRequest(url) {
