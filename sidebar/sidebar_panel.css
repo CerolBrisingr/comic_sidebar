@@ -100,14 +100,8 @@
 .dropdown_option_box {
     display: none;
     position: absolute;
-    /*overflow: auto;*/
     z-index: 20;
     flex-direction: column;
-    justify-content: space-around;
-}
-
-.dropdown_toggle:focus + .dropdown_option_box {
-    display: flex;
 }
 
 .dropdown_option {

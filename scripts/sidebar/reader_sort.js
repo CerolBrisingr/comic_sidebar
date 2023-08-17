@@ -2,14 +2,13 @@ class ReaderSort {
     static #possible_rules = {
         Name: (a,b) => {return compareLower(a.getLabel(), b.getLabel());},
         URL: (a,b) => {return compareLower(a.getPrefixMask(), b.getPrefixMask());},
-        Latest: (a,b) => {return compare(a.getLatestInputTime(), b.getLatestInputTime());},
-        Oldest: (b,a) => {return compare(a.getLatestInputTime(), b.getLatestInputTime());}
+        Oldest: (a,b) => {return compare(a.getLatestInputTime(), b.getLatestInputTime());},
+        Latest: (b,a) => {return compare(a.getLatestInputTime(), b.getLatestInputTime());}
     };
     static #rule = ReaderSort.#possible_rules.Name;
 
     static setRule(strRule) {
-        console.log(strRule);
-        if (!ReaderSort.#possible_rules.hasOwnParameter(strRule))
+        if (!ReaderSort.#possible_rules.hasOwnProperty(strRule))
             throw new Error(`Invalid sorting rule "${strRule}"`);
             ReaderSort.#rule = ReaderSort.#possible_rules[strRule];
     }
@@ -34,42 +33,70 @@ function compare(a, b) {
 }
 
 class SortControls {
+    #btnToggle;
+    #optionBox;
     #fcnUpdate;
-    #btnName;
-    #btnUrl;
-    #btnLatest;
-    #btnOldest;
+    #ruleButtons = [];
+    #isOpen = false;
 
-    constructor(fcnUpdate, btnName, btnUrl, btnLatest, btnOldest) {
+    constructor(fcnUpdate, btnToggle, optionBox, btnName, btnUrl, btnLatest, btnOldest) {
+        this.#btnToggle = btnToggle;
+        this.#optionBox = optionBox;
         this.#fcnUpdate = fcnUpdate;
-        this.#btnName = btnName;
-        this.#btnUrl = btnUrl;
-        this.#btnLatest = btnLatest;
-        this.#btnOldest = btnOldest;
-        this.#configureButtons();
+        this.#configureButtons(btnName, btnUrl, btnLatest, btnOldest);
     }
 
-    #configureButtons() {
-        this.#btnName.onclick = () => {
-            this.#setRule("Name");
+    #configureButtons(btnName, btnUrl, btnLatest, btnOldest) {
+        this.#btnToggle.onclick = (evt) => {
+            if (this.#isOpen) {
+                this.#close();
+            } else {
+                this.#open();
+            }
         };
-        this.#btnUrl.onclick = () => {
-            this.#setRule("URL");
-        };
-        this.#btnLatest.onclick = () => {
-            this.#setRule("Latest");
-        };
-        this.#btnOldest.onclick = () => {
-            this.#setRule("Oldest");
-        };
+        this.#btnToggle.onblur = (evt) => {this.#onblur(evt);};
+        this.#setUpRuleBtn(btnName, "Name");
+        this.#setUpRuleBtn(btnUrl, "URL");
+        this.#setUpRuleBtn(btnLatest, "Latest");
+        this.#setUpRuleBtn(btnOldest, "Oldest");
+    }
+
+    #open() {
+        this.#isOpen = true;
+        this.#optionBox.style.display = "flex";
+    }
+
+    #close() {
+        this.#isOpen = false;
+        this.#optionBox.style.display = "none";
+    }
+
+    #setUpRuleBtn(btn, strRule) {
+        btn.onclick = () => {this.#setRule(strRule);};
+        btn.onblur = (evt) => {this.#onblur(evt);};
+        this.#ruleButtons.push(btn);
+    }
+
+    #onblur(evt) {
+        if (!relatedTargetOnDropdown(evt.relatedTarget)) 
+            this.#close();
     }
 
     #setRule(strRule) {
-        console.log("clicked!");
         ReaderSort.setRule(strRule);
         this.#fcnUpdate();
+        this.#close();
     }
 
+}
+
+function relatedTargetOnDropdown(relTarget) {
+    if (relTarget === null)
+        return false;
+    if (relTarget.classList.contains("dropdown_option"))
+        return true;
+    if (relTarget.classList.contains("dropdown_divider"))
+        return true;
 }
 
 export {ReaderSort, SortControls}

@@ -39,11 +39,14 @@ function setUpButtons() {
     const fcnUpdate = () => {
         webReader.relistViewers();
     };
+    const btnToggle = document.getElementById("dropdown_toggle");
+    const optionBox = document.getElementById("dropdown_option_box");
     const btnName = document.getElementById("sort_name");
     const btnUrl = document.getElementById("sort_url");
     const btnLatest = document.getElementById("sort_latest");
     const btnOldest = document.getElementById("sort_oldest");
-    sortControls = new SortControls(fcnUpdate, btnName, btnUrl, btnLatest, btnOldest);
+    sortControls = new SortControls(fcnUpdate, btnToggle, optionBox, 
+        btnName, btnUrl, btnLatest, btnOldest);
 }
 
 function setUpReaderEditor() {
