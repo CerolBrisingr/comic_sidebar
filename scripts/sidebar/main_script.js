@@ -39,11 +39,11 @@ function setUpButtons() {
     const fcnUpdate = () => {
         webReader.relistViewers();
     };
-    const btnToggle = document.getElementById("dropdown_toggle");
-    const btnName = document.getElementById("dropdown_name");
-    const btnUrl = document.getElementById("dropdown_url");
-    const btnTime = document.getElementById("dropdown_time");
-    sortControls = new SortControls(fcnUpdate, btnToggle, btnName, btnUrl, btnTime);
+    const btnName = document.getElementById("sort_name");
+    const btnUrl = document.getElementById("sort_url");
+    const btnLatest = document.getElementById("sort_latest");
+    const btnOldest = document.getElementById("sort_oldest");
+    sortControls = new SortControls(fcnUpdate, btnName, btnUrl, btnLatest, btnOldest);
 }
 
 function setUpReaderEditor() {

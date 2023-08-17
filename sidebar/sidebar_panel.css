@@ -88,27 +88,32 @@
 }
 
 /* Sorting dropdown */
+.toggle_button:focus {
+    background-color: var(--main-hover-color);
+}
+
 .dropdown {
     display: inline-block;
     position: relative;
 }
 
-.dropdown_options {
+.dropdown_option_box {
     display: none;
     position: absolute;
-    overflow: auto;
+    /*overflow: auto;*/
     z-index: 20;
-}
-
-.dropdown:hover .dropdown_options {
-    display: flex;
     flex-direction: column;
     justify-content: space-around;
 }
 
-.dropdown_button {
+.dropdown_toggle:focus + .dropdown_option_box {
+    display: flex;
+}
+
+.dropdown_option {
     cursor: pointer;
-    width: 100%;
+    display: block;
+    text-align: left;
 }
 
 /* Add comic button */
