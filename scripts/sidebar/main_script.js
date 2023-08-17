@@ -1,5 +1,5 @@
 import {ReaderEditor} from "./reader_editor.js"
-import {WebReader, WebReaderController} from "../shared/web_reader.js"
+import {WebReader, WebReaderController, ShowAllInterface} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
@@ -80,14 +80,20 @@ function setUpReaderEditor() {
     let okBtn = document.getElementById('new_comic_finalize');
     let startDel = document.getElementById('comic_start_delete');
     let confirmDel = document.getElementById('comic_confirm_delete');
-    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel);
+    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, 
+        textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel);
 }
 
 function setUpWebReader(readerObjectList) {
     if (readerObjectList === undefined)
         return;
-    let container = document.getElementById('container');
-    let webReaderController = new WebReaderController(container);
+    const container = document.getElementById('container');
+    const showAll = {
+        button: document.getElementById("show_all"),
+        icon: document.getElementById("show_all_tick")
+    }
+    let showAllInterface = new ShowAllInterface(showAll);
+    let webReaderController = new WebReaderController(container, showAllInterface);
     webReader = new WebReader(webReaderController);
 }
 

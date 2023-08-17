@@ -1,8 +1,8 @@
 import {dissectUrl} from "./url.js"
 import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
-import {importBackup, unpackReaderObjectList} from "./backup_import.js"
-import {saveBackup, buildWebReaderObject} from "./backup_export.js"
+import {importBackup, unpackReaderObjectList, getShowAll} from "./backup_import.js"
+import {saveBackup, buildWebReaderObject, saveShowAll} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 
@@ -292,9 +292,15 @@ class WebReaderInterface {
 
 class WebReaderController {
     #container;
+    #showAllInterface;
     
-    constructor(container = undefined) {
+    constructor(container = undefined, showAllInterface = undefined) {
         this.#container = container;
+        this.#showAllInterface = showAllInterface;
+    }
+
+    getShowAll() {
+        return this.#showAllInterface.getValue();
     }
     
     getContainer() {
@@ -303,6 +309,50 @@ class WebReaderController {
     
     storageAccessGiven() {
         return this.#container === undefined;
+    }
+}
+
+class ShowAllInterface {
+    #showAllUi;
+    #showAll;
+
+    constructor(showAll = undefined) {
+        this.#showAllUi = showAll;
+        this.#setUpButton();
+        this.#initValue();
+    }
+
+    async #initValue() {
+        const value = await getShowAll();
+        this.#showAll = value;
+        this.#setShowAllVisuals(value);
+    }
+
+    #setUpButton() {
+        this.#showAllUi.button.onclick = () => {
+            this.setValue(!this.#showAll);
+        };
+    }
+
+    #setShowAllVisuals(value) {
+        if (!this.#showAllUi)
+            return;
+        if (value) {
+            this.#showAllUi.icon.style.visibility = "visible";
+        } else {
+            this.#showAllUi.icon.style.visibility = "hidden";
+        }
+    }
+
+    getValue() {
+        return this.#showAll;
+    }
+
+    setValue(value) {
+        value = Boolean(value);
+        this.#setShowAllVisuals(value);
+        this.#showAll = value;
+        saveShowAll(value);
     }
 }
 
@@ -321,4 +371,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReader, WebReaderController, ReaderSort}
+export {WebReader, WebReaderController, ReaderSort, ShowAllInterface}
