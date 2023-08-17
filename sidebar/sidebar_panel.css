@@ -88,27 +88,45 @@
 }
 
 /* Sorting dropdown */
+.toggle_button:focus {
+    background-color: var(--main-hover-color);
+}
+
 .dropdown {
     display: inline-block;
     position: relative;
 }
 
-.dropdown_options {
+.dropdown_option_box {
     display: none;
     position: absolute;
-    overflow: auto;
+    right: 0;
     z-index: 20;
-}
-
-.dropdown:hover .dropdown_options {
-    display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    border: groove;
+    border-radius: 0.3em;
+    border-width: 2px;
+    border-color: lightgray;
 }
 
-.dropdown_button {
+.dropdown_icon {
+    visibility: hidden;
+}
+
+.dropdown_option {
     cursor: pointer;
-    width: 100%;
+    display: block;
+    text-align: left;
+    white-space: nowrap;
+    border: none;
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+
+.dropdown_divider {
+    border-width: 2px;
+    border-top: solid;
+    border-color: lightgray;
 }
 
 /* Add comic button */

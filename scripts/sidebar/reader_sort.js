@@ -1,31 +1,47 @@
 class ReaderSort {
-    static #rule = "Name";
-    static #possible_rules = ["Name", "URL", "Time"];
+    static #possible_rules = {
+        Name: compareLabels,
+        URL: compareUrls,
+        Oldest: compareAgeUp,
+        Latest: compareAgeDown
+    };
+    static #rule = ReaderSort.#possible_rules.Name;
 
     static setRule(strRule) {
-        if (!ReaderSort.#possible_rules.includes(strRule))
+        if (!ReaderSort.#possible_rules.hasOwnProperty(strRule))
             throw new Error(`Invalid sorting rule "${strRule}"`);
-            ReaderSort.#rule = strRule;
+            ReaderSort.#rule = ReaderSort.#possible_rules[strRule];
     }
 
     static apply(readerStorageList) {
-        let sortFcn;
-        switch (ReaderSort.#rule) {
-            case "Name": {
-                sortFcn = (a,b) => {return compareLower(a.getLabel(), b.getLabel());};
-                break;
-            }
-            case "URL": {
-                sortFcn = (a,b) => {return compareLower(a.getPrefixMask(), b.getPrefixMask());};
-                break;
-            }
-            case "Time": {
-                sortFcn = (a,b) => {return compare(a.getLatestInputTime(), b.getLatestInputTime());};
-                break;
-            }
-        }
-        return readerStorageList.sort(sortFcn);
+        return readerStorageList.sort(ReaderSort.#rule);
     }
+}
+
+function compareLabels(a, b) {
+    a = a.getLabel();
+    b = b.getLabel();
+    return compareLower(a,b);
+}
+
+function compareUrls(a, b) {
+    a = a.getPrefixMask();
+    b = b.getPrefixMask();
+    return compareLower(a,b);
+}
+
+function compareAgeUp(a, b) {
+    let result = compare(a.getLatestInputTime(), b.getLatestInputTime())
+    if (result === 0) // Secondary sort by label
+        result = compareLower(a.getLabel(), b.getLabel());
+    return result;
+}
+
+function compareAgeDown(a, b) {
+    let result = compare(b.getLatestInputTime(), a.getLatestInputTime())
+    if (result === 0) // Secondary sort by label
+        result = compareLower(a.getLabel(), b.getLabel());
+    return result;
 }
 
 function compareLower(a, b) {
@@ -43,36 +59,82 @@ function compare(a, b) {
 }
 
 class SortControls {
-    #fcnUpdate;
     #btnToggle;
-    #btnName;
-    #btnUrl;
-    #btnTime;
+    #optionBox;
+    #fcnUpdate;
+    #ruleButtons = {};
+    #isOpen = false;
 
-    constructor(fcnUpdate, btnToggle, btnName, btnUrl, btnTime) {
+    constructor(fcnUpdate, btnToggle, optionBox, name, url, latest, oldest) {
+        this.#btnToggle = btnToggle;
+        this.#optionBox = optionBox;
         this.#fcnUpdate = fcnUpdate;
-        this.#btnToggle = btnToggle; // sticking to hover for now
-        this.#btnName = btnName;
-        this.#btnUrl = btnUrl;
-        this.#btnTime = btnTime;
-        this.#configureButtons();
+        this.#configureButtons(name, url, latest, oldest);
+        this.#setCheckmarks("Name");
     }
 
-    #configureButtons() {
-        this.#btnName.onclick = () => {
-            ReaderSort.setRule("Name");
-            this.#fcnUpdate();
+    #configureButtons(name, url, latest, oldest) {
+        this.#btnToggle.onclick = (evt) => {
+            if (this.#isOpen) {
+                this.#close();
+            } else {
+                this.#open();
+            }
         };
-        this.#btnUrl.onclick = () => {
-            ReaderSort.setRule("URL");
-            this.#fcnUpdate();
-        };
-        this.#btnTime.onclick = () => {
-            ReaderSort.setRule("Time");
-            this.#fcnUpdate();
+        this.#btnToggle.onblur = (evt) => {this.#onblur(evt);};
+        this.#setUpRuleBtn(name, "Name");
+        this.#setUpRuleBtn(url, "URL");
+        this.#setUpRuleBtn(latest, "Latest");
+        this.#setUpRuleBtn(oldest, "Oldest");
+    }
+
+    #open() {
+        this.#isOpen = true;
+        this.#optionBox.style.display = "flex";
+    }
+
+    #close() {
+        this.#isOpen = false;
+        this.#optionBox.style.display = "none";
+    }
+
+    #setUpRuleBtn(element, strRule) {
+        element.button.onclick = () => {this.#setRule(strRule);};
+        element.button.onblur = (evt) => {this.#onblur(evt);};
+        this.#ruleButtons[strRule] = element;
+    }
+
+    #onblur(evt) {
+        if (!relatedTargetOnDropdown(evt.relatedTarget)) 
+            this.#close();
+    }
+
+    #setRule(strRule) {
+        this.#setCheckmarks(strRule);
+        ReaderSort.setRule(strRule);
+        this.#fcnUpdate();
+        this.#close();
+    }
+
+    #setCheckmarks(strRule) {
+        for (const [key, entry] of Object.entries(this.#ruleButtons)) {
+            if (key === strRule) {
+                entry.icon.style.visibility = "visible";
+            } else {
+                entry.icon.style.visibility = "hidden";
+            }
         }
     }
 
+}
+
+function relatedTargetOnDropdown(relTarget) {
+    if (relTarget === null)
+        return false;
+    if (relTarget.classList.contains("dropdown_option"))
+        return true;
+    if (relTarget.classList.contains("dropdown_divider"))
+        return true;
 }
 
 export {ReaderSort, SortControls}

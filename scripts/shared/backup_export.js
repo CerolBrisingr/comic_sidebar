@@ -13,6 +13,11 @@ function saveActiveState(activeState) {
     browser.storage.local.set({activeState: activeState});
 }
 
+function saveShowAll(showAll) {
+    showAll = Boolean(showAll);
+    browser.storage.local.set({showAll: showAll});
+}
+
 function buildWebReaderObject(readerClassList) {
     let webReaderObject = {data: [], type: "sb_webcomic_sidebar_backup"};
     for (let readerClass of readerClassList) {
@@ -34,4 +39,4 @@ function replacer(key, value) {
     }
 }
 
-export {saveBackup, buildWebReaderObject, saveActiveState}
+export {saveBackup, buildWebReaderObject, saveActiveState, saveShowAll}

@@ -15,14 +15,32 @@
             id="search_box" 
             placeholder="Search for title..">
         <div class="dropdown">
-            <button id="dropdown_toggle">
-                Sort
+            <button class="dropdown_toggle" id="dropdown_toggle">
+                More ..
                 <img src="../icons/chevron_down.svg">
             </button>
-            <div class="dropdown_options">
-                <button class="dropdown_button" id="dropdown_name">Name</button>
-                <button class="dropdown_button" id="dropdown_url">URL</button>
-                <button class="dropdown_button" id="dropdown_time">Time</button>
+            <div id="dropdown_option_box" class="dropdown_option_box">
+                <button class="dropdown_option" id="sort_name">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_name_tick">
+                    sort by Name
+                </button>
+                <button class="dropdown_option" id="sort_url">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_url_tick">
+                    sort by URL
+                </button>
+                <button class="dropdown_option" id="sort_latest">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_latest_tick">
+                    sort by latest Access
+                </button>
+                <button class="dropdown_option" id="sort_oldest">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_oldest_tick">
+                    sort by oldest Access
+                </button>
+                <div class="dropdown_divider"></div>
+                <button class="dropdown_option" id="show_all">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="show_all_tick">
+                    Show all
+                </button>
             </div>
         </div>
     </div>
