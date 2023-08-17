@@ -98,7 +98,7 @@
 }
 
 .dropdown_option_box {
-    display: flex;
+    display: none;
     position: absolute;
     right: 0;
     z-index: 20;

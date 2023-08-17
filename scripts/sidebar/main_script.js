@@ -26,27 +26,46 @@ document.addEventListener('DOMContentLoaded', function () {
     requestWebReader();
 });
 
-function setUpButtons() {
+function setUpUserInterface() {
     const addComic = document.getElementById('add_reader');
     addComic.onclick = function () {addCurrentPage()};
 
+    setUpSearchBar();
+    setUpDropdownMenu();
+}
+
+function setUpSearchBar() {
     const searchBox = document.getElementById('search_box');
     searchBox.addEventListener("input", (event) => {
         ReaderFilter.setFilter(event.target.value);
         webReader.relistViewers();
     });
+}
 
+function setUpDropdownMenu() {
     const fcnUpdate = () => {
         webReader.relistViewers();
     };
     const btnToggle = document.getElementById("dropdown_toggle");
     const optionBox = document.getElementById("dropdown_option_box");
-    const btnName = document.getElementById("sort_name");
-    const btnUrl = document.getElementById("sort_url");
-    const btnLatest = document.getElementById("sort_latest");
-    const btnOldest = document.getElementById("sort_oldest");
+    const name = {
+        button: document.getElementById("sort_name"), 
+        icon: document.getElementById("sort_name_tick")
+    };
+    const url = {
+        button: document.getElementById("sort_url"),
+        icon: document.getElementById("sort_url_tick")
+    };
+    const latest = {
+        button: document.getElementById("sort_latest"),
+        icon: document.getElementById("sort_latest_tick")
+    };
+    const oldest = {
+        button: document.getElementById("sort_oldest"),
+        icon: document.getElementById("sort_oldest_tick")
+    };
     sortControls = new SortControls(fcnUpdate, btnToggle, optionBox, 
-        btnName, btnUrl, btnLatest, btnOldest);
+        name, url, latest, oldest);
 }
 
 function setUpReaderEditor() {
@@ -96,7 +115,7 @@ function receiveReaderObjectList(readerObjectList) {
     if (readerObjectList === undefined)
         return;
     isSetUp = true;
-    setUpButtons();
+    setUpUserInterface();
     setUpWebReader(readerObjectList);
     executeWebReaderLoading(readerObjectList);
 }
