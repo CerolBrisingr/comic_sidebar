@@ -3,7 +3,7 @@
     <head>
         <link rel="stylesheet" href="sidebar_panel.css">
         <meta charset="utf-8">
-        <script type="module" src="../scripts/sidebar/main_script.js"></script>
+        <srcipt type="module" src="../srcipts/sidebar/main_srcipt.js"></srcipt>
     </head>
 <body>
     <div>
@@ -20,12 +20,27 @@
                 <img src="../icons/chevron_down.svg">
             </button>
             <div id="dropdown_option_box" class="dropdown_option_box">
-                <button class="dropdown_option" id="sort_name">sort by Name</button>
-                <button class="dropdown_option" id="sort_url">sort by URL</button>
-                <button class="dropdown_option" id="sort_latest">sort by latest Access</button>
-                <button class="dropdown_option" id="sort_oldest">sort by oldest Access</button>
+                <button class="dropdown_option" id="sort_name">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_name_tick">
+                    sort by Name
+                </button>
+                <button class="dropdown_option" id="sort_url">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_url_tick">
+                    sort by URL
+                </button>
+                <button class="dropdown_option" id="sort_latest">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_latest_tick">
+                    sort by latest Access
+                </button>
+                <button class="dropdown_option" id="sort_oldest">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_oldest_tick">
+                    sort by oldest Access
+                </button>
                 <div class="dropdown_divider"></div>
-                <button class="dropdown_option" id="show_all">Show all</button>
+                <button class="dropdown_option" id="show_all">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="show_all_tick">
+                    Show all
+                </button>
             </div>
         </div>
     </div>
