@@ -64,6 +64,11 @@
 
     display: inline-flex;
     align-items: center;
+    visibility: hidden;
+}
+
+.gridline:hover .icon_button {
+    visibility: visible;
 }
 
 .icon_button:hover  {
