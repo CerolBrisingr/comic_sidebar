@@ -52,6 +52,7 @@
     grid-template-columns: auto 1fr;
     text-decoration: none;
     color: black;
+    align-items: center;
 }
 
 .icon_button {
@@ -60,6 +61,9 @@
     border-radius: 0.3em;
     background: #FFFFFF;
     z-index: 10;
+
+    display: inline-flex;
+    align-items: center;
 }
 
 .icon_button:hover  {
@@ -73,23 +77,35 @@
 
 /* Does help with overflow */
 .gridline_label {
-    display: inline-block;
+    display: inline-flex;
     overflow: hidden;
     text-overflow: clip;
     white-space: nowrap;
+    margin-top: 0.2vh;
+    margin-bottom: 0.2vh;
 } 
 
 .gridline:hover div > .label_input {
     background: var(--main-hover-color);
 }
 
-.labelled_link {
-    display: flex;
+/* Search bar */
+.search_box {
+    background: transparent;
+    background-image: url("../icons/search.svg");
+    background-repeat: no-repeat;
+    background-position-y: center;
+    padding-left: 20px;
+}
+
+.search_box:focus {
+    outline: none;
 }
 
 /* Sorting dropdown */
-.toggle_button:focus {
-    background-color: var(--main-hover-color);
+.dropdown_toggle {
+    display: flex;
+    align-items: center;
 }
 
 .dropdown {
@@ -115,12 +131,17 @@
 
 .dropdown_option {
     cursor: pointer;
-    display: block;
+    display: flex;
     text-align: left;
     white-space: nowrap;
     border: none;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    align-items: center;
+}
+
+.dropdown_label {
+    margin-top: 0.3vh;
+    margin-bottom: 0.3vh;
+    margin-left: 0.3em;
 }
 
 .dropdown_divider {

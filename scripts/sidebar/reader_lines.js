@@ -397,6 +397,7 @@ class IconButton {
         this.#button.classList.add("icon_button");
 
         this.#icon.src = String(iconPath);
+        this.#icon.classList.add("button_icon");
     }
 
     setOnClick(fkt) {
