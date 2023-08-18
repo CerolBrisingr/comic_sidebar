@@ -39,20 +39,12 @@
     padding-right: 0.1em;
     height: 75%;
     width: auto;
-
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 .thumbnail_icon {
     padding-right: 0.25em;
     height: 75%;
     width: auto;
-
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 .undecorated_link {
@@ -60,6 +52,8 @@
     grid-template-columns: auto 1fr;
     text-decoration: none;
     color: black;
+    
+    align-items: center;
 }
 
 .icon_button {
@@ -68,16 +62,13 @@
     border-radius: 0.3em;
     background: #FFFFFF;
     z-index: 10;
+
+    display: inline-flex;
+    align-items: center;
 }
 
 .icon_button:hover  {
     background: var(--button-hover-color);
-}
-
-.button_icon {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 .label_input {
@@ -111,7 +102,16 @@
     padding-left: 20px;
 }
 
+.search_box:focus {
+    outline: none;
+}
+
 /* Sorting dropdown */
+.dropdown_toggle {
+    display: flex;
+    align-items: center;
+}
+
 .dropdown {
     display: inline-block;
     position: relative;
