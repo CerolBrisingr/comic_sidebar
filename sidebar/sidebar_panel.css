@@ -82,15 +82,12 @@
     overflow: hidden;
     text-overflow: clip;
     white-space: nowrap;
-    align-items: center;
+    margin-top: 0.2vh;
+    margin-bottom: 0.2vh;
 } 
 
 .gridline:hover div > .label_input {
     background: var(--main-hover-color);
-}
-
-.labelled_link {
-    display: flex;
 }
 
 /* Search bar */
@@ -135,12 +132,17 @@
 
 .dropdown_option {
     cursor: pointer;
-    display: block;
+    display: flex;
     text-align: left;
     white-space: nowrap;
     border: none;
-    padding-top: 3%;
-    padding-bottom: 3%;
+    align-items: center;
+}
+
+.dropdown_label {
+    margin-top: 0.3vh;
+    margin-bottom: 0.3vh;
+    margin-left: 0.3em;
 }
 
 .dropdown_divider {
