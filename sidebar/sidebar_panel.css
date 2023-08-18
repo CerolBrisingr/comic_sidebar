@@ -87,10 +87,11 @@
 
 /* Does help with overflow */
 .gridline_label {
-    display: inline-block;
+    display: inline-flex;
     overflow: hidden;
     text-overflow: clip;
     white-space: nowrap;
+    align-items: center;
 } 
 
 .gridline:hover div > .label_input {
