@@ -93,6 +93,7 @@ class ReaderSyncCore extends ReaderSync {
     #deleteRequestHandler(deleteMe) {
         if (!deleteMe)
             return;
+        this.port.sendMessage("deleteCommand");
         this.#readerData.deleteMe();
     }
     
