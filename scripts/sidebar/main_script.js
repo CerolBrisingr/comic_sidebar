@@ -90,7 +90,8 @@ function setUpWebReader(readerObjectList) {
     const container = document.getElementById('container');
     const showAll = {
         button: document.getElementById("show_all"),
-        icon: document.getElementById("show_all_tick")
+        icon: document.getElementById("show_all_tick"),
+        label: document.getElementById("show_all_label")
     }
     let showAllInterface = new ShowAllInterface(showAll);
     let webReaderController = new WebReaderController(container, showAllInterface);
