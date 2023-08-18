@@ -87,11 +87,16 @@
     display: flex;
 }
 
-/* Sorting dropdown */
-.toggle_button:focus {
-    background-color: var(--main-hover-color);
+/* Search bar */
+.search_box {
+    background: transparent;
+    background-image: url("../icons/search.svg");
+    background-repeat: no-repeat;
+    background-position-y: center;
+    padding-left: 20px;
 }
 
+/* Sorting dropdown */
 .dropdown {
     display: inline-block;
     position: relative;
