@@ -39,12 +39,20 @@
     padding-right: 0.1em;
     height: 75%;
     width: auto;
+
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .thumbnail_icon {
     padding-right: 0.25em;
     height: 75%;
     width: auto;
+
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .undecorated_link {
@@ -64,6 +72,12 @@
 
 .icon_button:hover  {
     background: var(--button-hover-color);
+}
+
+.button_icon {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .label_input {
