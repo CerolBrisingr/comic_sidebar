@@ -223,7 +223,7 @@ class Editor {
     
     gatherData() {
         return {
-            initialUrl: this.fullLink,
+            url: this.fullLink,
             label: this.label,
             prefix: this.prefix,
             time: this.#timestamp

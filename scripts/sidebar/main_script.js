@@ -105,7 +105,7 @@ function requestPageAddition(readerEssentials) {
     let readerObject = {
         prefix_mask: readerEssentials.prefix,
         label: readerEssentials.label,
-        initialUrl: readerEssentials.initialUrl,
+        url: readerEssentials.url,
         time: readerEssentials.time};
     bsConnection.sendMessage({requestPageAddition: readerObject});
 }
