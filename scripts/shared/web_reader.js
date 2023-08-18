@@ -161,7 +161,7 @@ class WebReader {
     
     registerPage(readerObject) {
         let storageObject 
-            = this.#selectCorrespondingStorage(readerObject.initialUrl);
+            = this.#selectCorrespondingStorage(readerObject.url);
         if (storageObject.isValid()) {
             console.log("Page already registered as " + storageObject.getLabel());
             return -1;
@@ -173,7 +173,7 @@ class WebReader {
             return -1;
         }
         this.#readerStorage.saveObject(newManager);
-        this.updateBookmark(readerObject.initialUrl); // This also updates storage
+        this.updateBookmark(readerObject); // This also updates storage
         this.relistViewers();
         return this.#latestId;
     }
@@ -216,10 +216,14 @@ class HtmlContainer {
     removeObject(url) {
         let host = this.#getHost(url);
         if (host === undefined) {
-            console.log('Object selected for removal was not found');
+            console.log('Could not find valid host for given input');
             return;
         }
         let list = this.#data.get(host);
+        if (list === undefined) {
+            console.log('Object selected for removal was not found');
+            return;
+        }
         for (let [index, object] of list.entries()) {
             if (object.urlIsCompatible(url)) {
                 list.splice(index, 1);
