@@ -26,7 +26,7 @@ class ReaderLine {
     }
 
     #addExpandButton() {
-        this.#expandButton = new IconButton("../../icons/chevron_right.svg");
+        this.#expandButton = new IconButton("../../icons/chevron_right.svg", "icon_button_expand");
         this.#expandButton.appendTo(this.#frame);
         this.#expandButton.setOnClick( () => {
             this.#toggleExpand();
@@ -389,12 +389,12 @@ class IconButton {
     #icon;
     #button;
 
-    constructor(iconPath) {
+    constructor(iconPath, buttonClass = "icon_button") {
         this.#button = document.createElement("button");
         this.#icon = document.createElement("img");
         this.#button.appendChild(this.#icon);
 
-        this.#button.classList.add("icon_button");
+        this.#button.classList.add(buttonClass);
 
         this.#icon.src = String(iconPath);
         this.#icon.classList.add("button_icon");

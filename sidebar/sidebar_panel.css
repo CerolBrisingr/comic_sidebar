@@ -55,6 +55,7 @@
     align-items: center;
 }
 
+.icon_button_expand,
 .icon_button {
     outline: transparent;
     border: none;
@@ -62,15 +63,22 @@
     background: #FFFFFF;
     z-index: 10;
 
-    display: inline-flex;
     align-items: center;
-    visibility: hidden;
+}
+
+.icon_button {
+    display: none;
+}
+
+.icon_button_expand {
+    display: inline-flex;
 }
 
 .gridline:hover .icon_button {
-    visibility: visible;
+    display: inline-flex;
 }
 
+.icon_button_expand:hover,
 .icon_button:hover  {
     background: var(--button-hover-color);
 }
