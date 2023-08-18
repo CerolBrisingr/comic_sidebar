@@ -333,6 +333,7 @@ class ShowAllInterface {
     }
 
     #setUpButton() {
+        this.#showAllUi.icon.style.visibility = "visible";
         this.#showAllUi.button.onclick = () => {
             this.setValue(!this.#showAll);
         };
@@ -342,10 +343,21 @@ class ShowAllInterface {
         if (!this.#showAllUi)
             return;
         if (value) {
-            this.#showAllUi.icon.style.visibility = "visible";
+            this.#setTrueVisuals();
         } else {
-            this.#showAllUi.icon.style.visibility = "hidden";
+            this.#setFalseVisuals();
         }
+    }
+
+    #setTrueVisuals() {
+        this.#showAllUi.icon.src = "../../icons/eye.svg";
+        this.#showAllUi.label.innerText = "Showing hidden";
+    }
+
+    #setFalseVisuals() {
+        this.#showAllUi.icon.src = "../../icons/eye-slash.svg";
+        this.#showAllUi.label.innerText = "Show hidden";
+
     }
 
     getValue() {
