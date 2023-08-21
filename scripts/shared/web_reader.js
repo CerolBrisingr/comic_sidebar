@@ -7,13 +7,13 @@ import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 
 class WebReader {
-    _savingSuspended = false;
-    _readerStorage = new HtmlContainer();
-    _currentReader;
-    _latestId = 0;
     
     constructor() {
         this._currentReader = new ReaderClassDummy();
+        this._savingSuspended = false;
+        this._readerStorage = new HtmlContainer();
+        this._currentReader = undefined;
+        this._latestId = 0;
     }
     
     importBackup(file, fktDone) {
@@ -118,7 +118,6 @@ class WebReader {
     saveProgress() {}
 }
 
-
 class WebReaderBackground extends WebReader {
     constructor() {
         super();
@@ -128,7 +127,7 @@ class WebReaderBackground extends WebReader {
         return new ReaderData(
             readerObject,
             new WebReaderInterface(this),
-            intId,
+            intId
         )
     }
     
@@ -150,8 +149,6 @@ class WebReaderBackground extends WebReader {
     saveProgress() {
         if (this._savingSuspended)
             return;
-        if (!this.controller.storageAccessGiven())
-            return;
         let comicDataObject = buildWebReaderObject(this._readerStorage.getList());
         browser.storage.local.set({comicData: comicDataObject});
     }
@@ -162,9 +159,9 @@ class WebReaderSidebar extends WebReader {
     #showAllInterface;
 
     constructor(container, showAllInterface) {
+        super();
         if (this.#container == undefined)
             throw new Error("Containing element for reader listings must be provided");
-        super();
         this.#container = container;
         this.#showAllInterface = showAllInterface;
     }
