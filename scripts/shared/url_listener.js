@@ -1,56 +1,56 @@
 class UrlListener {
     #fktReactToUrl;
     #isActive;
-    #fktWebNavEvent;
     #fktTabEvent;
     #fktTabUpdateEvent;
     #lastUrl = "";
-    #favIconMap = new Map();
 
-    static #bundleUrl(url) {
-        return {url:url, time: Date.now()};
+    static #bundleUrl(url, favIconUrl) {
+        return {url:url, time: Date.now(), favIcon: favIconUrl};
     }
     
     static async findLatestTabUrl() {
         let tabs = await browser.tabs.query({currentWindow: true});
         let url = undefined;
+        let favIconUrl = undefined;
         let latest = 0;
         for (let tab of tabs) {
             if (tab.lastAccessed > latest) {
                 latest = tab.lastAccessed;
                 url = tab.url;
+                favIconUrl = tab.favIconUrl;
             }
         }
-        return UrlListener.#bundleUrl(url);
+        return UrlListener.#bundleUrl(url, favIconUrl);
     }
     
     constructor(fktReactToUrl) {
         this.#fktReactToUrl = fktReactToUrl;
-        this.#fktWebNavEvent = (event) => {this.#webNavEvent(event);};
-        this.#fktTabEvent = (tabInfo) => {this.#tabEvent(tabInfo);};
+        this.#fktTabEvent = (tabInfo) => {this.#readTab(tabInfo.tabId);};
         this.#fktTabUpdateEvent = (tabId, info) => {
-            this.#tabUpdateEvent(info);
+            if (!info.hasOwnProperty("url")) {
+                return;
+            }
+            this.#readTab(tabId);
             };
         this.activate();
     }
 
-    #sendUrl(url) {
-        this.#fktReactToUrl(UrlListener.#bundleUrl(url));
+    #sendUrl(url, favIconUrl) {
+        this.#fktReactToUrl(UrlListener.#bundleUrl(url, favIconUrl));
     }
     
-    #fireOnlyOnce(url) {
+    #fireOnlyOnce(url, favIconUrl) {
         if (url === this.#lastUrl)
             return;
         this.#lastUrl = url;
-        this.#sendUrl(url);
+        this.#sendUrl(url, favIconUrl);
     }
     
     #connect() {
         if (this.#isActive)
             return;
         browser.tabs.onActivated.addListener(this.#fktTabEvent);
-        browser.webNavigation.onDOMContentLoaded.addListener(this.#fktWebNavEvent);
-        browser.webNavigation.onReferenceFragmentUpdated.addListener(this.#fktWebNavEvent);
         browser.tabs.onUpdated.addListener(this.#fktTabUpdateEvent);
         this.#isActive = true;
     }
@@ -59,8 +59,6 @@ class UrlListener {
         if (!this.#isActive)
             return;
         browser.tabs.onActivated.removeListener(this.#fktTabEvent);
-        browser.webNavigation.onDOMContentLoaded.removeListener(this.#fktWebNavEvent);
-        browser.webNavigation.onReferenceFragmentUpdated.removeListener(this.#fktWebNavEvent);
         browser.tabs.onUpdated.removeListener(this.#fktTabUpdateEvent);
         this.#isActive = false;
     }
@@ -74,42 +72,17 @@ class UrlListener {
         this.#disconnect();
     }
     
-    retransmit() {
-        UrlListener.findLatestTabUrl()
-            .then((url) => {
-                this.#sendUrl(url);
-                }, promiseError);
+    async retransmit() {
+        const bundle = await UrlListener.findLatestTabUrl();
+        this.#fktReactToUrl(bundle);
     }
     
-    #webNavEvent(event) {
-        // Filter out any sub-frame related navigation event
-        if (event.frameId !== 0) {
-            return;
-        }
-        this.#fireOnlyOnce(event.url);
-    }
-    
-    #tabEvent(tabInfo) {
-        let fktReadTab = (tab) => {this.#readTab(tab);};
-        let getTab = browser.tabs.get(tabInfo.tabId);
-        getTab.then(fktReadTab, promiseError);
-    }
-    
-    #tabUpdateEvent(info) {
-        if (info.hasOwnProperty("url")) {
-            this.#fireOnlyOnce(info.url);
-        }
-    }
-    
-    #readTab(tab) {
+    async #readTab(tabId) {
+        let tab = await browser.tabs.get(tabId);
         if (tab === undefined)
             return;
-        this.#fireOnlyOnce(tab.url);
+        this.#fireOnlyOnce(tab.url, tab.favIconUrl);
     }
-}
-    
-function promiseError(error) {
-    console.log(error);
 }
 
 export {UrlListener}

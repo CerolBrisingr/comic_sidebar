@@ -23,6 +23,10 @@ class HtmlContainer {
             this.#data.set(host, [object]);
         }
     }
+
+    keys() {
+        return Array.from(this.#data.keys());
+    }
     
     clearData() {
         this.#data.clear();

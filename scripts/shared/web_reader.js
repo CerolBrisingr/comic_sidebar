@@ -130,19 +130,14 @@ class WebReaderBackground extends WebReader {
         )
     }
     
-    loadInterface(fktDone) {
-        let gettingItem = browser.storage.local.get("comicData");
-        gettingItem.then((storageResult) => {
-            if (!storageResult.hasOwnProperty("comicData")) {
-                console.log("No data stored locally, aborting loading sequence! (2)");
-                fktDone();
-                return;
-            }
-            let readerObjectList = unpackReaderObjectList(storageResult.comicData);
-            this._importReaderObjectList(readerObjectList);
-            fktDone();
-            }, 
-            () => {console.log("No data stored locally, aborting loading sequence! (1)")});
+    async loadInterface() {
+        let storageResult = await browser.storage.local.get("comicData");
+        if (!storageResult.hasOwnProperty("comicData")) {
+            console.log("No data stored locally, aborting loading sequence!");
+            return;
+        }
+        let readerObjectList = unpackReaderObjectList(storageResult.comicData);
+        this._importReaderObjectList(readerObjectList);
     }
     
     saveProgress() {

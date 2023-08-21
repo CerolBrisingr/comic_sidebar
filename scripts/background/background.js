@@ -15,11 +15,9 @@ let webReader = new WebReaderBackground();
 async function initialize() {
     isActive = await getActiveState();
     updateBrowserAction();
-    let fktDone = () => {
-        isSetUp = true;
-        transmitWebReaderData();
-    }
-    webReader.loadInterface(fktDone);
+    await webReader.loadInterface();
+    isSetUp = true;
+    transmitWebReaderData();
 }
 
 function transmitWebReaderData() {
