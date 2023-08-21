@@ -1,4 +1,4 @@
-import { dissectUrl } from "./url";
+import { dissectUrl } from "./url.js";
 
 class HtmlContainer {
     #data = new Map();

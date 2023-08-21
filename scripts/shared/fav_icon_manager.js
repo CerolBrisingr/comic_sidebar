@@ -1,4 +1,4 @@
-class FavIconServer {
+//class FavIconServer {
     /* 
     * Holds copy of FavIconStorage Map
     * Interacts with UrlListener
@@ -7,11 +7,11 @@ class FavIconServer {
         * broadcasts updates
         * favicons organized by origin url
     */
-}
+//}
 
-class FavIconSubscriber {
+//class FavIconSubscriber {
     /* 
     * Holds copy of FavIconStorage Map
     * Interacts with individual readers
     */
-}
+//}

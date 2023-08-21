@@ -7,12 +7,11 @@ import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 
 class WebReader {
-    
+
     constructor() {
         this._currentReader = new ReaderClassDummy();
         this._savingSuspended = false;
         this._readerStorage = new HtmlContainer();
-        this._currentReader = undefined;
         this._latestId = 0;
     }
     
@@ -159,9 +158,9 @@ class WebReaderSidebar extends WebReader {
     #showAllInterface;
 
     constructor(container, showAllInterface) {
-        super();
-        if (this.#container == undefined)
+        if (container == undefined)
             throw new Error("Containing element for reader listings must be provided");
+        super();
         this.#container = container;
         this.#showAllInterface = showAllInterface;
     }
@@ -169,7 +168,7 @@ class WebReaderSidebar extends WebReader {
     _createReaderClass(readerObject) {
         return new ReaderManager(
             readerObject,
-            new WebReaderInterface(),
+            new WebReaderInterface(this),
             this.#container
         )
     }
