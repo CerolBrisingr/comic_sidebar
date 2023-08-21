@@ -7,14 +7,12 @@ import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 
 class WebReader {
-    controller;
     _savingSuspended = false;
     _readerStorage = new HtmlContainer();
     _currentReader;
     _latestId = 0;
     
-    constructor(controller) {
-        this.controller = controller;
+    constructor() {
         this._currentReader = new ReaderClassDummy();
     }
     
@@ -122,10 +120,8 @@ class WebReader {
 
 
 class WebReaderBackground extends WebReader {
-    #saving_suspended
-
-    constructor(controller) {
-        super(controller);
+    constructor() {
+        super();
     }
 
     _createReaderClass(readerObject, intId) {
@@ -165,10 +161,10 @@ class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
 
-    constructor(controller, container, showAllInterface) {
+    constructor(container, showAllInterface) {
         if (this.#container == undefined)
             throw new Error("Containing element for reader listings must be provided");
-        super(controller);
+        super();
         this.#container = container;
         this.#showAllInterface = showAllInterface;
     }
