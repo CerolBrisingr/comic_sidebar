@@ -10,7 +10,7 @@ class ReaderManager {
     #readerVisuals;
     #readerSync;
     
-    constructor(readerObject, parentInterface, intId_ignored, container) {
+    constructor(readerObject, parentInterface, container) {
         this.#container = container;
         this.#parentInterface = parentInterface;
         this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);

@@ -59,6 +59,10 @@ class ReaderLine {
         }
     }
 
+    updateFavIcon(src) {
+        this.#link.setImg(src);
+    }
+
     setLink(href) {
         this.#link.setLink(href);
     }

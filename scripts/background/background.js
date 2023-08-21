@@ -1,6 +1,6 @@
 import {UrlListener} from "../shared/url_listener.js"
 import {ListeningPort} from "./listening_port.js"
-import {WebReader, WebReaderController} from "../shared/web_reader.js"
+import {WebReaderBackground} from "../shared/web_reader.js"
 import {getActiveState} from "../shared/backup_import.js"
 import {saveActiveState} from "../shared/backup_export.js"
 
@@ -10,7 +10,7 @@ let urlListener = new UrlListener(updateSidebar);
 let sbConnection = new ListeningPort(receiveMessage);
 let baConnection = new ListeningPort(receiveOptionOrBrowserAction, "browser_action");
 let opConnection = new ListeningPort(receiveOptionOrBrowserAction, "options_script");
-let webReader = new WebReader(new WebReaderController());
+let webReader = new WebReaderBackground();
 
 async function initialize() {
     isActive = await getActiveState();

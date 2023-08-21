@@ -5,6 +5,7 @@ class UrlListener {
     #fktTabEvent;
     #fktTabUpdateEvent;
     #lastUrl = "";
+    #favIconMap = new Map();
 
     static #bundleUrl(url) {
         return {url:url, time: Date.now()};

@@ -1,5 +1,5 @@
 import {ReaderEditor} from "./reader_editor.js"
-import {WebReader, WebReaderController, ShowAllInterface} from "../shared/web_reader.js"
+import {WebReaderSidebar, ShowAllInterface} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
@@ -94,8 +94,7 @@ function setUpWebReader(readerObjectList) {
         label: document.getElementById("show_all_label")
     }
     let showAllInterface = new ShowAllInterface(showAll);
-    let webReaderController = new WebReaderController(container, showAllInterface);
-    webReader = new WebReader(webReaderController);
+    webReader = new WebReaderSidebar(container, showAllInterface);
 }
 
 function requestUrlRetransmission() {
