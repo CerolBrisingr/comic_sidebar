@@ -187,7 +187,7 @@ class WebReaderSidebar extends WebReader {
     
     _setContainerContent() {
         let visualsList = [];
-        for (let manager of this.#getSortedStorage()) {
+        for (let manager of this._getSortedStorage()) {
             if (!manager.hasVisuals())
                 continue; // not a manager then
             if (!manager.isValid())
