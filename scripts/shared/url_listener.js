@@ -47,16 +47,12 @@ class UrlListener {
     
     #fireOnlyOnce(url, favIconUrl) {
         if (favIconUrl === undefined | this.#hasFavIcon) {
+            // We don't need a favIcon or have no chance to get one
             if (url === this.#lastUrl)
                 return;
         }
         this.#lastUrl = url;
-        if (favIconUrl === undefined) {
-            this.#hasFavIcon = false;
-            this.#sendUrl(url, favIconUrl);
-            return;
-        }
-        this.#hasFavIcon = true;
+        this.#hasFavIcon = favIconUrl !== undefined;
         this.#sendUrl(url, favIconUrl);
     }
     
