@@ -158,7 +158,7 @@ class WebReaderBackground extends WebReader {
             delete data.favIcon; // Don't want to send extra 2kb if not needed
             return false;
         }
-        const favIconIsNew = this.#favIconController.updateValue(urlPieces.base_url, data.favIcon);
+        const favIconIsNew = this.#favIconController.updateValue(urlPieces.host, data.favIcon);
         if (!favIconIsNew) {
             delete data.favIcon; // Don't want to send extra 2kb if not needed
             return false;
@@ -214,20 +214,13 @@ class WebReaderSidebar extends WebReader {
         const urlPieces = dissectUrl(data.url);
         if (urlPieces === undefined)
             return; // Should not happen in sidebar
-        if (this.#favIconSubscriber.updateValue(urlPieces.base_url, data.favIcon))
-            this.setFavIconFromUrl(data.url, data.favIcon);
+        if (this.#favIconSubscriber.updateValue(urlPieces.host, data.favIcon))
+            this.setFavIconFromKey(urlPieces.host, data.favIcon);
     }
 
     #setFavIcons() {
         for (const [key, value] of this.#favIconSubscriber.entries()) {
             this.setFavIconFromKey(key, value);
-        }
-    }
-
-    setFavIconFromUrl(url, value) {
-        let managerList = this._readerStorage.getHostListFromUrl(url);
-        for (const manager of managerList) {
-            manager.updateFavIcon(value);
         }
     }
 

@@ -4,6 +4,7 @@ class UrlListener {
     #fktTabEvent;
     #fktTabUpdateEvent;
     #lastUrl = "";
+    #hasFavIcon = false;
 
     static #bundleUrl(url, favIconUrl) {
         return {url:url, time: Date.now(), favIcon: favIconUrl};
@@ -28,11 +29,16 @@ class UrlListener {
         this.#fktReactToUrl = fktReactToUrl;
         this.#fktTabEvent = (tabInfo) => {this.#readTab(tabInfo.tabId);};
         this.#fktTabUpdateEvent = (tabId, info) => {
-            if (!info.hasOwnProperty("url")) {
+            if (info.hasOwnProperty("status")) {
+                if (info.status === "complete")
+                    this.#readTab(tabId);
+                return;
+                };
+            if (info.hasOwnProperty("favIconUrl")) {
+                this.#readTab(tabId);
                 return;
             }
-            this.#readTab(tabId);
-            };
+        }
         this.activate();
     }
 
@@ -41,9 +47,16 @@ class UrlListener {
     }
     
     #fireOnlyOnce(url, favIconUrl) {
-        if (url === this.#lastUrl)
-            return;
+        if (favIconUrl === undefined | this.#hasFavIcon) {
+            if (url === this.#lastUrl)
+                return;
+        }
         this.#lastUrl = url;
+        if (favIconUrl === undefined) {
+            this.#hasFavIcon = false;
+            return;
+        }
+        this.#hasFavIcon = true;
         this.#sendUrl(url, favIconUrl);
     }
     
