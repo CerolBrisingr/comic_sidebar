@@ -111,8 +111,8 @@ function sendActiveState() {
 }
 
 function updateSidebar(data) {
-    sbConnection.sendMessage({updateBookmark: data});
-    webReader.updateBookmark(data);
+    if (webReader.updateBookmark(data))
+        sbConnection.sendMessage({updateBookmark: data});
 }
 
 function updateUrlListener() {

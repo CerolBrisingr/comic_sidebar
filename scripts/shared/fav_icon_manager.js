@@ -1,16 +1,17 @@
-import { ListeningPort } from "../background/listening_port.js";
-import { SubscriberPort } from "../sidebar/subscriber_port.js";
-
 class FavIcons {
     _data = new Map();
     _defaultEntry;
 
     constructor() {
-        this._defaultEntry = {src: "../../icons/globe.svg", id: 0};
+        this._defaultEntry = "../../icons/globe.svg";
     }
 
     async initialize() {
         await this._readStorage();
+    }
+
+    entries() {
+        return this._data.entries();
     }
 
     getValue(key) {
@@ -21,50 +22,54 @@ class FavIcons {
         return this._data.get(key);
     }
 
-    updateValue() {
-        throw new Error("must be implemented");
+    updateValue(key, value) {
+        // Tries to update favIcon data for key
+        // Returns true on success
+        // Returns false if same value is already set
+        let entry = this._data.get(key);
+        if (value === undefined) {
+            this._data.set(key, this._defaultEntry);
+            this._updateStorage();
+            return true;
+        }
+        if (value === entry) {
+            return false;
+        }
+        this._data.set(key, value);
+        return true;
+    }
+
+    async _readStorage() {
+        const favIconData = await browser.storage.local.get("favIconData");
+        if (!favIconData.hasOwnProperty("favIconData")) {
+            this._data = new Map();
+            return
+        }
+        const objects = JSON.parse(favIconData.favIconData);
+        this._data = new Map(Object.entries(objects));
     }
 
     async _updateStorage() {}
 }
 class FavIconController extends FavIcons {
-    #broadcast;
 
     constructor() {
         super();
-        this.#broadcast = new ListeningPort((message) => {
-            this.#receive(message);
-        }, "fav_icons");
-    }
-
-    #receive(message) {
-        console.log(message);
     }
 
     async initialize(originUrlList) {
-        super().initialize();
+        super.initialize();
         this._removeUnneededEntries(originUrlList);
         this._createMissingEntries(originUrlList);
         await this._updateStorage();
     }
 
     updateValue(key, value) {
-        // Tries to update data below key
-        // Returns new entry id on success,
-        // returns -1 if same value is already set;
-        let entry = this._data.get(key);
-        if (value === entry.src) {
-            return -1;
-        }
-        if (value === undefined) {
-            this._data.set(key, this._defaultEntry);
+        if (super.updateValue(key, value)) {
             this._updateStorage();
-            return this._defaultEntry.id;
+            return true;
         }
-        entry.id = (entry.id + 1) % 250;
-        entry.src = value;
-        this._data.set(key, entry);
-        return entry.id;
+        return false;
     }
 
     _createMissingEntries(originUrlList) {
@@ -81,34 +86,16 @@ class FavIconController extends FavIcons {
         }
     }
 
-    async _readStorage() {
-        const favIconData = await browser.storage.local.get("favIconData");
-        if (!favIconData.hasOwnProperty("favIconData")) {
-            this._data = new Map();
-            return
-        }
-        const objects = JSON.parse(favIconData.favIconData);
-        this._data = new Map(Object.entries(objects));
-    }
-
     async _updateStorage() {
         const jsonFromData = JSON.stringify(Object.fromEntries(this._data));
         await browser.storage.local.set({favIconData: jsonFromData});
     }
 }
 
-class FavIconSubscriber {
-    #receiver;
+class FavIconSubscriber extends FavIcons {
 
     constructor() {
         super();
-        this.#receiver = new SubscriberPort((message) => {
-            this.#receive(message);
-        }, "fav_icons");
-    }
-
-    #receive(message) {
-        console.log(message);
     }
 
     updateValue(key, value, id) {

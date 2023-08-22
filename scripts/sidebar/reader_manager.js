@@ -18,10 +18,6 @@ class ReaderManager {
         this.#createReaderVisuals();
     }
     
-    hasVisuals() {
-        return true;
-    }
-    
     getLabel() {
         return this.#readerData.getLabel();
     }
@@ -36,6 +32,10 @@ class ReaderManager {
             new ReaderManagerInterface(this),
             this.#readerSync
         );
+    }
+
+    updateFavIcon(src) {
+        this.#readerVisuals.updateFavIcon(src);
     }
     
     #createReaderVisuals() {
@@ -76,10 +76,12 @@ class ReaderManager {
     }
     
     addAutomatic(data) {
-        if (this.#readerData.addAutomatic(data))
+        const addedAutomatic = this.#readerData.addAutomatic(data);
+        if (addedAutomatic)
             this.#readerVisuals.updateReaderUrls(this.#readerData);
         if (data.time)
             this.#parentInterface.relistViewerDisplay();
+        return addedAutomatic;
     }
 
     getLatestInputTime() {
@@ -99,6 +101,10 @@ class ReaderManager {
         if (this.#readerData.updateManualLabel(url, newLabel)) {
             this.#readerVisuals.updateManualLabel(url, newLabel);
         }
+    }
+
+    updateFavIcon(src) {
+        this.#readerVisuals.updateFavIcon(src);
     }
     
     sendUnpinRequest(url) {

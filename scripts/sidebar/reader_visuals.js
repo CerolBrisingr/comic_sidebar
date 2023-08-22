@@ -28,6 +28,10 @@ class ReaderVisuals {
         this.updateReaderUrls(readerData);
     }
 
+    updateFavIcon(src) {
+        this.#readerLine.updateFavIcon(src);
+    }
+
     #addReaderLine(readerLabel) {
         this.#readerLine = new ReaderLine(this.#managerInterface, readerLabel);
         this.#readerLine.appendTo(this.#listing);

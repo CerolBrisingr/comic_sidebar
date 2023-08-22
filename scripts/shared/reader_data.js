@@ -54,10 +54,6 @@ class ReaderData {
         }
     }
     
-    hasVisuals() {
-        return false;
-    }
-    
     getLabel() {
         return this.#label;
     }

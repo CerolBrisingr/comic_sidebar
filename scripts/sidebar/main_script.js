@@ -126,10 +126,10 @@ function receiveReaderObjectList(readerObjectList) {
     executeWebReaderLoading(readerObjectList);
 }
 
-function executeWebReaderLoading(readerObjectList) {
+async function executeWebReaderLoading(readerObjectList) {
     if (readerObjectList === undefined)
         return;
-    webReader.importInterface(readerObjectList);
+    await webReader.importInterface(readerObjectList);
     setTimeout(() => {
         requestUrlRetransmission();
         }, 250);

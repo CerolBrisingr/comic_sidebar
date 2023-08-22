@@ -5,6 +5,8 @@ import {importBackup, unpackReaderObjectList, getShowAll} from "./backup_import.
 import {saveBackup, buildWebReaderObject, saveShowAll} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
+import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
+import { dissectUrl } from "./url.js"
 
 class WebReader {
 
@@ -26,8 +28,8 @@ class WebReader {
     updateBookmark(data) {
         let object = this._selectCorrespondingStorage(data.url);
         if (!object.isValid())
-            return;
-        object.addAutomatic(data);
+            return false;
+        return object.addAutomatic(data);
     }
     
     saveBackup() {
@@ -78,7 +80,6 @@ class WebReader {
                 continue;
             this._readerStorage.saveObject(newObject);
         }
-        this._setContainerContent();
         this._savingSuspended = false;
         this.saveProgress();
     }
@@ -112,12 +113,12 @@ class WebReader {
         this._readerStorage.removeObject(prefixMask);
     }
 
-    _setContainerContent() {}
     relistViewers() {}
     saveProgress() {}
 }
 
 class WebReaderBackground extends WebReader {
+    #favIconController = new FavIconController();
     constructor() {
         super();
     }
@@ -138,6 +139,31 @@ class WebReaderBackground extends WebReader {
         }
         let readerObjectList = unpackReaderObjectList(storageResult.comicData);
         this._importReaderObjectList(readerObjectList);
+        await this.#favIconController.initialize(this._readerStorage.keys());
+    }
+
+    updateBookmark(data) {
+        let bookmarkIsNew = super.updateBookmark(data);
+        let favIconIsNew = this.#updateFavIcon(data);
+        return bookmarkIsNew | favIconIsNew;
+    }
+
+    #updateFavIcon(data) {
+        if (data.favIcon === undefined) {
+            delete data.favIcon; // Don't want to trigger anything without data
+            return false;
+        }
+        const urlPieces = dissectUrl(data.url);
+        if (urlPieces === undefined) {
+            delete data.favIcon; // Don't want to send extra 2kb if not needed
+            return false;
+        }
+        const favIconIsNew = this.#favIconController.updateValue(urlPieces.base_url, data.favIcon);
+        if (!favIconIsNew) {
+            delete data.favIcon; // Don't want to send extra 2kb if not needed
+            return false;
+        }
+        return true;
     }
     
     saveProgress() {
@@ -151,7 +177,7 @@ class WebReaderBackground extends WebReader {
 class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
-
+    #favIconSubscriber = new FavIconSubscriber();
     constructor(container, showAllInterface) {
         if (container == undefined)
             throw new Error("Containing element for reader listings must be provided");
@@ -168,6 +194,43 @@ class WebReaderSidebar extends WebReader {
         )
     }
 
+    async _importReaderObjectList(readerObjectList) {
+        super._importReaderObjectList(readerObjectList);
+        await this.#favIconSubscriber.initialize();
+        this.#setFavIcons();
+        this._setContainerContent();
+    }
+
+    updateBookmark(data) {
+        super.updateBookmark(data);
+        this.#updateFavIcon(data);
+    }    
+    
+    #updateFavIcon(data) {
+        if (!data.hasOwnProperty("favIcon")) {
+            console.log("No favIcon packaged");
+            return;
+        }
+        const urlPieces = dissectUrl(data.url);
+        if (urlPieces === undefined)
+            return; // Should not happen in sidebar
+        if (this.#favIconSubscriber.updateValue(urlPieces.origin, data.favIcon))
+            this.setFavIcon(data.url, data.favIcon);
+    }
+
+    #setFavIcons() {
+        for (const [key, value] of this.#favIconSubscriber.entries()) {
+            this.setFavIcon(key, value);
+        }
+    }
+
+    setFavIcon(key, value) {
+        let managerList = this._readerStorage.getHostListFromKey(key);
+        for (const manager of managerList) {
+            manager.updateFavIcon(value);
+        }
+    }
+
     relistViewers() {
         this._setContainerContent();
     }
@@ -175,8 +238,6 @@ class WebReaderSidebar extends WebReader {
     _setContainerContent() {
         let visualsList = [];
         for (let manager of this._getSortedStorage()) {
-            if (!manager.hasVisuals())
-                continue; // not a manager then
             if (!manager.isValid())
                 continue;
             if (!ReaderFilter.fits(manager))
@@ -186,7 +247,7 @@ class WebReaderSidebar extends WebReader {
         this.#container.replaceChildren(...visualsList);
     }
     
-    importInterface(readerObjectList) {
+    async importInterface(readerObjectList) {
         if (readerObjectList === undefined)
             return;
         this._importReaderObjectList(readerObjectList);

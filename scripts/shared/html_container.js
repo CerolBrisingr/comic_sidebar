@@ -61,12 +61,24 @@ class HtmlContainer {
         }
         return this.#findObject(host, url);
     }
+
+    getHostListFromUrl(url) {
+        let host = this.#getHost(url);
+        if (host === undefined) {
+            return [];
+        }
+        return this.getHostListFromKey(host);
+    }
+
+    getHostListFromKey(host) {
+        if (!this.#data.has(host)) {
+            return [];
+        }
+        return this.#data.get(host);
+    }
     
     #findObject(host, url) {
-        if (!this.#data.has(host)) {
-            return undefined;
-        }
-        for (let object of this.#data.get(host)) {
+        for (let object of this.getHostListFromKey(host)) {
             if (object.urlIsCompatible(url))
                 return object;
         }
