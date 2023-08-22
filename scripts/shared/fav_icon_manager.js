@@ -58,7 +58,7 @@ class FavIconController extends FavIcons {
     }
 
     async initialize(originUrlList) {
-        super.initialize();
+        await super.initialize();
         this._removeUnneededEntries(originUrlList);
         this._createMissingEntries(originUrlList);
         await this._updateStorage();
