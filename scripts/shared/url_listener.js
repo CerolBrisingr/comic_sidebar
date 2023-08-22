@@ -29,9 +29,8 @@ class UrlListener {
         this.#fktReactToUrl = fktReactToUrl;
         this.#fktTabEvent = (tabInfo) => {this.#readTab(tabInfo.tabId);};
         this.#fktTabUpdateEvent = (tabId, info) => {
-            if (info.hasOwnProperty("status")) {
-                if (info.status === "complete")
-                    this.#readTab(tabId);
+            if (info.hasOwnProperty("url")) {
+                this.#readTab(tabId);
                 return;
                 };
             if (info.hasOwnProperty("favIconUrl")) {
@@ -54,6 +53,7 @@ class UrlListener {
         this.#lastUrl = url;
         if (favIconUrl === undefined) {
             this.#hasFavIcon = false;
+            this.#sendUrl(url, favIconUrl);
             return;
         }
         this.#hasFavIcon = true;
