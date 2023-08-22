@@ -214,17 +214,24 @@ class WebReaderSidebar extends WebReader {
         const urlPieces = dissectUrl(data.url);
         if (urlPieces === undefined)
             return; // Should not happen in sidebar
-        if (this.#favIconSubscriber.updateValue(urlPieces.origin, data.favIcon))
-            this.setFavIcon(data.url, data.favIcon);
+        if (this.#favIconSubscriber.updateValue(urlPieces.base_url, data.favIcon))
+            this.setFavIconFromUrl(data.url, data.favIcon);
     }
 
     #setFavIcons() {
         for (const [key, value] of this.#favIconSubscriber.entries()) {
-            this.setFavIcon(key, value);
+            this.setFavIconFromKey(key, value);
         }
     }
 
-    setFavIcon(key, value) {
+    setFavIconFromUrl(url, value) {
+        let managerList = this._readerStorage.getHostListFromUrl(url);
+        for (const manager of managerList) {
+            manager.updateFavIcon(value);
+        }
+    }
+
+    setFavIconFromKey(key, value) {
         let managerList = this._readerStorage.getHostListFromKey(key);
         for (const manager of managerList) {
             manager.updateFavIcon(value);

@@ -98,11 +98,6 @@ class FavIconSubscriber extends FavIcons {
         super();
     }
 
-    updateValue(key, value, id) {
-        let entry = {scr: value, id: id};
-        this._data.set(key, entry);
-    }
-
 }
 
 export {FavIconController, FavIconSubscriber}
