@@ -51,7 +51,9 @@ class FavIcons {
 
     async _updateStorage() {}
 }
+
 class FavIconController extends FavIcons {
+    #imageAdjuster = new ImageAdjuster();
 
     constructor() {
         super();
@@ -64,12 +66,13 @@ class FavIconController extends FavIcons {
         await this._updateStorage();
     }
 
-    updateValue(key, value) {
-        if (super.updateValue(key, value)) {
+    async updateValue(key, favIcon) {
+        favIcon = await this.#imageAdjuster.apply(favIcon);
+        let info = {hasUpdate: super.updateValue(key, favIcon), favIcon: favIcon};
+        if (info.hasUpdate) {
             this._updateStorage();
-            return true;
         }
-        return false;
+        return info;
     }
 
     _createMissingEntries(originUrlList) {
@@ -98,6 +101,79 @@ class FavIconSubscriber extends FavIcons {
         super();
     }
 
+    async updateValue(key, favIcon) {
+        let info = {hasUpdate: super.updateValue(key, favIcon), favIcon: favIcon};
+        return info;
+    }
+
+}
+
+class ImageAdjuster {
+    #canvas;
+    #ctx;
+    #targetHeight = 32;
+    #targetWidth = 32;
+
+    constructor() {
+        this.#canvas = document.createElement('canvas');
+        this.#ctx = this.#canvas.getContext('2d');
+    }
+
+    async apply(favIcon) {
+        if (favIcon === undefined) {
+            return favIcon;
+        }
+
+        let image = new Image();
+        image.src = favIcon;
+        await image.decode();
+
+        if (image.naturalWidth == image.naturalHeight) {
+            favIcon = this.#treatSquare(favIcon, image);
+        } else if (image.naturalWidth > image.naturalHeight) {
+            favIcon = this.#treatWideImage(favIcon, image);
+        } else {
+            favIcon = this.#treatHighImage(favIcon, image);
+        }
+        return favIcon;
+    }
+
+    #treatSquare(value, image) {
+        if (image.naturalHeight <= this.#targetHeight) {
+            return value;
+        }
+        return this.#returnDims(image, this.#targetWidth, this.#targetHeight);
+    }
+
+    #treatWideImage(value, image) {
+        if (image.naturalWidth <= this.#targetWidth) {
+            return value;
+        }
+        let individualHeight = this.#targetHeight * image.naturalWidth / this.#targetWidth;
+        return this.#returnDims(image, this.#targetWidth, individualHeight);
+    }
+
+    #treatHighImage(value, image) {
+        if (image.naturalHeight <= this.#targetHeight) {
+            return value;
+        }
+        let individualWidth = this.#targetWidth * image.naturalHeight / this.#targetHeight;
+        return this.#returnDims(image, individualWidth, this.#targetHeight);
+    }
+
+    #returnDims(image, width, height) {
+        this.#canvas.width = width;
+        this.#canvas.height = height;
+        this.#ctx.drawImage(image, 0, 0, width, height);
+        return this.#canvas.toDataURL();
+    }
+}
+
+async function displaySize(data, strTitle) {
+    let image = new Image();
+    image.src = data;
+    await image.decode();
+    console.log(`Image ${strTitle}: ${image.naturalWidth} x ${image.naturalHeight}`);
 }
 
 export {FavIconController, FavIconSubscriber}

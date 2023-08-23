@@ -111,8 +111,11 @@ function sendActiveState() {
 }
 
 function updateSidebar(data) {
-    if (webReader.updateBookmark(data))
-        sbConnection.sendMessage({updateBookmark: data});
+    let promise = webReader.updateBookmark(data);
+    promise.then((didUpdate) => {
+        if (didUpdate)
+            sbConnection.sendMessage({updateBookmark: data});
+    });
 }
 
 function updateUrlListener() {

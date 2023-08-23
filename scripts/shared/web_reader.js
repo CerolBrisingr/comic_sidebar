@@ -142,13 +142,13 @@ class WebReaderBackground extends WebReader {
         await this.#favIconController.initialize(this._readerStorage.keys());
     }
 
-    updateBookmark(data) {
+    async updateBookmark(data) {
         let bookmarkIsNew = super.updateBookmark(data);
-        let favIconIsNew = this.#updateFavIcon(data);
+        let favIconIsNew = await this.#updateFavIcon(data);
         return bookmarkIsNew | favIconIsNew;
     }
 
-    #updateFavIcon(data) {
+    async #updateFavIcon(data) {
         if (data.favIcon === undefined) {
             delete data.favIcon; // Don't want to trigger anything without data
             return false;
@@ -158,11 +158,12 @@ class WebReaderBackground extends WebReader {
             delete data.favIcon; // Don't want to send extra 2kb if not needed
             return false;
         }
-        const favIconIsNew = this.#favIconController.updateValue(urlPieces.host, data.favIcon);
-        if (!favIconIsNew) {
+        const info = await this.#favIconController.updateValue(urlPieces.host, data.favIcon);
+        if (!info.hasUpdate) {
             delete data.favIcon; // Don't want to send extra 2kb if not needed
             return false;
         }
+        data.favIcon = info.favIcon;
         return true;
     }
     
@@ -214,8 +215,12 @@ class WebReaderSidebar extends WebReader {
         const urlPieces = dissectUrl(data.url);
         if (urlPieces === undefined)
             return; // Should not happen in sidebar
-        if (this.#favIconSubscriber.updateValue(urlPieces.host, data.favIcon))
-            this.setFavIconFromKey(urlPieces.host, data.favIcon);
+        let update = this.#favIconSubscriber.updateValue(urlPieces.host, data.favIcon);
+        update.then((info) => {
+            if (!info.hasUpdate)
+                return;
+            this.setFavIconFromKey(urlPieces.host, info.favIcon);
+        });
     }
 
     #setFavIcons() {
