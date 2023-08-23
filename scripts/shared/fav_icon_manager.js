@@ -111,8 +111,8 @@ class FavIconSubscriber extends FavIcons {
 class ImageAdjuster {
     #canvas;
     #ctx;
-    #targetHeight = 32;
-    #targetWidth = 32;
+    #targetHeight = 16;
+    #targetWidth = 16;
 
     constructor() {
         this.#canvas = document.createElement('canvas');

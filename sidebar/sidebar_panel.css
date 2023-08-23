@@ -35,16 +35,16 @@
 }
 
 .bookmark_icon {
+    object-fit: contain;
     padding-left: 2.5em;
-    padding-right: 0.1em;
-    height: 75%;
-    width: auto;
+    height: 98%;
+    width: 98%;
 }
 
 .thumbnail_icon {
-    padding-right: 0.25em;
-    height: 75%;
-    width: auto;
+    object-fit: contain;
+    height: 95%;
+    width: 95%;
 }
 
 .undecorated_link {
