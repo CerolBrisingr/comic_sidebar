@@ -1,155 +1,248 @@
-import {dissectUrl} from "./url.js"
+import { HtmlContainer } from "./html_container.js"
 import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList, getShowAll} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject, saveShowAll} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
+import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
+import { dissectUrl } from "./url.js"
 
 class WebReader {
-    #controller;
-    #container;
-    #readerClass;
-    #myInterface;
-    #savingSuspended = false;
-    #readerStorage = new HtmlContainer();
-    #currentReader;
-    #latestId = 0;
-    
-    constructor(controller) {
-        this.#controller = controller;
-        this.#container = controller.getContainer();
-        this.#readerClass = this.#getReaderClass();
-        this.#myInterface = new WebReaderInterface(this);
-        this.#currentReader = new ReaderClassDummy();
+
+    constructor() {
+        this._currentReader = new ReaderClassDummy();
+        this._savingSuspended = false;
+        this._readerStorage = new HtmlContainer();
+        this._latestId = 0;
     }
     
     importBackup(file, fktDone) {
         let fktImportBackup = (readerObjectList) => {
-            this.#importReaderObjectList(readerObjectList);
+            this._importReaderObjectList(readerObjectList);
             fktDone();
         }
         importBackup(file, fktImportBackup);
     }
     
     updateBookmark(data) {
-        let object = this.#selectCorrespondingStorage(data.url);
+        let object = this._selectCorrespondingStorage(data.url);
         if (!object.isValid())
-            return;
-        object.addAutomatic(data);
+            return false;
+        return object.addAutomatic(data);
     }
     
     saveBackup() {
-        saveBackup(this.#getSortedStorage());
+        saveBackup(this._getSortedStorage());
     }
     
-    #clearData() {
-        for (let storageObject of this.#readerStorage.getList()) {
+    _clearData() {
+        for (let storageObject of this._readerStorage.getList()) {
             storageObject.deleteMe();
         }
-        this.#readerStorage.clearData();
+        this._readerStorage.clearData();
     }
 
-    #getSortedStorage() {
-        return ReaderSort.apply(this.#readerStorage.getList());
+    _getSortedStorage() {
+        return ReaderSort.apply(this._readerStorage.getList());
     }
     
     getObjectList() {
-        let readerObject = buildWebReaderObject(this.#getSortedStorage());
+        let readerObject = buildWebReaderObject(this._getSortedStorage());
         return readerObject.data;
     }
     
-    #selectCorrespondingStorage(url) {
-        if (this.#currentReader.urlIsCompatible(url))
-            return this.#currentReader;
-        let object = this.#readerStorage.getObject(url);
+    _selectCorrespondingStorage(url) {
+        if (this._currentReader.urlIsCompatible(url))
+            return this._currentReader;
+        let object = this._readerStorage.getObject(url);
         if (object === undefined) {
-            this.#updateCurrentReader(new ReaderClassDummy());
-            return this.#currentReader;
+            this._updateCurrentReader(new ReaderClassDummy());
+            return this._currentReader;
         }
-        this.#updateCurrentReader(object);
+        this._updateCurrentReader(object);
         return object;
     }
     
-    #updateCurrentReader(newObject) {
-        this.#currentReader.collapse();
+    _updateCurrentReader(newObject) {
+        this._currentReader.collapse();
         newObject.expand();
-        this.#currentReader = newObject;
+        this._currentReader = newObject;
     }
     
-    saveProgress() {
-        if (this.#savingSuspended)
-            return;
-        if (!this.#controller.storageAccessGiven())
-            return;
-        let comicDataObject = buildWebReaderObject(this.#readerStorage.getList());
-        browser.storage.local.set({comicData: comicDataObject});
-    }
-
-    relistViewers() {
-        this.#setContainerContent();
-    }
-    
-    importInterface(readerObjectList) {
-        if (readerObjectList === undefined)
-            return;
-        this.#importReaderObjectList(readerObjectList);
-    }
-    
-    loadInterface(fktDone) {
-        let gettingItem = browser.storage.local.get("comicData");
-        gettingItem.then((storageResult) => {
-            if (!storageResult.hasOwnProperty("comicData")) {
-                console.log("No data stored locally, aborting loading sequence! (2)");
-                fktDone();
-                return;
-            }
-            let readerObjectList = unpackReaderObjectList(storageResult.comicData);
-            this.#importReaderObjectList(readerObjectList);
-            fktDone();
-            }, 
-            () => {console.log("No data stored locally, aborting loading sequence! (1)")});
-    }
-    
-    #importReaderObjectList(readerObjectList){
-        this.#clearData();
-        this.#savingSuspended = true;
+    _importReaderObjectList(readerObjectList){
+        this._clearData();
+        this._savingSuspended = true;
         for (let [index, readerObject] of readerObjectList.entries()) {
-            this.#latestId = index;
-            let newObject = this.#createReaderClass(readerObject, index);
+            this._latestId = index;
+            let newObject = this._createReaderClass(readerObject, index);
             if (!newObject.isValid())
                 continue;
-            this.#readerStorage.saveObject(newObject);
+            this._readerStorage.saveObject(newObject);
         }
-        this.#setContainerContent();
-        this.#savingSuspended = false;
+        this._savingSuspended = false;
         this.saveProgress();
     }
     
-    #createReaderClass(readerObject, intId) {
-        return new this.#readerClass(
+    _createReaderClass(readerObject, intId) {
+        throw new Error("not implemented");
+    }
+    
+    registerPage(readerObject) {
+        let storageObject 
+            = this._selectCorrespondingStorage(readerObject.url);
+        if (storageObject.isValid()) {
+            console.log("Page already registered as " + storageObject.getLabel());
+            return -1;
+        }
+        this._latestId += 1;
+        let newManager = this._createReaderClass(readerObject, this._latestId);
+        if (!newManager.isValid()) {
+            console.log("Failed to build comic entry");
+            return -1;
+        }
+        this._readerStorage.saveObject(newManager);
+        this.updateBookmark(readerObject); // This also updates storage
+        this.relistViewers();
+        return this._latestId;
+    }
+    
+    removeReader(prefixMask) {
+        if (this._currentReader.urlIsCompatible(prefixMask))
+            this._updateCurrentReader(new ReaderClassDummy());
+        this._readerStorage.removeObject(prefixMask);
+    }
+
+    relistViewers() {}
+    saveProgress() {}
+}
+
+class WebReaderBackground extends WebReader {
+    #favIconController = new FavIconController();
+    constructor() {
+        super();
+    }
+
+    _createReaderClass(readerObject, intId) {
+        return new ReaderData(
             readerObject,
-            this.#myInterface,
-            intId,
-            this.#container
+            new WebReaderInterface(this),
+            intId
         )
     }
     
-    #getReaderClass() {
-        if (this.#container === undefined) {
-            return ReaderData;
-        } else {
-            return ReaderManager;
+    async loadInterface() {
+        let storageResult = await browser.storage.local.get("comicData");
+        if (!storageResult.hasOwnProperty("comicData")) {
+            console.log("No data stored locally, aborting loading sequence!");
+            return;
         }
+        let readerObjectList = unpackReaderObjectList(storageResult.comicData);
+        this._importReaderObjectList(readerObjectList);
+        await this.#favIconController.initialize(this._readerStorage.keys());
+    }
+
+    async updateBookmark(data) {
+        let bookmarkIsNew = super.updateBookmark(data);
+        let favIconIsNew = await this.#updateFavIcon(data);
+        return bookmarkIsNew | favIconIsNew;
+    }
+
+    async #updateFavIcon(data) {
+        if (data.favIcon === undefined) {
+            delete data.favIcon; // Don't want to trigger anything without data
+            return false;
+        }
+        const urlPieces = dissectUrl(data.url);
+        if (urlPieces === undefined) {
+            delete data.favIcon; // Don't want to send extra 2kb if not needed
+            return false;
+        }
+        const info = await this.#favIconController.updateValue(urlPieces.host, data.favIcon);
+        if (!info.hasUpdate) {
+            delete data.favIcon; // Don't want to send extra 2kb if not needed
+            return false;
+        }
+        data.favIcon = info.favIcon;
+        return true;
     }
     
-    #setContainerContent() {
-        if (this.#container == undefined)
+    saveProgress() {
+        if (this._savingSuspended)
             return;
+        let comicDataObject = buildWebReaderObject(this._readerStorage.getList());
+        browser.storage.local.set({comicData: comicDataObject});
+    }
+}
+
+class WebReaderSidebar extends WebReader {
+    #container;
+    #showAllInterface;
+    #favIconSubscriber = new FavIconSubscriber();
+    constructor(container, showAllInterface) {
+        if (container == undefined)
+            throw new Error("Containing element for reader listings must be provided");
+        super();
+        this.#container = container;
+        this.#showAllInterface = showAllInterface;
+    }
+
+    _createReaderClass(readerObject) {
+        return new ReaderManager(
+            readerObject,
+            new WebReaderInterface(this),
+            this.#container
+        )
+    }
+
+    async _importReaderObjectList(readerObjectList) {
+        super._importReaderObjectList(readerObjectList);
+        await this.#favIconSubscriber.initialize();
+        this.#setFavIcons();
+        this._setContainerContent();
+    }
+
+    updateBookmark(data) {
+        super.updateBookmark(data);
+        this.#updateFavIcon(data);
+    }    
+    
+    #updateFavIcon(data) {
+        if (!data.hasOwnProperty("favIcon")) {
+            console.log("No favIcon packaged");
+            return;
+        }
+        const urlPieces = dissectUrl(data.url);
+        if (urlPieces === undefined)
+            return; // Should not happen in sidebar
+        let update = this.#favIconSubscriber.updateValue(urlPieces.host, data.favIcon);
+        update.then((info) => {
+            if (!info.hasUpdate)
+                return;
+            this.setFavIconFromKey(urlPieces.host, info.favIcon);
+        });
+    }
+
+    #setFavIcons() {
+        for (const [key, value] of this.#favIconSubscriber.entries()) {
+            this.setFavIconFromKey(key, value);
+        }
+    }
+
+    setFavIconFromKey(key, value) {
+        let managerList = this._readerStorage.getHostListFromKey(key);
+        for (const manager of managerList) {
+            manager.updateFavIcon(value);
+        }
+    }
+
+    relistViewers() {
+        this._setContainerContent();
+    }
+    
+    _setContainerContent() {
         let visualsList = [];
-        for (let manager of this.#getSortedStorage()) {
-            if (!manager.hasVisuals())
-                continue; // not a manager then
+        for (let manager of this._getSortedStorage()) {
             if (!manager.isValid())
                 continue;
             if (!ReaderFilter.fits(manager))
@@ -159,120 +252,13 @@ class WebReader {
         this.#container.replaceChildren(...visualsList);
     }
     
-    registerPage(readerObject) {
-        let storageObject 
-            = this.#selectCorrespondingStorage(readerObject.url);
-        if (storageObject.isValid()) {
-            console.log("Page already registered as " + storageObject.getLabel());
-            return -1;
-        }
-        this.#latestId += 1;
-        let newManager = this.#createReaderClass(readerObject, this.#latestId);
-        if (!newManager.isValid()) {
-            console.log("Failed to build comic entry");
-            return -1;
-        }
-        this.#readerStorage.saveObject(newManager);
-        this.updateBookmark(readerObject); // This also updates storage
-        this.relistViewers();
-        return this.#latestId;
-    }
-    
-    removeReader(prefixMask) {
-        if (this.#currentReader.urlIsCompatible(prefixMask))
-            this.#updateCurrentReader(new ReaderClassDummy());
-        this.#readerStorage.removeObject(prefixMask);
+    async importInterface(readerObjectList) {
+        if (readerObjectList === undefined)
+            return;
+        this._importReaderObjectList(readerObjectList);
     }
 }
 
-class HtmlContainer {
-    #data = new Map();
-    
-    constructor() {}
-    
-    saveObject(object, url = undefined) {
-        if (url === undefined)
-            url = object.getPrefixMask();
-        
-        let host = this.#getHost(url);
-        if (host === undefined) {
-            return false;
-        }
-        if (this.#findObject(host, url) !== undefined) {
-            return false;
-        }
-        if (this.#data.has(host)) {
-            let array = this.#data.get(host);
-            array.push(object);
-        } else {
-            this.#data.set(host, [object]);
-        }
-    }
-    
-    clearData() {
-        this.#data.clear();
-    }
-    
-    removeObject(url) {
-        let host = this.#getHost(url);
-        if (host === undefined) {
-            console.log('Could not find valid host for given input');
-            return;
-        }
-        let list = this.#data.get(host);
-        if (list === undefined) {
-            console.log('Object selected for removal was not found');
-            return;
-        }
-        for (let [index, object] of list.entries()) {
-            if (object.urlIsCompatible(url)) {
-                list.splice(index, 1);
-                break;
-            }
-        }
-        if (list.length === 0) {
-            this.#data.delete(host);
-        }
-    }
-    
-    getObject(url) {
-        let host = this.#getHost(url);
-        if (host === undefined) {
-            return undefined;
-        }
-        return this.#findObject(host, url);
-    }
-    
-    #findObject(host, url) {
-        if (!this.#data.has(host)) {
-            return undefined;
-        }
-        for (let object of this.#data.get(host)) {
-            if (object.urlIsCompatible(url))
-                return object;
-        }
-        return undefined;
-    }
-    
-    #getHost(url) {
-        let urlPieces = dissectUrl(url);
-        if (urlPieces === undefined)
-            return
-        return urlPieces.host;
-    }
-    
-    getList() {
-        // Returns stored objects as list
-        // Upkeeping a sorted index is probably better once we actually sort
-        let objectList = [];
-        for (let host of this.#data.values())
-            for (let object of host) {
-                objectList.push(object);
-            }
-        return objectList;
-    }
-    
-}
 
 class WebReaderInterface {
     #webReader
@@ -291,28 +277,6 @@ class WebReaderInterface {
     
     relistViewerDisplay() {
         this.#webReader.relistViewers();
-    }
-}
-
-class WebReaderController {
-    #container;
-    #showAllInterface;
-    
-    constructor(container = undefined, showAllInterface = undefined) {
-        this.#container = container;
-        this.#showAllInterface = showAllInterface;
-    }
-
-    getShowAll() {
-        return this.#showAllInterface.getValue();
-    }
-    
-    getContainer() {
-        return this.#container;
-    }
-    
-    storageAccessGiven() {
-        return this.#container === undefined;
     }
 }
 
@@ -387,4 +351,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReader, WebReaderController, ReaderSort, ShowAllInterface}
+export {WebReaderSidebar, WebReaderBackground, ReaderSort, ShowAllInterface}

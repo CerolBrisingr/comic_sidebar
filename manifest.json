@@ -35,7 +35,7 @@
   },
 
 
-  "permissions": ["storage", "tabs", "webNavigation"],
+  "permissions": ["storage", "tabs"],
 
   "commands": {
     "_execute_sidebar_action": {
