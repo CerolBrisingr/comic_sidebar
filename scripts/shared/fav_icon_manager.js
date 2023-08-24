@@ -22,14 +22,31 @@ class FavIcons {
         return this._data.get(key);
     }
 
+    setValue(key, value) {
+        let entry = this._data.get(key);
+        if (value === entry) {
+            return false;
+        }
+        if (value === undefined) {
+            this._data.set(key, this._defaultEntry);
+            return true;
+        }
+        this._data.set(key, value);
+        return true;
+        
+    }
+
     updateValue(key, value) {
         // Tries to update favIcon data for key
         // Returns true on success
         // Returns false if same value is already set
+        // Returns false if key does not exist
         let entry = this._data.get(key);
+        if (entry === undefined) {
+            return false;
+        }
         if (value === undefined) {
             this._data.set(key, this._defaultEntry);
-            this._updateStorage();
             return true;
         }
         if (value === entry) {
@@ -66,6 +83,15 @@ class FavIconController extends FavIcons {
         await this._updateStorage();
     }
 
+    async setValue(key, favIcon) {
+        favIcon = await this.#imageAdjuster.apply(favIcon);
+        let info = {didSet: super.setValue(key, favIcon), favIcon: favIcon};
+        if (info.didSet) {
+            this._updateStorage();
+        }
+        return info;
+    }
+
     async updateValue(key, favIcon) {
         favIcon = await this.#imageAdjuster.apply(favIcon);
         let info = {hasUpdate: super.updateValue(key, favIcon), favIcon: favIcon};
@@ -99,6 +125,11 @@ class FavIconSubscriber extends FavIcons {
 
     constructor() {
         super();
+    }
+
+    async setValue(key, favIcon) {
+        let info = {didSet: super.setValue(key, favIcon), favIcon: favIcon};
+        return info;
     }
 
     async updateValue(key, favIcon) {

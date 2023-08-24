@@ -88,7 +88,7 @@ class WebReader {
         throw new Error("not implemented");
     }
     
-    registerPage(readerObject) {
+    async registerPage(readerObject) {
         let storageObject 
             = this._selectCorrespondingStorage(readerObject.url);
         if (storageObject.isValid()) {
@@ -102,7 +102,8 @@ class WebReader {
             return -1;
         }
         this._readerStorage.saveObject(newManager);
-        this.updateBookmark(readerObject); // This also updates storage
+        await this._registerFavIcon(readerObject);
+        await this.updateBookmark(readerObject, false); // This also updates storage
         this.relistViewers();
         return this._latestId;
     }
@@ -115,6 +116,8 @@ class WebReader {
 
     relistViewers() {}
     saveProgress() {}
+    _updateFavIcon() {}
+    async _registerFavIcon() {}
 }
 
 class WebReaderBackground extends WebReader {
@@ -142,25 +145,35 @@ class WebReaderBackground extends WebReader {
         await this.#favIconController.initialize(this._readerStorage.keys());
     }
 
-    async updateBookmark(data) {
+    async updateBookmark(data, doClean = true) {
         let bookmarkIsNew = super.updateBookmark(data);
-        let favIconIsNew = await this.#updateFavIcon(data);
+        let favIconIsNew = await this._updateFavIcon(data);
+        if (!favIconIsNew & doClean) {
+            delete data.favIcon;
+        }
         return bookmarkIsNew | favIconIsNew;
     }
 
-    async #updateFavIcon(data) {
+    async _registerFavIcon(data) {
+        const urlPieces = dissectUrl(data.url);
+        if (urlPieces === undefined) {
+            delete data.favIcon;
+            return false;
+        }
+        const info = await this.#favIconController.setValue(urlPieces.host, data.favIcon);
+        data.favIcon = info.favIcon;
+    }
+
+    async _updateFavIcon(data) {
         if (data.favIcon === undefined) {
-            delete data.favIcon; // Don't want to trigger anything without data
             return false;
         }
         const urlPieces = dissectUrl(data.url);
         if (urlPieces === undefined) {
-            delete data.favIcon; // Don't want to send extra 2kb if not needed
             return false;
         }
         const info = await this.#favIconController.updateValue(urlPieces.host, data.favIcon);
         if (!info.hasUpdate) {
-            delete data.favIcon; // Don't want to send extra 2kb if not needed
             return false;
         }
         data.favIcon = info.favIcon;
@@ -202,12 +215,22 @@ class WebReaderSidebar extends WebReader {
         this._setContainerContent();
     }
 
-    updateBookmark(data) {
+    async updateBookmark(data) {
         super.updateBookmark(data);
-        this.#updateFavIcon(data);
-    }    
+        this._updateFavIcon(data);
+    }
+
+    async _registerFavIcon(data) {
+        const urlPieces = dissectUrl(data.url);
+        if (urlPieces === undefined) {
+            delete data.favIcon;
+            return false;
+        }
+        const info = await this.#favIconSubscriber.setValue(urlPieces.host, data.favIcon);
+        this.setFavIconFromKey(urlPieces.host, data.favIcon);
+    }
     
-    #updateFavIcon(data) {
+    _updateFavIcon(data) {
         if (!data.hasOwnProperty("favIcon")) {
             console.log("No favIcon packaged");
             return;

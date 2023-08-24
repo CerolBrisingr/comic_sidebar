@@ -28,7 +28,7 @@ function enforceWebReaderData() {
     sbConnection.sendMessage({webReaderReload: webReader.getObjectList()})
 }
 
-function receiveMessage(message) {
+async function receiveMessage(message) {
     if (message === "test") {
         console.log("Background script received test message");
         sbConnection.sendMessage("test");
@@ -40,7 +40,7 @@ function receiveMessage(message) {
     }
     if (message.hasOwnProperty("requestPageAddition")) {
         let readerObject = message.requestPageAddition;
-        let readerId = webReader.registerPage(readerObject);
+        let readerId = await webReader.registerPage(readerObject);
         if (readerId === -1)
             return;
         readerObject.intId = readerId;

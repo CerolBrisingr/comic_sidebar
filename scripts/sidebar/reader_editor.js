@@ -178,6 +178,7 @@ class Editor {
             this.setUserMessage("Error: ", "Invalid Link provided");
             return;
         }
+        this.favIcon = data.favIcon;
         this.fullLink = data.url;
         this.label = urlPieces.host;
         this.setUserMessage("", "");
@@ -201,6 +202,7 @@ class Editor {
             this.openEditor();
             return;
         }
+        this.favIcon = undefined;
         this.fullLink = url;
         this.label = readerData.getLabel();
         this.setUserMessage("", "");
@@ -226,7 +228,8 @@ class Editor {
             url: this.fullLink,
             label: this.label,
             prefix: this.prefix,
-            time: this.#timestamp
+            time: this.#timestamp,
+            favIcon: this.favIcon
         }
     }
     

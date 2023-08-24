@@ -106,7 +106,8 @@ function requestPageAddition(readerEssentials) {
         prefix_mask: readerEssentials.prefix,
         label: readerEssentials.label,
         url: readerEssentials.url,
-        time: readerEssentials.time};
+        time: readerEssentials.time,
+        favIcon: readerEssentials.favIcon};
     bsConnection.sendMessage({requestPageAddition: readerObject});
 }
 
@@ -151,10 +152,10 @@ function onError(error) {
     console.log(`Error: ${error}`);
 }
 
-function updateBookmark(data) {
+async function updateBookmark(data) {
     if (webReader === undefined)
         return;
-    webReader.updateBookmark(data);
+    await webReader.updateBookmark(data);
 }
 
 function receiveMessage(message) {
