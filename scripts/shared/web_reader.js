@@ -17,10 +17,12 @@ class WebReader {
         this._latestId = 0;
     }
     
-    importBackup(file, fktDone) {
+    async importBackup(file, fktDone) {
         let fktImportBackup = (readerObjectList) => {
-            this._importReaderObjectList(readerObjectList);
-            fktDone();
+            let run = this._importReaderObjectList(readerObjectList);
+            run.then(() => {
+                fktDone();
+            });
         }
         importBackup(file, fktImportBackup);
     }
@@ -141,7 +143,11 @@ class WebReaderBackground extends WebReader {
             return;
         }
         let readerObjectList = unpackReaderObjectList(storageResult.comicData);
-        this._importReaderObjectList(readerObjectList);
+        await this._importReaderObjectList(readerObjectList);
+    }
+
+    async _importReaderObjectList(readerObjectList) {
+        super._importReaderObjectList(readerObjectList);
         await this.#favIconController.initialize(this._readerStorage.keys());
     }
 
@@ -210,7 +216,7 @@ class WebReaderSidebar extends WebReader {
 
     async _importReaderObjectList(readerObjectList) {
         super._importReaderObjectList(readerObjectList);
-        await this.#favIconSubscriber.initialize();
+        await this.#favIconSubscriber.initialize(this._readerStorage.keys());
         this.#setFavIcons();
         this._setContainerContent();
     }
