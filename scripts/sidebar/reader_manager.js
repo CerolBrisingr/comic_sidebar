@@ -2,6 +2,7 @@ import {ReaderVisuals} from "./reader_visuals.js"
 import {ReaderData} from "../shared/reader_data.js"
 import {ReaderSync} from "../shared/reader_sync.js"
 import {ReaderEditor} from "./reader_editor.js"
+import { Scheduler } from "../shared/schedule.js"
 
 class ReaderManager {
     #readerData;
@@ -9,13 +10,19 @@ class ReaderManager {
     #container;
     #readerVisuals;
     #readerSync;
+    #schedule;
     
-    constructor(readerObject, parentInterface, container) {
+    constructor(readerObject, parentInterface, container, showAllInterface) {
         this.#container = container;
         this.#parentInterface = parentInterface;
         this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
         this.#readerData = this.#createReaderData(readerObject);
+        this.#schedule = new Scheduler(this.#readerData, showAllInterface);
         this.#createReaderVisuals();
+    }
+
+    canShow() {
+        return this.#schedule.canShow(this.#readerData.getLatestInputTime());
     }
     
     getLabel() {
@@ -127,7 +134,9 @@ class ReaderManager {
     }
     
     isValid() {
-        if (this.#readerData === undefined || this.#readerVisuals === undefined)
+        if (this.#readerData === undefined 
+            || this.#readerVisuals === undefined
+            || this.#schedule === undefined)
             return false;
         return this.#readerData.isValid();
     }

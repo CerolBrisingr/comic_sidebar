@@ -1,9 +1,10 @@
 import {ReaderEditor} from "./reader_editor.js"
-import {WebReaderSidebar, ShowAllInterface} from "../shared/web_reader.js"
+import {WebReaderSidebar} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
 import { SortControls } from "./reader_sort.js"
+import { ShowAllInterface } from "../shared/schedule.js"
 
 /* 
 Browser modified during development:
@@ -95,6 +96,7 @@ function setUpWebReader(readerObjectList) {
     }
     let showAllInterface = new ShowAllInterface(showAll);
     webReader = new WebReaderSidebar(container, showAllInterface);
+    showAllInterface.setUpdateFcn(() => {webReader.relistViewers();});
 }
 
 function requestUrlRetransmission() {

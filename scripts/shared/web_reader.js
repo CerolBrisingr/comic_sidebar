@@ -1,8 +1,8 @@
 import { HtmlContainer } from "./html_container.js"
 import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
-import {importBackup, unpackReaderObjectList, getShowAll} from "./backup_import.js"
-import {saveBackup, buildWebReaderObject, saveShowAll} from "./backup_export.js"
+import {importBackup, unpackReaderObjectList} from "./backup_import.js"
+import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
@@ -204,7 +204,8 @@ class WebReaderSidebar extends WebReader {
         return new ReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#container
+            this.#container, 
+            this.#showAllInterface
         )
     }
 
@@ -270,6 +271,8 @@ class WebReaderSidebar extends WebReader {
                 continue;
             if (!ReaderFilter.fits(manager))
                 continue;
+            if (!manager.canShow())
+                continue;
             visualsList.push(manager.getVisuals());
         }
         this.#container.replaceChildren(...visualsList);
@@ -303,62 +306,6 @@ class WebReaderInterface {
     }
 }
 
-class ShowAllInterface {
-    #showAllUi;
-    #showAll;
-
-    constructor(showAll = undefined) {
-        this.#showAllUi = showAll;
-        this.#setUpButton();
-        this.#initValue();
-    }
-
-    async #initValue() {
-        const value = await getShowAll();
-        this.#showAll = value;
-        this.#setShowAllVisuals(value);
-    }
-
-    #setUpButton() {
-        this.#showAllUi.icon.style.visibility = "visible";
-        this.#showAllUi.button.onclick = () => {
-            this.setValue(!this.#showAll);
-        };
-    }
-
-    #setShowAllVisuals(value) {
-        if (!this.#showAllUi)
-            return;
-        if (value) {
-            this.#setTrueVisuals();
-        } else {
-            this.#setFalseVisuals();
-        }
-    }
-
-    #setTrueVisuals() {
-        this.#showAllUi.icon.src = "../../icons/eye.svg";
-        this.#showAllUi.label.innerText = "Showing hidden";
-    }
-
-    #setFalseVisuals() {
-        this.#showAllUi.icon.src = "../../icons/eye-slash.svg";
-        this.#showAllUi.label.innerText = "Show hidden";
-
-    }
-
-    getValue() {
-        return this.#showAll;
-    }
-
-    setValue(value) {
-        value = Boolean(value);
-        this.#setShowAllVisuals(value);
-        this.#showAll = value;
-        saveShowAll(value);
-    }
-}
-
 class ReaderClassDummy {
     constructor() {}
     
@@ -374,4 +321,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReaderSidebar, WebReaderBackground, ReaderSort, ShowAllInterface}
+export {WebReaderSidebar, WebReaderBackground, ReaderSort}
