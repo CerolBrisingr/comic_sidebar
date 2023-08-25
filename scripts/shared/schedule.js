@@ -3,6 +3,7 @@ import { saveShowAll } from "./backup_export.js";
 
 class Scheduler {
     #showAllInterface;
+    #dayFactor = 1.0/(1000*60*60*24);
 
     constructor(readerData, showAllInterface) {
         this.#showAllInterface = showAllInterface;
@@ -10,7 +11,27 @@ class Scheduler {
     }
 
     canShow(lastInteraction) {
-        return this.#showAllInterface.getValue();
+        if (this.#showAllInterface.getValue()){
+            // Scheduler is deactivated
+            return true;
+        }
+        const now = new Date();
+        const wasYesterday = (this.#startOfDay(now) - lastInteraction) > 0;
+        return wasYesterday;
+    }
+
+    #startOfDay(now) {
+        let start = new Date(now.getTime());
+        start.setHours(0, 0, 0, 0);
+        return start.getTime();
+    }
+
+    #toSeconds(timespan) {
+        return timespan/1000;
+    }
+
+    #toDays(timespan) {
+        return timespan * this.#dayFactor;
     }
 }
 

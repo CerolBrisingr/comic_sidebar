@@ -260,6 +260,12 @@ class WebReaderSidebar extends WebReader {
         }
     }
 
+    _selectCorrespondingStorage(url) {
+        let newReader = super._selectCorrespondingStorage(url);
+        this.relistViewers();
+        return newReader;
+    }
+
     relistViewers() {
         this._setContainerContent();
     }
@@ -271,11 +277,15 @@ class WebReaderSidebar extends WebReader {
                 continue;
             if (!ReaderFilter.fits(manager))
                 continue;
-            if (!manager.canShow())
+            if (!this.#canShow(manager))
                 continue;
             visualsList.push(manager.getVisuals());
         }
         this.#container.replaceChildren(...visualsList);
+    }
+
+    #canShow(manager) {
+        return manager.canShow() | manager === this._currentReader;
     }
     
     async importInterface(readerObjectList) {
@@ -312,8 +322,16 @@ class ReaderClassDummy {
     isValid() {
         return false;
     }
+
+    getLabel() {
+        return "Dummy";
+    }
     
     urlIsCompatible(url) {
+        return false;
+    }
+
+    canShow() {
         return false;
     }
     

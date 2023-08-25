@@ -86,8 +86,6 @@ class ReaderManager {
         const addedAutomatic = this.#readerData.addAutomatic(data);
         if (addedAutomatic)
             this.#readerVisuals.updateReaderUrls(this.#readerData);
-        if (data.time)
-            this.#parentInterface.relistViewerDisplay();
         return addedAutomatic;
     }
 
