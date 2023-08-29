@@ -10,8 +10,10 @@ class ReaderData {
     #automatic;
     #manual;
     #parentInterface;
+    #schedule;
     
     constructor(data, parentInterface, readerSync) {
+        // Import object from storage
         this.#parentInterface = parentInterface;
         this.#registerInteraction(data.time);
         if (data.hasOwnProperty("base_url"))
@@ -20,12 +22,9 @@ class ReaderData {
             this.#prefixMask = String(data.prefix_mask);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
-        this.#automatic = [];
-        this.#manual = [];
-        if (data.hasOwnProperty("automatic"))
-            this.#importAutomaticList(data.automatic);
-        if (data.hasOwnProperty("manual"))
-            this.#importManualList(data.manual);
+        this.#importManualList(data.manual);
+        this.#importAutomaticList(data.automatic);
+        this.#schedule = new ReaderSchedule(data.schedule);
         
         if (typeof readerSync === "number")
             readerSync = ReaderSync.makeCore(readerSync, this);
@@ -34,8 +33,9 @@ class ReaderData {
     }
     
     #importAutomaticList(list) {
-        if (!Array.isArray(list))
-            return
+        this.#automatic = [];
+        if (!isArray(list))
+            return;
         for (let entry of list) {
             if (entry.hasOwnProperty("href"))
                 this.#registerAutomatic(String(entry.href));
@@ -43,8 +43,9 @@ class ReaderData {
     }
     
     #importManualList(list) {
-        if (!Array.isArray(list))
-            return
+        this.#manual = [];
+        if (!isArray(list))
+            return;
         for (let entry of list) {
             if (!entry.hasOwnProperty("href"))
                 continue;
@@ -99,7 +100,7 @@ class ReaderData {
             this.#latestInteraction = time;
             return true;
         }
-        false;
+        return false;
     }
     
     #registerAutomatic(url) {
@@ -193,6 +194,10 @@ class ReaderData {
         }
         return -1;
     }
+
+    getSchedule() {
+        return this.#schedule;
+    }
     
     returnAsObject() {
         let thisAsObject = {
@@ -200,6 +205,7 @@ class ReaderData {
             time: this.#latestInteraction,
             label:this.#label,
             prefix_mask:this.#prefixMask,
+            schedule:this.#schedule.returnAsObject(),
             automatic: [],
             manual: []
         }
@@ -219,6 +225,35 @@ class ReaderData {
     deleteMe() {
         this.#readerSync.disconnect();
         this.#parentInterface.deleteMe(this.#prefixMask);
+    }
+}
+
+function isArray(list) {
+    if (list === undefined)
+        return false;
+    return Array.isArray(list);
+}
+
+class ReaderSchedule {
+    #possibleRules = ["none", "daily", "hourly"];
+    #rule = "hourly";
+    
+    constructor(rule) {
+        if (rule === undefined)
+            return;
+        if (this.#possibleRules.includes(rule)) {
+            this.#rule = rule;
+        } else {
+            console.log("Invalid scheduling rule");
+        }
+    }
+
+    getRule() {
+        return this.#rule;
+    }
+
+    returnAsObject() {
+        return this.#rule;
     }
 }
 

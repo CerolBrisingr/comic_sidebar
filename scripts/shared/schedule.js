@@ -4,10 +4,29 @@ import { saveShowAll } from "./backup_export.js";
 class Scheduler {
     #showAllInterface;
     #dayFactor = 1.0/(1000*60*60*24);
+    #rule;
 
-    constructor(readerData, showAllInterface) {
+    constructor(readerSchedule, showAllInterface) {
         this.#showAllInterface = showAllInterface;
-        // Import ruleset
+        this.updateRuleset(readerSchedule);
+    }
+
+    updateRuleset(readerSchedule) {
+        switch (readerSchedule.getRule()) {
+            case "none":
+                this.#rule = () => {return true;};
+                break;
+            case "daily":
+                this.#rule = (now, lastInteraction) => {
+                    return (this.#startOfDay(now) - lastInteraction) > 0;
+                }
+                break;
+            case "hourly":
+                this.#rule = (now, lastInteraction) => {
+                    return (this.#startOfHour(now) - lastInteraction) > 0;
+                }
+                break;
+        }
     }
 
     canShow(lastInteraction) {
@@ -16,8 +35,20 @@ class Scheduler {
             return true;
         }
         const now = new Date();
-        const wasYesterday = (this.#startOfDay(now) - lastInteraction) > 0;
-        return wasYesterday;
+        return this.#rule(now, lastInteraction);
+    }
+
+    #lastWeekday(now, intDay) {
+        // Get time of previous named weekday
+        // Just writing some methods. Probably need end of day for this
+        let timeToday = this.#startOfDay(now);
+        let today = now.getDay(); // 0 = Sunday .. 6 = Saturday
+    }
+
+    #startOfHour(now) {
+        let start = new Date(now.getTime());
+        start.setHours(now.getHours(), 0, 0, 0);
+        return start.getTime();
     }
 
     #startOfDay(now) {

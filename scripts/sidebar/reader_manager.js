@@ -17,7 +17,7 @@ class ReaderManager {
         this.#parentInterface = parentInterface;
         this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
         this.#readerData = this.#createReaderData(readerObject);
-        this.#schedule = new Scheduler(this.#readerData, showAllInterface);
+        this.#schedule = new Scheduler(this.#readerData.getSchedule(), showAllInterface);
         this.#createReaderVisuals();
     }
 
