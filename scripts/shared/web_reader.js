@@ -29,8 +29,11 @@ class WebReader {
     
     updateBookmark(data) {
         let object = this._selectCorrespondingStorage(data.url);
-        if (!object.isValid())
-            return false;
+        if (!object.isValid()) {
+            data.doCollapse = true;
+            return true;
+        }
+        data.doCollapse = false;
         return object.addAutomatic(data);
     }
     
@@ -152,12 +155,14 @@ class WebReaderBackground extends WebReader {
     }
 
     async updateBookmark(data, doClean = true) {
+        let wasValid = this._currentReader.isValid();
         let bookmarkIsNew = super.updateBookmark(data);
         let favIconIsNew = await this._updateFavIcon(data);
         if (!favIconIsNew & doClean) {
             delete data.favIcon;
         }
-        return bookmarkIsNew | favIconIsNew;
+        let sendReset = wasValid & data.doCollapse;
+        return bookmarkIsNew | favIconIsNew | sendReset;
     }
 
     async _registerFavIcon(data) {
@@ -224,7 +229,12 @@ class WebReaderSidebar extends WebReader {
     }
 
     async updateBookmark(data) {
-        super.updateBookmark(data);
+        if (data.doCollapse) {
+            this._updateCurrentReader(new ReaderClassDummy());
+            this.relistViewers();
+        } else {
+            super.updateBookmark(data);
+        }
         this._updateFavIcon(data);
     }
 
