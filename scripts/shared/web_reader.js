@@ -187,6 +187,7 @@ class WebReaderBackground extends WebReader {
     }
     
     saveProgress() {
+        return;
         if (this._savingSuspended)
             return;
         let comicDataObject = buildWebReaderObject(this._readerStorage.getList());
