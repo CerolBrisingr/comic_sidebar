@@ -1,8 +1,8 @@
 import { HtmlContainer } from "./html_container.js"
 import {ReaderData} from "./reader_data.js"
 import {ReaderManager} from "../sidebar/reader_manager.js"
-import {importBackup, unpackReaderObjectList, getShowAll} from "./backup_import.js"
-import {saveBackup, buildWebReaderObject, saveShowAll} from "./backup_export.js"
+import {importBackup, unpackReaderObjectList} from "./backup_import.js"
+import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
@@ -29,8 +29,11 @@ class WebReader {
     
     updateBookmark(data) {
         let object = this._selectCorrespondingStorage(data.url);
-        if (!object.isValid())
-            return false;
+        if (!object.isValid()) {
+            data.doCollapse = true;
+            return true;
+        }
+        data.doCollapse = false;
         return object.addAutomatic(data);
     }
     
@@ -152,12 +155,14 @@ class WebReaderBackground extends WebReader {
     }
 
     async updateBookmark(data, doClean = true) {
+        let wasValid = this._currentReader.isValid();
         let bookmarkIsNew = super.updateBookmark(data);
         let favIconIsNew = await this._updateFavIcon(data);
         if (!favIconIsNew & doClean) {
             delete data.favIcon;
         }
-        return bookmarkIsNew | favIconIsNew;
+        let sendReset = wasValid & data.doCollapse;
+        return bookmarkIsNew | favIconIsNew | sendReset;
     }
 
     async _registerFavIcon(data) {
@@ -210,7 +215,8 @@ class WebReaderSidebar extends WebReader {
         return new ReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#container
+            this.#container, 
+            this.#showAllInterface
         )
     }
 
@@ -222,7 +228,12 @@ class WebReaderSidebar extends WebReader {
     }
 
     async updateBookmark(data) {
-        super.updateBookmark(data);
+        if (data.doCollapse) {
+            this._updateCurrentReader(new ReaderClassDummy());
+            this.relistViewers();
+        } else {
+            super.updateBookmark(data);
+        }
         this._updateFavIcon(data);
     }
 
@@ -232,7 +243,7 @@ class WebReaderSidebar extends WebReader {
             delete data.favIcon;
             return false;
         }
-        const info = await this.#favIconSubscriber.setValue(urlPieces.host, data.favIcon);
+        await this.#favIconSubscriber.setValue(urlPieces.host, data.favIcon);
         this.setFavIconFromKey(urlPieces.host, data.favIcon);
     }
     
@@ -265,6 +276,12 @@ class WebReaderSidebar extends WebReader {
         }
     }
 
+    _selectCorrespondingStorage(url) {
+        let newReader = super._selectCorrespondingStorage(url);
+        this.relistViewers();
+        return newReader;
+    }
+
     relistViewers() {
         this._setContainerContent();
     }
@@ -276,9 +293,15 @@ class WebReaderSidebar extends WebReader {
                 continue;
             if (!ReaderFilter.fits(manager))
                 continue;
+            if (!this.#canShow(manager))
+                continue;
             visualsList.push(manager.getVisuals());
         }
         this.#container.replaceChildren(...visualsList);
+    }
+
+    #canShow(manager) {
+        return manager.canShow() | manager === this._currentReader;
     }
     
     async importInterface(readerObjectList) {
@@ -309,70 +332,22 @@ class WebReaderInterface {
     }
 }
 
-class ShowAllInterface {
-    #showAllUi;
-    #showAll;
-
-    constructor(showAll = undefined) {
-        this.#showAllUi = showAll;
-        this.#setUpButton();
-        this.#initValue();
-    }
-
-    async #initValue() {
-        const value = await getShowAll();
-        this.#showAll = value;
-        this.#setShowAllVisuals(value);
-    }
-
-    #setUpButton() {
-        this.#showAllUi.icon.style.visibility = "visible";
-        this.#showAllUi.button.onclick = () => {
-            this.setValue(!this.#showAll);
-        };
-    }
-
-    #setShowAllVisuals(value) {
-        if (!this.#showAllUi)
-            return;
-        if (value) {
-            this.#setTrueVisuals();
-        } else {
-            this.#setFalseVisuals();
-        }
-    }
-
-    #setTrueVisuals() {
-        this.#showAllUi.icon.src = "../../icons/eye.svg";
-        this.#showAllUi.label.innerText = "Showing hidden";
-    }
-
-    #setFalseVisuals() {
-        this.#showAllUi.icon.src = "../../icons/eye-slash.svg";
-        this.#showAllUi.label.innerText = "Show hidden";
-
-    }
-
-    getValue() {
-        return this.#showAll;
-    }
-
-    setValue(value) {
-        value = Boolean(value);
-        this.#setShowAllVisuals(value);
-        this.#showAll = value;
-        saveShowAll(value);
-    }
-}
-
 class ReaderClassDummy {
     constructor() {}
     
     isValid() {
         return false;
     }
+
+    getLabel() {
+        return "Dummy";
+    }
     
     urlIsCompatible(url) {
+        return false;
+    }
+
+    canShow() {
         return false;
     }
     
@@ -380,4 +355,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReaderSidebar, WebReaderBackground, ReaderSort, ShowAllInterface}
+export {WebReaderSidebar, WebReaderBackground, ReaderSort}
