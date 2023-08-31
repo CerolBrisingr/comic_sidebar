@@ -236,7 +236,7 @@ function isArray(list) {
 
 class ReaderSchedule {
     #possibleRules = ["none", "daily", "hourly"];
-    #rule = "hourly";
+    #rule = "none";
     
     constructor(rule) {
         if (rule === undefined)
