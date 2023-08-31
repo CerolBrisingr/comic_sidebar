@@ -192,7 +192,6 @@ class WebReaderBackground extends WebReader {
     }
     
     saveProgress() {
-        return;
         if (this._savingSuspended)
             return;
         let comicDataObject = buildWebReaderObject(this._readerStorage.getList());
@@ -244,7 +243,7 @@ class WebReaderSidebar extends WebReader {
             delete data.favIcon;
             return false;
         }
-        const info = await this.#favIconSubscriber.setValue(urlPieces.host, data.favIcon);
+        await this.#favIconSubscriber.setValue(urlPieces.host, data.favIcon);
         this.setFavIconFromKey(urlPieces.host, data.favIcon);
     }
     
