@@ -3,7 +3,6 @@ import { ReaderEditor } from "./reader_editor.js";
 
 let readerEditor;
 let port;
-console.log("Load");
 
 if (document.readySate === "loading") {
     document.addEventListener('DOMContentLoaded', function (event) {
@@ -28,7 +27,6 @@ function receive(message) {
         return;
     }
     if (message.hasOwnProperty("import")) {
-        console.log("Import");
         readerEditor.importLink(message.import, sendImport);
         return;
     }
@@ -54,7 +52,6 @@ function closeMe() {
 }
 
 function setUpReaderEditor() {
-    readerEditor = undefined;
     let fullFrame = document.getElementById('new_comic_input_frame');
     let fullLink = document.getElementById('new_comic_full_link');
     let label = document.getElementById('new_comic_label');
