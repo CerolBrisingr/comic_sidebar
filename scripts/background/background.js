@@ -3,6 +3,7 @@ import {ListeningPort} from "./listening_port.js"
 import {WebReaderBackground} from "../shared/web_reader.js"
 import {getActiveState} from "../shared/backup_import.js"
 import {saveActiveState} from "../shared/backup_export.js"
+import { ReaderEditorControl } from "../editor/reader_editor_control.js"
 
 let isActive = true;
 let isSetUp = false;
@@ -39,7 +40,10 @@ async function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("requestPageAddition")) {
-        let readerObject = message.requestPageAddition;
+        let data = message.requestPageAddition;
+        ReaderEditorControl.importLink(data);
+        // TODO: adjust to new input
+        return;
         let readerId = await webReader.registerPage(readerObject);
         if (readerId === -1)
             return;

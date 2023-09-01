@@ -1,41 +1,6 @@
 import {dissectUrl} from "../shared/url.js"
 
 class ReaderEditor {
-    constructor() {
-        throw new Error("Static class, do not instantiate!")
-    }
-    
-    static editor;
-    
-    static setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
-        ReaderEditor.editor = new Editor(fullFrame,
-            fullLink,
-            label,
-            prefix,
-            linkLabel,
-            textMsg,
-            errorMsg,
-            cancelBtn,
-            okBtn,
-            startDel,
-            confirmDel);
-    }
-    
-    static importLink(data, fktFinalize) {
-        if (ReaderEditor.editor === undefined)
-            return;
-        ReaderEditor.editor.importLink(data, fktFinalize);
-    }
-    
-    static updateLink(readerData, fktFinalize) {
-        if (ReaderEditor.editor === undefined)
-            return;
-        ReaderEditor.editor.updateLink(readerData, fktFinalize);
-    }
-    
-}
-
-class Editor {
     #timestamp;
 
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
@@ -44,7 +9,6 @@ class Editor {
                 throw("Constructor input incomplete, cannot build ReaderEditor instance");
             }
         }
-        
         this.fullFrame = fullFrame;
         
         this.fullLinkObject = fullLink;

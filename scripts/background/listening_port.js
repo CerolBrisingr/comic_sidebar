@@ -49,8 +49,9 @@ class ListeningPort {
     sendMessage(message) {
         if (!this.#connectionAlive)
             return;
-        for (let connection of this.#connected.values())
+        for (let connection of this.#connected.values()) {
             connection.postMessage(message);
+        }
     }
     
     #contacted(port) {

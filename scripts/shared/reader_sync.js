@@ -81,7 +81,8 @@ class ReaderSyncCore extends ReaderSync {
         }
     }
     
-    #editRequestHandler(readerEssentials) {
+    #editRequestHandler(readerData) {
+        // TODO: adjust to new input
         if (readerEssentials.hasOwnProperty("deleteMe")) {
             this.#deleteRequestHandler(readerEssentials.deleteMe);
             return;
@@ -119,8 +120,8 @@ class ReaderSyncSatellite extends ReaderSync {
     }
     
     
-    sendEditRequest(readerEssentials) {
-        this.port.sendMessage({editRequest: readerEssentials});
+    sendEditRequest(readerData) {
+        this.port.sendMessage({editRequest: readerData});
     }
     
     sendBookmarkLabelUpdateRequest(url, newLabel) {

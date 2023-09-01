@@ -192,6 +192,7 @@ class WebReaderBackground extends WebReader {
     }
     
     saveProgress() {
+        return;
         if (this._savingSuspended)
             return;
         let comicDataObject = buildWebReaderObject(this._readerStorage.getList());
@@ -249,7 +250,6 @@ class WebReaderSidebar extends WebReader {
     
     _updateFavIcon(data) {
         if (!data.hasOwnProperty("favIcon")) {
-            console.log("No favIcon packaged");
             return;
         }
         const urlPieces = dissectUrl(data.url);
