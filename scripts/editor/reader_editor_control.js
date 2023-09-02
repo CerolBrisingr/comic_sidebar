@@ -5,9 +5,13 @@ class ReaderEditorControl {
         throw new Error("Static class, do not instantiate!")
     }
     
-    static port = new ListeningPort(ReaderEditorControl.receive, "editor_form");
+    static port;
     static fktFinalize;
-    static promise;
+
+    static setUpController() {
+        console.log("Setting up editor controller");
+        ReaderEditorControl.port = new ListeningPort(ReaderEditorControl.receive, "editor_form");
+    }
 
     static receive(message) {
         if (message === "setUp") {
@@ -16,6 +20,7 @@ class ReaderEditorControl {
             return;
         }
         if (message.hasOwnProperty("data")) {
+            console.log("create/update");
             ReaderEditorControl.fktFinalize(message.data);
             return;
         }
@@ -44,12 +49,16 @@ class ReaderEditorControl {
     }
     
     static async importLink(data, fktFinalize) {
+        if (ReaderEditorControl.port === undefined)
+            return;
         await ReaderEditorControl.createNewEditorWindow();
         ReaderEditorControl.fktFinalize = fktFinalize;
         ReaderEditorControl.port.sendMessage({import: data});
     }
     
     static async updateLink(readerObjectLike, fktFinalize) {
+        if (ReaderEditorControl.port === undefined)
+            return;
         await ReaderEditorControl.createNewEditorWindow();
         ReaderEditorControl.fktFinalize = fktFinalize;
         ReaderEditorControl.port.sendMessage({update: readerObjectLike});

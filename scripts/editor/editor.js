@@ -3,6 +3,7 @@ import { ReaderEditor } from "./reader_editor.js";
 
 let readerEditor;
 let port;
+console.log("Loading editor script");
 
 if (document.readySate === "loading") {
     document.addEventListener('DOMContentLoaded', function (event) {
