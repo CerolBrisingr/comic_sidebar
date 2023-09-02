@@ -49,10 +49,10 @@ class ReaderEditorControl {
         ReaderEditorControl.port.sendMessage({import: data});
     }
     
-    static async updateLink(readerData, fktFinalize) {
+    static async updateLink(readerObjectLike, fktFinalize) {
         await ReaderEditorControl.createNewEditorWindow();
         ReaderEditorControl.fktFinalize = fktFinalize;
-        ReaderEditorControl.port.sendMessage({update: readerData});
+        ReaderEditorControl.port.sendMessage({update: readerObjectLike});
     }
     
 }

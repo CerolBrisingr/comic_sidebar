@@ -151,7 +151,7 @@ class ReaderEditor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(readerData, fktFinalize) {
+    updateLink(readerObjectLike, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -161,18 +161,18 @@ class ReaderEditor {
         this.okBtn.innerText = "Update Reader";
         this.#timestamp = undefined;
         
-        let url = readerData.getMostRecentAutomaticUrl();
+        let url = readerObjectLike.mostRecentAutomaticUrl;
         if (url === undefined) {
             this.openEditor();
             return;
         }
         this.favIcon = undefined;
         this.fullLink = url;
-        this.label = readerData.getLabel();
+        this.label = readerObjectLike.label;
         this.setUserMessage("", "");
         this.enableInterface();
         this.#setDeleteSectionVisibility("idle");
-        this.prefix = readerData.getPrefixMask();
+        this.prefix = readerObjectLike.prefix_mask;
     }
     
     finalize() {

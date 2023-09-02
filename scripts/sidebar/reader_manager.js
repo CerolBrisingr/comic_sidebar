@@ -55,7 +55,7 @@ class ReaderManager {
     }
     
     prepareReaderEdit() {
-        this.#readerSync.sendEditRequest(this.#readerData);
+        this.#readerSync.sendEditRequest();
         this.expand();
     }
     
