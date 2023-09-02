@@ -191,9 +191,10 @@ class ReaderEditor {
         return {
             url: this.fullLink,
             label: this.label,
-            prefix: this.prefix,
+            prefix_mask: this.prefix,
             time: this.#timestamp,
-            favIcon: this.favIcon
+            favIcon: this.favIcon,
+            schedule: "none"
         }
     }
     

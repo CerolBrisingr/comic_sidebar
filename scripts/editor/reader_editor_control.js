@@ -15,6 +15,10 @@ class ReaderEditorControl {
             window.dispatchEvent(evt);
             return;
         }
+        if (message.hasOwnProperty("data")) {
+            ReaderEditorControl.fktFinalize(message.data);
+            return;
+        }
     }
 
     static async createNewEditorWindow() {

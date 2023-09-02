@@ -41,14 +41,7 @@ async function receiveMessage(message) {
     }
     if (message.hasOwnProperty("requestPageAddition")) {
         let data = message.requestPageAddition;
-        ReaderEditorControl.importLink(data);
-        // TODO: adjust to new input
-        return;
-        let readerId = await webReader.registerPage(readerObject);
-        if (readerId === -1)
-            return;
-        readerObject.intId = readerId;
-        sbConnection.sendMessage({addPage: readerObject});
+        ReaderEditorControl.importLink(data, handleImport);
         return;
     }
     if (message === "requestReaderTransmission") {
@@ -61,6 +54,15 @@ async function receiveMessage(message) {
     }
     console.log("Don't know how to act on this message:");
     console.log(message);
+}
+
+async function handleImport(readerObjectLike) {
+    let readerId = await webReader.registerPage(readerObjectLike);
+    if (readerId === -1)
+        return;
+    readerObjectLike.intId = readerId;
+    sbConnection.sendMessage({addPage: readerObjectLike});
+    return;
 }
 
 function receiveOptionOrBrowserAction(message) {

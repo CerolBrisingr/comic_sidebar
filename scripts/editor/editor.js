@@ -37,13 +37,11 @@ function receive(message) {
 }
 
 function sendImport(data) {
-    console.log("sendImport");
-    console.log(data);
+    port.sendMessage({data: data});
 }
 
 function sendUpdate(data) {
-    console.log("sendUpdate");
-    console.log(data);
+    port.sendMessage({data:data});
 }
 
 function closeMe() {
