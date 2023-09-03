@@ -19,8 +19,7 @@ let webReader;
 let sortControls;
 let isSetUp = false;
 // Connection to background script
-let bsConnection = new SubscriberPort(receiveMessage);;
-console.log("Loading sidebar script");
+let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
     requestWebReader();

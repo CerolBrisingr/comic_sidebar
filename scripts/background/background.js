@@ -13,8 +13,6 @@ let baConnection = new ListeningPort(receiveOptionOrBrowserAction, "browser_acti
 let opConnection = new ListeningPort(receiveOptionOrBrowserAction, "options_script");
 let webReader = new WebReaderBackground();
 
-console.log("Loading background script");
-
 async function initialize() {
     isActive = await getActiveState();
     updateBrowserAction();

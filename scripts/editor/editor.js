@@ -3,7 +3,6 @@ import { ReaderEditor } from "./reader_editor.js";
 
 let readerEditor;
 let port;
-console.log("Loading editor script");
 
 if (document.readySate === "loading") {
     document.addEventListener('DOMContentLoaded', function (event) {
@@ -15,9 +14,7 @@ if (document.readySate === "loading") {
 
 function setUpScript() {
     setUpReaderEditor()
-    document.getElementById("closeme").addEventListener("click", () => {
-        closeMe();
-    });
+    window.addEventListener("blur", () => {closeMe();});
     port = new SubscriberPort(receive, "editor_form");
     port.sendMessage("setUp");
 }
@@ -28,21 +25,18 @@ function receive(message) {
         return;
     }
     if (message.hasOwnProperty("import")) {
-        readerEditor.importLink(message.import, sendImport);
+        readerEditor.importLink(message.import, finalize);
         return;
     }
     if (message.hasOwnProperty("update")) {
-        readerEditor.updateLink(message.update, sendUpdate);
+        readerEditor.updateLink(message.update, finalize);
         return;
     }
 }
 
-function sendImport(data) {
+function finalize(data) {
     port.sendMessage({data: data});
-}
-
-function sendUpdate(data) {
-    port.sendMessage({data:data});
+    closeMe();
 }
 
 function closeMe() {

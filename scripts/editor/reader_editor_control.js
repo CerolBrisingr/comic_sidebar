@@ -9,7 +9,6 @@ class ReaderEditorControl {
     static fktFinalize;
 
     static setUpController() {
-        console.log("Setting up editor controller");
         ReaderEditorControl.port = new ListeningPort(ReaderEditorControl.receive, "editor_form");
     }
 
@@ -20,7 +19,6 @@ class ReaderEditorControl {
             return;
         }
         if (message.hasOwnProperty("data")) {
-            console.log("create/update");
             ReaderEditorControl.fktFinalize(message.data);
             return;
         }
