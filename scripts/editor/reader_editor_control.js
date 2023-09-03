@@ -45,21 +45,21 @@ class ReaderEditorControl {
             window.addEventListener("myEvent", listener);
         })
     }
-    
-    static async importLink(data, fktFinalize) {
+
+    static async #startEditor(command, data, fktFinalize) {
         if (ReaderEditorControl.port === undefined)
             return;
         await ReaderEditorControl.createNewEditorWindow();
         ReaderEditorControl.fktFinalize = fktFinalize;
-        ReaderEditorControl.port.sendMessage({import: data});
+        ReaderEditorControl.port.sendMessage({[command]: data});
+    }
+    
+    static async importLink(data, fktFinalize) {
+        ReaderEditorControl.#startEditor("import", data, fktFinalize);
     }
     
     static async updateLink(readerObjectLike, fktFinalize) {
-        if (ReaderEditorControl.port === undefined)
-            return;
-        await ReaderEditorControl.createNewEditorWindow();
-        ReaderEditorControl.fktFinalize = fktFinalize;
-        ReaderEditorControl.port.sendMessage({update: readerObjectLike});
+        ReaderEditorControl.#startEditor("update", readerObjectLike, fktFinalize);
     }
     
 }
