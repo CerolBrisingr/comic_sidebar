@@ -33,7 +33,7 @@ class ReaderEditor {
         let fktConfirmDel = () => {this.#confirmDelete();};
         this.confirmDeleteBtn = new HideShowButton(confirmDel, fktConfirmDel, false);
         
-        this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
+        this.prefixObject.addEventListener("input", () => {this.updateLabelPreview()});
         this.openEditor();
     }
     
@@ -51,7 +51,7 @@ class ReaderEditor {
     }
     set prefix(newText) {
         this.prefixObject.value = newText;
-        this.updateLinkLabel();
+        this.updateLabelPreview();
     }
     get prefix() {
         return this.prefixObject.value;
@@ -126,7 +126,7 @@ class ReaderEditor {
         this.prefixObject.disabled = false;
     }
     
-    importLink(data, fktFinalize) {
+    createReaderEntry(data, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -151,7 +151,7 @@ class ReaderEditor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(readerObjectLike, fktFinalize) {
+    updateReaderEntry(readerObjectLike, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -176,18 +176,23 @@ class ReaderEditor {
     }
     
     finalize() {
+        // Successful confiuration. Send data
         let readerEssentials = this.gatherData();
         this.fktFinalize(readerEssentials);
         this.openEditor();
     }
     
     terminate() {
+        // User confirmed delete option. Send order
         let readerEssentials = {deleteMe: true};
         this.fktFinalize(readerEssentials);
         this.openEditor();
     }
     
     gatherData() {
+        // Building readerObjectLike object
+        // Can be used for loading intstanciating ReaderData()
+        // Has extra properties depending on context
         return {
             url: this.fullLink,
             label: this.label,
@@ -210,7 +215,7 @@ class ReaderEditor {
         this.isOpen = true;
     }
     
-    updateLinkLabel() {
+    updateLabelPreview() {
         let urlPieces = dissectUrl(this.fullLink, this.prefix);
         if (urlPieces === undefined) {
             this.okBtn.disabled = true;

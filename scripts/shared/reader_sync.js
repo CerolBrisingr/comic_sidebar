@@ -85,7 +85,7 @@ class ReaderSyncCore extends ReaderSync {
     #editRequestHandler(readerData) {
         let readerObject = readerData.returnAsObject();
         readerObject.mostRecentAutomaticUrl = readerData.getMostRecentAutomaticUrl();
-        ReaderEditorControl.updateLink(readerObject, (readerObjectLike) => {
+        ReaderEditorControl.updateReaderEntry(readerObject, (readerObjectLike) => {
             this.#handleReaderEdit(readerObjectLike);
         });
     }

@@ -42,7 +42,7 @@ async function receiveMessage(message) {
     }
     if (message.hasOwnProperty("requestPageAddition")) {
         let data = message.requestPageAddition;
-        ReaderEditorControl.importLink(data, handleImport);
+        ReaderEditorControl.createReaderEntry(data, handleImport);
         return;
     }
     if (message === "requestReaderTransmission") {

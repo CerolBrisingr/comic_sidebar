@@ -25,11 +25,11 @@ function receive(message) {
         return;
     }
     if (message.hasOwnProperty("import")) {
-        readerEditor.importLink(message.import, finalize);
+        readerEditor.createReaderEntry(message.import, finalize);
         return;
     }
     if (message.hasOwnProperty("update")) {
-        readerEditor.updateLink(message.update, finalize);
+        readerEditor.updateReaderEntry(message.update, finalize);
         return;
     }
 }

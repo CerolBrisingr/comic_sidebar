@@ -86,6 +86,7 @@ function requestUrlRetransmission() {
 }
 
 function requestPageAddition(data) {
+    // data: latest browser tab information
     bsConnection.sendMessage({requestPageAddition: data});
 }
 
@@ -116,7 +117,8 @@ async function executeWebReaderLoading(readerObjectList) {
 
 // Add current page to list
 function addCurrentPage() {
-    // Will urge background to start configuration dialog
+    // Request information about current tab and then
+    // message background script to start configuration dialog
     if (webReader === undefined)
         return;
     UrlListener.findLatestTabUrl()

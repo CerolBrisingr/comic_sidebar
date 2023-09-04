@@ -14,6 +14,7 @@ class ReaderEditorControl {
 
     static receive(message) {
         if (message === "setUp") {
+            // Trigger event for custom listener in awaitSetup()
             const evt = new Event("myEvent");
             window.dispatchEvent(evt);
             return;
@@ -37,6 +38,11 @@ class ReaderEditorControl {
     }
 
     static async awaitSetup() {
+        /* awaitSetup
+        Setting up a listener to a custom event and awaiting trigger.
+        Event will be dispatched once the editor setup script issues
+        it's finished confirmation message.
+        */
         return new Promise((resolve) => {
             const listener = () => {
                 window.removeEventListener("myEvent", listener);
@@ -54,11 +60,11 @@ class ReaderEditorControl {
         ReaderEditorControl.port.sendMessage({[command]: data});
     }
     
-    static async importLink(data, fktFinalize) {
+    static async createReaderEntry(data, fktFinalize) {
         ReaderEditorControl.#startEditor("import", data, fktFinalize);
     }
     
-    static async updateLink(readerObjectLike, fktFinalize) {
+    static async updateReaderEntry(readerObjectLike, fktFinalize) {
         ReaderEditorControl.#startEditor("update", readerObjectLike, fktFinalize);
     }
     
