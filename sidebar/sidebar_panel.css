@@ -31,7 +31,12 @@
 }
 
 .no_draw {
-    display:none;
+    display:none !important;
+}
+
+.edit_link_editor {
+    display: grid;
+    grid-template-columns: auto 1fr;
 }
 
 .bookmark_icon {
