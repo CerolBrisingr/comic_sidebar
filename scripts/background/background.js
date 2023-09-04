@@ -3,6 +3,7 @@ import {ListeningPort} from "./listening_port.js"
 import {WebReaderBackground} from "../shared/web_reader.js"
 import {getActiveState} from "../shared/backup_import.js"
 import {saveActiveState} from "../shared/backup_export.js"
+import { ReaderEditorControl } from "../editor/reader_editor_control.js"
 
 let isActive = true;
 let isSetUp = false;
@@ -16,6 +17,7 @@ async function initialize() {
     isActive = await getActiveState();
     updateBrowserAction();
     await webReader.loadInterface();
+    ReaderEditorControl.setUpController();
     isSetUp = true;
     transmitWebReaderData();
 }
@@ -39,12 +41,8 @@ async function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("requestPageAddition")) {
-        let readerObject = message.requestPageAddition;
-        let readerId = await webReader.registerPage(readerObject);
-        if (readerId === -1)
-            return;
-        readerObject.intId = readerId;
-        sbConnection.sendMessage({addPage: readerObject});
+        let data = message.requestPageAddition;
+        ReaderEditorControl.createReaderEntry(data, handleImport);
         return;
     }
     if (message === "requestReaderTransmission") {
@@ -57,6 +55,15 @@ async function receiveMessage(message) {
     }
     console.log("Don't know how to act on this message:");
     console.log(message);
+}
+
+async function handleImport(readerObjectLike) {
+    let readerId = await webReader.registerPage(readerObjectLike);
+    if (readerId === -1)
+        return;
+    readerObjectLike.intId = readerId;
+    sbConnection.sendMessage({addPage: readerObjectLike});
+    return;
 }
 
 function receiveOptionOrBrowserAction(message) {

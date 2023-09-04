@@ -93,22 +93,22 @@ class WebReader {
         throw new Error("not implemented");
     }
     
-    async registerPage(readerObject) {
+    async registerPage(readerObjectLike) {
         let storageObject 
-            = this._selectCorrespondingStorage(readerObject.url);
+            = this._selectCorrespondingStorage(readerObjectLike.url);
         if (storageObject.isValid()) {
             console.log("Page already registered as " + storageObject.getLabel());
             return -1;
         }
         this._latestId += 1;
-        let newManager = this._createReaderClass(readerObject, this._latestId);
+        let newManager = this._createReaderClass(readerObjectLike, this._latestId);
         if (!newManager.isValid()) {
             console.log("Failed to build comic entry");
             return -1;
         }
         this._readerStorage.saveObject(newManager);
-        await this._registerFavIcon(readerObject);
-        await this.updateBookmark(readerObject, false); // This also updates storage
+        await this._registerFavIcon(readerObjectLike);
+        await this.updateBookmark(readerObjectLike, false); // This also updates storage
         this.relistViewers();
         return this._latestId;
     }
@@ -249,7 +249,6 @@ class WebReaderSidebar extends WebReader {
     
     _updateFavIcon(data) {
         if (!data.hasOwnProperty("favIcon")) {
-            console.log("No favIcon packaged");
             return;
         }
         const urlPieces = dissectUrl(data.url);

@@ -1,41 +1,6 @@
 import {dissectUrl} from "../shared/url.js"
 
 class ReaderEditor {
-    constructor() {
-        throw new Error("Static class, do not instantiate!")
-    }
-    
-    static editor;
-    
-    static setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
-        ReaderEditor.editor = new Editor(fullFrame,
-            fullLink,
-            label,
-            prefix,
-            linkLabel,
-            textMsg,
-            errorMsg,
-            cancelBtn,
-            okBtn,
-            startDel,
-            confirmDel);
-    }
-    
-    static importLink(data, fktFinalize) {
-        if (ReaderEditor.editor === undefined)
-            return;
-        ReaderEditor.editor.importLink(data, fktFinalize);
-    }
-    
-    static updateLink(readerData, fktFinalize) {
-        if (ReaderEditor.editor === undefined)
-            return;
-        ReaderEditor.editor.updateLink(readerData, fktFinalize);
-    }
-    
-}
-
-class Editor {
     #timestamp;
 
     constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
@@ -44,7 +9,6 @@ class Editor {
                 throw("Constructor input incomplete, cannot build ReaderEditor instance");
             }
         }
-        
         this.fullFrame = fullFrame;
         
         this.fullLinkObject = fullLink;
@@ -69,7 +33,7 @@ class Editor {
         let fktConfirmDel = () => {this.#confirmDelete();};
         this.confirmDeleteBtn = new HideShowButton(confirmDel, fktConfirmDel, false);
         
-        this.prefixObject.addEventListener("input", () => {this.updateLinkLabel()});
+        this.prefixObject.addEventListener("input", () => {this.updateLabelPreview()});
         this.openEditor();
     }
     
@@ -87,7 +51,7 @@ class Editor {
     }
     set prefix(newText) {
         this.prefixObject.value = newText;
-        this.updateLinkLabel();
+        this.updateLabelPreview();
     }
     get prefix() {
         return this.prefixObject.value;
@@ -162,7 +126,7 @@ class Editor {
         this.prefixObject.disabled = false;
     }
     
-    importLink(data, fktFinalize) {
+    createReaderEntry(data, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -187,7 +151,7 @@ class Editor {
         this.prefix = urlPieces.base_url;
     }
     
-    updateLink(readerData, fktFinalize) {
+    updateReaderEntry(readerObjectLike, fktFinalize) {
         if (!this.isOpen) {
             console.log("Editor already in use!")
             return;
@@ -197,39 +161,45 @@ class Editor {
         this.okBtn.innerText = "Update Reader";
         this.#timestamp = undefined;
         
-        let url = readerData.getMostRecentAutomaticUrl();
+        let url = readerObjectLike.mostRecentAutomaticUrl;
         if (url === undefined) {
             this.openEditor();
             return;
         }
         this.favIcon = undefined;
         this.fullLink = url;
-        this.label = readerData.getLabel();
+        this.label = readerObjectLike.label;
         this.setUserMessage("", "");
         this.enableInterface();
         this.#setDeleteSectionVisibility("idle");
-        this.prefix = readerData.getPrefixMask();
+        this.prefix = readerObjectLike.prefix_mask;
     }
     
     finalize() {
+        // Successful confiuration. Send data
         let readerEssentials = this.gatherData();
         this.fktFinalize(readerEssentials);
         this.openEditor();
     }
     
     terminate() {
+        // User confirmed delete option. Send order
         let readerEssentials = {deleteMe: true};
         this.fktFinalize(readerEssentials);
         this.openEditor();
     }
     
     gatherData() {
+        // Building readerObjectLike object
+        // Can be used for loading intstanciating ReaderData()
+        // Has extra properties depending on context
         return {
             url: this.fullLink,
             label: this.label,
-            prefix: this.prefix,
+            prefix_mask: this.prefix,
             time: this.#timestamp,
-            favIcon: this.favIcon
+            favIcon: this.favIcon,
+            schedule: "none"
         }
     }
     
@@ -245,7 +215,7 @@ class Editor {
         this.isOpen = true;
     }
     
-    updateLinkLabel() {
+    updateLabelPreview() {
         let urlPieces = dissectUrl(this.fullLink, this.prefix);
         if (urlPieces === undefined) {
             this.okBtn.disabled = true;

@@ -1,5 +1,6 @@
 import {SubscriberPort} from "../sidebar/subscriber_port.js"
 import {ListeningPort} from "../background/listening_port.js"
+import { ReaderEditorControl } from "../editor/reader_editor_control.js";
 
 class ReaderSync {
     intId;
@@ -59,8 +60,8 @@ class ReaderSyncCore extends ReaderSync {
             this.#unpinRequestHandler(message.unpinRequest);
             return;
         }
-        if (message.hasOwnProperty("editRequest")) {
-            this.#editRequestHandler(message.editRequest);
+        if (message === "editRequest") {
+            this.#editRequestHandler(this.#readerData);
             return;
         }
         if (message.hasOwnProperty("updateBookmarkLabelRequest")) {
@@ -81,13 +82,21 @@ class ReaderSyncCore extends ReaderSync {
         }
     }
     
-    #editRequestHandler(readerEssentials) {
-        if (readerEssentials.hasOwnProperty("deleteMe")) {
-            this.#deleteRequestHandler(readerEssentials.deleteMe);
+    #editRequestHandler(readerData) {
+        let readerObject = readerData.returnAsObject();
+        readerObject.mostRecentAutomaticUrl = readerData.getMostRecentAutomaticUrl();
+        ReaderEditorControl.updateReaderEntry(readerObject, (readerObjectLike) => {
+            this.#handleReaderEdit(readerObjectLike);
+        });
+    }
+
+    #handleReaderEdit(readerObjectLike) {
+        if (readerObjectLike.hasOwnProperty("deleteMe")) {
+            this.#deleteRequestHandler(readerObjectLike.deleteMe);
             return;
         }
-        this.#readerData.editReader(readerEssentials);
-        this.port.sendMessage({editCommand: readerEssentials});
+        this.#readerData.editReader(readerObjectLike);
+        this.port.sendMessage({editCommand: readerObjectLike});
     }
     
     #deleteRequestHandler(deleteMe) {
@@ -119,8 +128,8 @@ class ReaderSyncSatellite extends ReaderSync {
     }
     
     
-    sendEditRequest(readerEssentials) {
-        this.port.sendMessage({editRequest: readerEssentials});
+    sendEditRequest() {
+        this.port.sendMessage("editRequest");
     }
     
     sendBookmarkLabelUpdateRequest(url, newLabel) {

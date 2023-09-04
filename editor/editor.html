@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="editor.css">
+        <meta charset="utf-8">
+        <script type="module" src="../scripts/editor/editor.js"></script>
+    </head>
+<body>
+    <div class="input_frame no_draw" id="new_comic_input_frame">
+        <table>
+            <tr>
+                <th>Link</th>
+                <td id="new_comic_full_link">Full_Link</td>
+            </tr>
+            <tr>
+                <th>Comic Label</th>
+                <td><input class="td" id="new_comic_label" type="text" value="Comic_Label"></td>
+            </tr>
+            <tr>
+                <th>Link Prefix</th>
+                <td><input class="td" id="new_comic_prefix" type="text" value="Link_Prefix"></td>
+            </tr>
+            <tr>
+                <th>Link Label</th>
+                <td id="new_comic_link_label">Link_Label_Format</td>
+            </tr>
+        </table>
+        <div>
+            <span id="new_comic_message">Error: </span>
+            <span id="new_comic_error" style="color:red">Hope you're debugging!</span>
+        </div>
+        <button id="new_comic_cancel">Cancel</button>
+        <button id="new_comic_finalize">Add Comic</button>
+        <button id="comic_start_delete" style="float: right">Delete</button>
+        <button id="comic_confirm_delete" style="float: right">Yes</button>
+    </div>
+</body>

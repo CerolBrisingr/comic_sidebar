@@ -138,9 +138,9 @@ class ReaderData {
         return true;
     }
     
-    editReader(readerEssentials) {
-        this.#label = readerEssentials.label;
-        this.#prefixMask = readerEssentials.prefix;
+    editReader(readerObjectLike) {
+        this.#label = readerObjectLike.label;
+        this.#prefixMask = readerObjectLike.prefix_mask;
         this.#parentInterface.saveProgress();
     }
     

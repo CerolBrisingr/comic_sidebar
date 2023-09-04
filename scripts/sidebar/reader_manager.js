@@ -1,7 +1,6 @@
 import {ReaderVisuals} from "./reader_visuals.js"
 import {ReaderData} from "../shared/reader_data.js"
 import {ReaderSync} from "../shared/reader_sync.js"
-import {ReaderEditor} from "./reader_editor.js"
 import { Scheduler } from "../shared/schedule.js"
 
 class ReaderManager {
@@ -56,10 +55,7 @@ class ReaderManager {
     }
     
     prepareReaderEdit() {
-        let fktForward = (readerEssentials) => {
-            this.#readerSync.sendEditRequest(readerEssentials);
-        };
-        ReaderEditor.updateLink(this.#readerData, fktForward);
+        this.#readerSync.sendEditRequest();
         this.expand();
     }
     

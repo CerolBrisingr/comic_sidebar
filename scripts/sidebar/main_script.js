@@ -1,4 +1,3 @@
-import {ReaderEditor} from "./reader_editor.js"
 import {WebReaderSidebar} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
@@ -23,7 +22,6 @@ let isSetUp = false;
 let bsConnection = new SubscriberPort(receiveMessage);
 
 document.addEventListener('DOMContentLoaded', function () {
-    setUpReaderEditor();
     requestWebReader();
 });
 
@@ -69,22 +67,6 @@ function setUpDropdownMenu() {
         name, url, latest, oldest);
 }
 
-function setUpReaderEditor() {
-    let fullFrame = document.getElementById('new_comic_input_frame');
-    let fullLink = document.getElementById('new_comic_full_link');
-    let label = document.getElementById('new_comic_label');
-    let prefix = document.getElementById('new_comic_prefix');
-    let linkLabel = document.getElementById('new_comic_link_label');
-    let textMsg = document.getElementById('new_comic_message');
-    let errorMsg = document.getElementById('new_comic_error');
-    let cancelBtn = document.getElementById('new_comic_cancel');
-    let okBtn = document.getElementById('new_comic_finalize');
-    let startDel = document.getElementById('comic_start_delete');
-    let confirmDel = document.getElementById('comic_confirm_delete');
-    ReaderEditor.setUpEditor(fullFrame, fullLink, label, prefix, linkLabel, 
-        textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel);
-}
-
 function setUpWebReader(readerObjectList) {
     if (readerObjectList === undefined)
         return;
@@ -103,14 +85,9 @@ function requestUrlRetransmission() {
     bsConnection.sendMessage("urlRetransmissionRequest");
 }
 
-function requestPageAddition(readerEssentials) {
-    let readerObject = {
-        prefix_mask: readerEssentials.prefix,
-        label: readerEssentials.label,
-        url: readerEssentials.url,
-        time: readerEssentials.time,
-        favIcon: readerEssentials.favIcon};
-    bsConnection.sendMessage({requestPageAddition: readerObject});
+function requestPageAddition(data) {
+    // data: latest browser tab information
+    bsConnection.sendMessage({requestPageAddition: data});
 }
 
 function requestWebReader() {
@@ -140,12 +117,13 @@ async function executeWebReaderLoading(readerObjectList) {
 
 // Add current page to list
 function addCurrentPage() {
-    // Will start configuration dialog and then hand result over to background script
+    // Request information about current tab and then
+    // message background script to start configuration dialog
     if (webReader === undefined)
         return;
     UrlListener.findLatestTabUrl()
         .then((data) => {
-            ReaderEditor.importLink(data, requestPageAddition)
+            requestPageAddition(data);
             }, onError);
 }
 
