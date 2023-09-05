@@ -8,12 +8,12 @@ class ReaderLine {
     #frame;
     #bookmarkContainer;
 
-    constructor(managerInterface, label) {
+    constructor(managerInterface, label, favIcon) {
         this.#managerInterface = managerInterface;
         this.#buildFrame();
 
         this.#addExpandButton();
-        this.#addLink(label);
+        this.#addLink(label, favIcon);
         this.#addSettingsButton();
 
         this.#addBookmarkContainer();
@@ -33,8 +33,8 @@ class ReaderLine {
         });
     }
 
-    #addLink(label) {
-        this.#link = IconLink.getReader(label);
+    #addLink(label, favIcon) {
+        this.#link = IconLink.getReader(label, favIcon);
         this.#link.appendTo(this.#frame);
     }
 
@@ -312,9 +312,11 @@ class IconLink {
     #link;
     #label;
 
-    static getReader(label) {
+    static getReader(label, favIcon) {
+        if (favIcon === undefined)
+            favIcon = "../../icons/globe.svg";
         let href = "#";
-        let iconLink = new IconLink(href, label, "../../icons/globe.svg");
+        let iconLink = new IconLink(href, label, favIcon);
         iconLink.addImgClass("thumbnail_icon");
         return iconLink;
     }

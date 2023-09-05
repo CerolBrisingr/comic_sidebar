@@ -45,7 +45,6 @@ function closeMe() {
 }
 
 function setUpReaderEditor() {
-    let fullFrame = document.getElementById('new_comic_input_frame');
     let fullLink = document.getElementById('new_comic_full_link');
     let label = document.getElementById('new_comic_label');
     let prefix = document.getElementById('new_comic_prefix');
@@ -56,7 +55,8 @@ function setUpReaderEditor() {
     let okBtn = document.getElementById('new_comic_finalize');
     let startDel = document.getElementById('comic_start_delete');
     let confirmDel = document.getElementById('comic_confirm_delete');
-    readerEditor = new ReaderEditor(fullFrame, fullLink, label, prefix, linkLabel, 
-        textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel);
+    let schedule = document.getElementsByName('schedule');
+    readerEditor = new ReaderEditor(fullLink, label, prefix, linkLabel, 
+        textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel, schedule);
 }
 

@@ -22,9 +22,9 @@ class ReaderVisuals {
         return this.#listing;
     }
     
-    updateListing(readerData) {
+    updateListing(readerData, favIcon=undefined) {
         this.#listing.replaceChildren();
-        this.#addReaderLine(readerData.getLabel());
+        this.#addReaderLine(readerData.getLabel(), favIcon);
         this.updateReaderUrls(readerData);
     }
 
@@ -32,8 +32,8 @@ class ReaderVisuals {
         this.#readerLine.updateFavIcon(src);
     }
 
-    #addReaderLine(readerLabel) {
-        this.#readerLine = new ReaderLine(this.#managerInterface, readerLabel);
+    #addReaderLine(readerLabel, favIcon) {
+        this.#readerLine = new ReaderLine(this.#managerInterface, readerLabel, favIcon);
         this.#readerLine.appendTo(this.#listing);
         this.#bookmarkContainer = this.#readerLine.getBookmarkContainer();
     }

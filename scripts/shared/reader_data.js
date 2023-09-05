@@ -302,4 +302,4 @@ class Bookmark {
     }
 }
 
-export {Bookmark, ReaderData}
+export {ReaderSchedule, ReaderData}
