@@ -10,6 +10,7 @@ class ReaderManager {
     #readerVisuals;
     #readerSync;
     #schedule;
+    #favIcon;
     
     constructor(readerObject, parentInterface, container, showAllInterface) {
         this.#container = container;
@@ -41,7 +42,13 @@ class ReaderManager {
     }
 
     updateFavIcon(src) {
-        this.#readerVisuals.updateFavIcon(src);
+        this.#favIcon = src;
+        this.#drawFavIcon();
+    }
+
+    #drawFavIcon() {
+        if (this.#favIcon)
+            this.#readerVisuals.updateFavIcon(this.#favIcon);
     }
     
     #createReaderVisuals() {
@@ -67,7 +74,7 @@ class ReaderManager {
     }
     
     #updateReaderVisuals() {
-        this.#readerVisuals.updateListing(this.#readerData);
+        this.#readerVisuals.updateListing(this.#readerData, this.#favIcon);
     }
     
     urlIsCompatible(url) {
@@ -102,10 +109,6 @@ class ReaderManager {
         if (this.#readerData.updateManualLabel(url, newLabel)) {
             this.#readerVisuals.updateManualLabel(url, newLabel);
         }
-    }
-
-    updateFavIcon(src) {
-        this.#readerVisuals.updateFavIcon(src);
     }
     
     sendUnpinRequest(url) {

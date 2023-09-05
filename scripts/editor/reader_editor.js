@@ -1,15 +1,17 @@
 import {dissectUrl} from "../shared/url.js"
+import { ReaderSchedule } from "../shared/reader_data.js";
 
 class ReaderEditor {
     #timestamp;
 
-    constructor(fullFrame, fullLink, label, prefix, linkLabel, textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel) {
+    constructor(fullLink, label, prefix, linkLabel, textMsg, errorMsg,
+            cancelBtn, okBtn, startDel, confirmDel, schedule) {
         for (let arg of arguments) {
             if (arg === undefined) {
                 throw("Constructor input incomplete, cannot build ReaderEditor instance");
             }
         }
-        this.fullFrame = fullFrame;
+        this.schedule = schedule;
         
         this.fullLinkObject = fullLink;
         this.labelObject = label;
@@ -23,6 +25,7 @@ class ReaderEditor {
         this.cancelBtn.onclick = () => {
             this.okBtn.disabled = true;
             this.openEditor();
+            window.close();
         }
         this.okBtn = okBtn;
         this.okBtn.onclick = () => {
@@ -35,6 +38,20 @@ class ReaderEditor {
         
         this.prefixObject.addEventListener("input", () => {this.updateLabelPreview()});
         this.openEditor();
+    }
+
+    importSchedule(schedule) {
+        for (const element of this.schedule) {
+            element.checked = (element.value === schedule);
+        }
+    }
+
+    gatherSelectedSchedule() {
+        for (const element of this.schedule) {
+            if (element.checked)
+                return element.value;
+        }
+        return "none";
     }
     
     set fullLink(newText) {
@@ -78,14 +95,6 @@ class ReaderEditor {
     
     #confirmDelete() {
         this.terminate();
-    }
-    
-    #setInvisible() {
-        this.fullFrame.classList.add("no_draw");
-    }
-    
-    #setVisible() {
-        this.fullFrame.classList.remove("no_draw");
     }
     
     #setDeleteSectionVisibility(mode) {
@@ -145,6 +154,8 @@ class ReaderEditor {
         this.favIcon = data.favIcon;
         this.fullLink = data.url;
         this.label = urlPieces.host;
+        const schedule = new ReaderSchedule();
+        this.importSchedule(schedule.returnAsObject());
         this.setUserMessage("", "");
         this.enableInterface();
         this.#setDeleteSectionVisibility("off");
@@ -169,6 +180,7 @@ class ReaderEditor {
         this.favIcon = undefined;
         this.fullLink = url;
         this.label = readerObjectLike.label;
+        this.importSchedule(readerObjectLike.schedule);
         this.setUserMessage("", "");
         this.enableInterface();
         this.#setDeleteSectionVisibility("idle");
@@ -177,8 +189,8 @@ class ReaderEditor {
     
     finalize() {
         // Successful confiuration. Send data
-        let readerEssentials = this.gatherData();
-        this.fktFinalize(readerEssentials);
+        let readerObjectLike = this.gatherData();
+        this.fktFinalize(readerObjectLike);
         this.openEditor();
     }
     
@@ -199,18 +211,16 @@ class ReaderEditor {
             prefix_mask: this.prefix,
             time: this.#timestamp,
             favIcon: this.favIcon,
-            schedule: "none"
+            schedule: this.gatherSelectedSchedule()
         }
     }
     
     occupyEditor(fktFinalize) {
-        this.#setVisible();
         this.fktFinalize = fktFinalize;
         this.isOpen = false;
     }
     
     openEditor() {
-        this.#setInvisible();
         this.fktFinalize = () => {};
         this.isOpen = true;
     }

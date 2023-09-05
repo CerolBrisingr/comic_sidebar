@@ -6,7 +6,7 @@
         <script type="module" src="../scripts/editor/editor.js"></script>
     </head>
 <body>
-    <div class="input_frame no_draw" id="new_comic_input_frame">
+    <div class="input_frame">
         <table>
             <tr>
                 <th>Link</th>
@@ -34,4 +34,19 @@
         <button id="comic_start_delete" style="float: right">Delete</button>
         <button id="comic_confirm_delete" style="float: right">Yes</button>
     </div>
+    <fieldset class="input_frame">
+        <legend>Schedule</legend>
+        <div>
+            <input type="radio" id="none" name="schedule" value="none" checked/>
+            <label for="none">Always visible</label>
+        </div>
+        <div>
+            <input type="radio" id="hourly" name="schedule" value="hourly"/>
+            <label for="hourly">Hide for one hour</label>
+        </div>
+        <div>
+            <input type="radio" id="daily" name="schedule" value="daily"/>
+            <label for="daily">Hide until next day</label>
+        </div>
+    </fieldset>
 </body>
