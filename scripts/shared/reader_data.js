@@ -141,6 +141,7 @@ class ReaderData {
     editReader(readerObjectLike) {
         this.#label = readerObjectLike.label;
         this.#prefixMask = readerObjectLike.prefix_mask;
+        this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();
     }
     
@@ -239,6 +240,10 @@ class ReaderSchedule {
     #rule = "none";
     
     constructor(rule) {
+        this.updateSchedule(rule);
+    }
+
+    updateSchedule(rule) {
         if (rule === undefined)
             return;
         if (this.#possibleRules.includes(rule)) {
