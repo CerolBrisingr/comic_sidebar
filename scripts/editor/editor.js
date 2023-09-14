@@ -83,6 +83,7 @@ class Editor {
         // Successful confiuration. Send data
         let readerObjectLike = this.#reader.returnAsObject();
         readerObjectLike.favIcon = this.#preview.getFavIcon();
+        readerObjectLike.url = this.#reader.getMostRecentAutomaticUrl();
         this.#fcnFinalize(readerObjectLike);
     }
 

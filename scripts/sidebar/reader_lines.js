@@ -359,7 +359,7 @@ class IconLink {
         this.#link.classList.add("undecorated_link")
         this.#label.innerText = String(label);
 
-        this.#icon.src = String(imgPath);
+        this.setImg(imgPath);
     }
 
     setImg(imgPath) {
