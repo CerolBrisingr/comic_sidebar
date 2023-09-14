@@ -63,6 +63,10 @@ class ReaderLine {
         this.#link.setImg(src);
     }
 
+    getFavIcon() {
+        return this.#link.getImg();
+    }
+
     setLabel(label) {
         this.#link.setLabel(label);
     }
@@ -360,6 +364,10 @@ class IconLink {
 
     setImg(imgPath) {
         this.#icon.src = String(imgPath);
+    }
+
+    getImg() {
+        return this.#icon.src;
     }
 
     addImgClass(strClass) {

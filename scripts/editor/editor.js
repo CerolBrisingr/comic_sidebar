@@ -11,6 +11,11 @@ class Editor {
     #preview;
     #fcnFinalize;
 
+    #cancel;
+    #finalizer;
+    #startDeleteBtn;
+    #confirmDeleteBtn;
+
     constructor() {
         // Wait for instructions
     }
@@ -22,6 +27,7 @@ class Editor {
         this.#setUpPrefixHandling(data.url);
         this.#setUpPreview(data.favIcon);
         this.#setUpLabelInput();
+        this.#setUpCreationExit();
     }
 
     updateReaderEntry(readerObjectLike, fcnFinalize) {
@@ -31,6 +37,53 @@ class Editor {
         this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
+        this.#setUpUpdateExit();
+    }
+
+    #setUpCreationExit() {
+        this.#collectExitButtons();
+        this.#setDeleteSectionVisibility("off");
+        this.#finalizer.innerText = "Add Reader";
+    }
+
+    #setUpUpdateExit() {
+        this.#collectExitButtons();
+        this.#setDeleteSectionVisibility("idle");
+        this.#finalizer.innerText = "Update Reader";
+    }
+
+    #collectExitButtons() {
+        this.#cancel = document.getElementById("cancel");
+        this.#cancel.onclick = () => {window.close();};
+        this.#finalizer = document.getElementById("finalize");
+        this.#finalizer.onclick = () => {this.#finalize();};
+        let startDelete = document.getElementById("start_delete");
+        let fcnStartDelete = () => {this.#triggerDelete();};
+        this.#startDeleteBtn = new HideShowButton(startDelete, fcnStartDelete, false);
+        let confirmDelete = document.getElementById("confirm_delete");
+        let fcnConfirmDelte = () => {this.#confirmDelete();};
+        this.#confirmDeleteBtn = new HideShowButton(confirmDelete, fcnConfirmDelte, false);
+    }
+
+    #triggerDelete() {
+        if (this.#startDeleteBtn.getLabel() === "Delete") {
+            this.#setDeleteSectionVisibility("armed");
+        } else {
+            this.#setDeleteSectionVisibility("idle");
+        }
+    }
+
+    #confirmDelete() {
+        // User confirmed delete option. Send order
+        let deleteCommand = {deleteMe: true};
+        this.#fcnFinalize(deleteCommand);
+    }
+
+    #finalize() {
+        // Successful confiuration. Send data
+        let readerObjectLike = this.#reader.returnAsObject();
+        readerObjectLike.favIcon = this.#preview.getFavIcon();
+        this.#fcnFinalize(readerObjectLike);
     }
 
     #setUpPrefixHandling(url) {
@@ -64,6 +117,62 @@ class Editor {
             this.#reader.setLabel(text);
             this.#preview.updateLabelOnly(text);
         });
+    }
+
+    #setDeleteSectionVisibility(mode) {
+        switch (mode) {
+            case "idle":
+                this.#startDeleteBtn.setLabel("Delete");
+                this.#startDeleteBtn.setVisible(true);
+                this.#confirmDeleteBtn.setVisible(false);
+                break;
+            case "off":
+                this.#startDeleteBtn.setVisible(false);
+                this.#confirmDeleteBtn.setVisible(false);
+                break;
+            case "armed":
+                this.#startDeleteBtn.setLabel("Cancel");
+                this.#startDeleteBtn.setVisible(true);
+                this.#confirmDeleteBtn.setVisible(true);
+                break;
+            default:
+                this.#startDeleteBtn.setVisible(false);
+                this.#confirmDeleteBtn.setVisible(false);
+        }
+    }
+}
+
+class HideShowButton {
+    #objButton;
+    
+    constructor(objButton, fktClick, isVisible) {
+        this.#objButton = objButton;
+        objButton.onclick = fktClick;
+        this.setVisible(isVisible);
+    }
+    
+    setVisible(isVisible) {
+        if (isVisible) {
+            this.#setVisible();
+        } else {
+            this.#setInvisible();
+        }
+    }
+    
+    setLabel(newLabel) {
+        this.#objButton.innerText = newLabel;
+    }
+    
+    getLabel() {
+        return this.#objButton.innerText;
+    }
+    
+    #setInvisible() {
+        this.#objButton.style.display = "none";
+    }
+    
+    #setVisible() {
+        this.#objButton.style.removeProperty("display");
     }
 }
 

@@ -36,6 +36,10 @@ class ReaderVisuals {
         this.#readerLine.updateFavIcon(src);
     }
 
+    getFavIcon() {
+        return this.#readerLine.getFavIcon();
+    }
+
     #addReaderLine(readerLabel, favIcon) {
         this.#readerLine = new ReaderLine(this.#managerInterface, readerLabel, favIcon);
         this.#readerLine.appendTo(this.#listing);
