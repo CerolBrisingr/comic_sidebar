@@ -29,7 +29,7 @@ class ReaderEditorControl {
         ReaderEditorControl.port.sendMessage("close"); // close any open windows
         let createData = {
             type: "detached_panel",
-            url: "../../editor/editor.html",
+            url: "../../editor/editor_panel.html",
             width: 500,
             height: 300
           };
