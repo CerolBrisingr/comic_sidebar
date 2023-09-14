@@ -12,19 +12,19 @@ class PrefixSelector {
 
     #mouseDown = false;
 
-    constructor(url, fcnUpdate) {
+    constructor(url, prefix_mask, fcnUpdate) {
         this.#url = url;
         this.#fcnUpdate = fcnUpdate;
-        this.#setUpSpans();
+        this.#setUpSpans(prefix_mask);
         this.#setUpInteractions();
     }
 
-    #setUpSpans() {
+    #setUpSpans(prefix_mask) {
         let urlPieces = dissectUrl(this.#url);
         if (urlPieces === undefined)
             return;
-        this.#iSplit = urlPieces.base_url.length - 1;
-        this.#minIndex = this.#iSplit;
+        this.#iSplit = prefix_mask.length - 1;
+        this.#minIndex = urlPieces.base_url.length - 1;
         
         this.#main = document.getElementById("prefix_main");
         this.#edge = document.getElementById("prefix_edge");

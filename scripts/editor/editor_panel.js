@@ -25,7 +25,7 @@ function receive(message) {
         return;
     }
     if (message.hasOwnProperty("update")) {
-        //readerEditor.updateReaderEntry(message.update, finalize);
+        readerEditor.updateReaderEntry(message.update, finalize);
         return;
     }
 }

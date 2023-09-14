@@ -17,16 +17,27 @@ class Editor {
 
     createReaderEntry(data, fcnFinalize) {
         this.#fcnFinalize = fcnFinalize;
-        this.#reader = ReaderData.buildForEditor(data);
+        this.#reader = ReaderData.buildForEditorFromData(data);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
         this.#setUpPrefixHandling(data.url);
         this.#setUpPreview(data.favIcon);
         this.#setUpLabelInput();
     }
 
+    updateReaderEntry(readerObjectLike, fcnFinalize) {
+        this.#fcnFinalize = fcnFinalize;
+        this.#reader = ReaderData.buildForEditor(readerObjectLike);
+        this.#preview = ReaderVisuals.makePreview(this.#reader);
+        this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
+        this.#setUpPreview(readerObjectLike.favIcon);
+        this.#setUpLabelInput();
+    }
+
     #setUpPrefixHandling(url) {
         this.#prefixInfo = document.getElementById("prefix_output");
-        this.#prefixEdit = new PrefixSelector(url, (prefix) => {this.#prefixUpdate(prefix);});
+        this.#prefixEdit = new PrefixSelector(url, this.#reader.getPrefixMask(), (prefix) => {
+            this.#prefixUpdate(prefix);
+        });
     }
 
     #prefixUpdate(prefix) {
@@ -47,8 +58,11 @@ class Editor {
         const labelInput = document.getElementById("label_box");
         labelInput.placeholder = this.#reader.getLabel();
         labelInput.addEventListener("input", () => {
-            this.#reader.setLabel(labelInput.value);
-            this.#preview.updateLabelOnly(labelInput.value);
+            let text = labelInput.value.trim();
+            if (text === "")
+                text = labelInput.placeholder;
+            this.#reader.setLabel(text);
+            this.#preview.updateLabelOnly(text);
         });
     }
 }

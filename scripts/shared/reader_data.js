@@ -12,7 +12,13 @@ class ReaderData {
     #parentInterface;
     #schedule;
 
-    static buildForEditor(data) {
+    static buildForEditor(readerObject) {
+        // Build readerData without the connected behavior
+        return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
+    }
+
+    static buildForEditorFromData(data) {
+        // Build readerData without connected behavior and from basic assumptions
         let urlPieces = dissectUrl(data.url);
         let readerObject = {time: data.time, prefix_mask: urlPieces.base_url, label: urlPieces.host, manual: [], automatic: []};
         readerObject.automatic.push({href: data.url});
