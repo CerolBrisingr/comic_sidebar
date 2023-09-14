@@ -11,6 +11,13 @@ class ReaderData {
     #manual;
     #parentInterface;
     #schedule;
+
+    static buildForEditor(data) {
+        let urlPieces = dissectUrl(data.url);
+        let readerObject = {time: data.time, prefix_mask: urlPieces.base_url, label: urlPieces.host, manual: [], automatic: []};
+        readerObject.automatic.push({href: data.url});
+        return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
+    }
     
     constructor(data, parentInterface, readerSync) {
         // Import object from storage
@@ -58,9 +65,17 @@ class ReaderData {
     getLabel() {
         return this.#label;
     }
+
+    setLabel(label) {
+        this.#label = label;
+    }
     
     getPrefixMask() {
         return this.#prefixMask;
+    }
+
+    setPrefixMask(prefixMask) {
+        this.#prefixMask = prefixMask;
     }
     
     getPinnedBookmarks() {
@@ -305,6 +320,19 @@ class Bookmark {
         }
             
     }
+}
+
+class ReaderSyncDummy {
+    getId() {
+        return 1;
+    }
+
+    disconnect() {}
+}
+
+class InterfaceDummy {
+    saveProgress() {}
+    deleteMe() {}
 }
 
 export {ReaderSchedule, ReaderData}

@@ -1,31 +1,51 @@
-/* comic edit frame */
-div.input_frame {
-	margin: 6px;
-    border: 2px solid black;
+.spans {
+    display: flex;
+    flex-direction: row;
 }
 
-/* comic edit input fields */
-input.td {
-    width: 100%;
+.prefix_main {
+    background: lightgreen;
 }
 
-/* Table in comic edit frame */
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
+.prefix_main::selection {
+    background: lightgreen;
 }
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
+.prefix_edge {
+    background: green;
 }
 
-tr:nth-child(even) {
-  background-color: #dddddd;
+.prefix_edge::selection {
+    background: green;
 }
 
-.no_draw {
-  display: none;
+.prefix_trail {
+    background: lightgray;
+}
+
+.prefix_trail::selection {
+    background: lightgray;
+}
+
+.append_stars {
+    color: lightgray;
+}
+
+.config_container {
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 18px;
+}
+
+.div_label {
+    position: relative;
+    top: 1ex;
+    z-index: 1;
+    left: 2em;
+    background-color: white;
+    padding: 0 5px;
+}
+
+.label_box {
+    width: 300px;
 }

@@ -6,6 +6,10 @@ class ReaderVisuals {
     #readerLine;
     #bookmarkContainer;
     #manualBookmarkLines = [];
+
+    static makePreview(readerData) {
+        return new ReaderVisuals(readerData, new InterfaceDummy());
+    }
     
     constructor(readerData, managerInterface) {
         this.#managerInterface = managerInterface;
@@ -36,6 +40,10 @@ class ReaderVisuals {
         this.#readerLine = new ReaderLine(this.#managerInterface, readerLabel, favIcon);
         this.#readerLine.appendTo(this.#listing);
         this.#bookmarkContainer = this.#readerLine.getBookmarkContainer();
+    }
+
+    updateLabelOnly(label) {
+        this.#readerLine.setLabel(label);
     }
     
     updateReaderUrls(readerData) {
@@ -84,6 +92,14 @@ class ReaderVisuals {
     collapse () {
         this.#readerLine.collapse();
     }
+}
+
+class InterfaceDummy {
+    saveProgress() {}
+    prepareReaderEdit() {}
+    requestPinBookmark() {}
+    requestUnpinBookmark() {}
+    requestBookmarkLabelUpdate() {}
 }
 
 export {ReaderVisuals}

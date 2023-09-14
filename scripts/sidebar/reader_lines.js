@@ -63,6 +63,10 @@ class ReaderLine {
         this.#link.setImg(src);
     }
 
+    setLabel(label) {
+        this.#link.setLabel(label);
+    }
+
     setLink(href) {
         this.#link.setLink(href);
     }
