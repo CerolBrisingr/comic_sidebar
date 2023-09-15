@@ -363,6 +363,8 @@ class IconLink {
     }
 
     setImg(imgPath) {
+        if (imgPath === undefined)
+            return;
         this.#icon.src = String(imgPath);
     }
 
