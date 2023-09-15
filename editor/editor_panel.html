@@ -37,6 +37,21 @@
     <div id="preview_container" class="config_container"></div>
     <label class="div_label" for="schedule_container">Display Schedule</label>
     <div id="schedule_container" class="config_container">
+        <fieldset class="input_frame">
+            <legend>Schedule</legend>
+            <div>
+                <input type="radio" id="none" name="schedule" value="none" checked/>
+                <label for="none">Always visible</label>
+            </div>
+            <div>
+                <input type="radio" id="hourly" name="schedule" value="hourly"/>
+                <label for="hourly">Hide for one hour</label>
+            </div>
+            <div>
+                <input type="radio" id="daily" name="schedule" value="daily"/>
+                <label for="daily">Hide until next day</label>
+            </div>
+        </fieldset>
     </div>
     <button id="cancel">Cancel</button>
     <button id="finalize">Finalize</button>

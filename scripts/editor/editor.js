@@ -3,6 +3,7 @@ import { ReaderData } from "../shared/reader_data.js";
 import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
 import { ImageAdjuster } from "../shared/fav_icon_manager.js";
+import { ScheduleEditor } from "./schedule_editor.js";
 
 class Editor {
     #prefixInfo;
@@ -10,6 +11,7 @@ class Editor {
     
     #reader;
     #preview;
+    #scheduler;
     #fcnFinalize;
 
     #cancel;
@@ -30,6 +32,7 @@ class Editor {
         const favIcon = await imageAdjuster.apply(data.favIcon);
         this.#setUpPreview(favIcon);
         this.#setUpLabelInput();
+        this.#setUpScheduleEditor();
         this.#setUpCreationExit();
     }
 
@@ -40,6 +43,7 @@ class Editor {
         this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
+        this.#setUpScheduleEditor();
         this.#setUpUpdateExit();
     }
 
@@ -53,6 +57,14 @@ class Editor {
         this.#collectExitButtons();
         this.#setDeleteSectionVisibility("idle");
         this.#finalizer.innerText = "Update Reader";
+    }
+
+    #setUpScheduleEditor() {
+        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
+    }
+
+    #updateSchedule(scheduleObject) {
+        this.#reader.updateSchedule(scheduleObject);
     }
 
     #collectExitButtons() {
