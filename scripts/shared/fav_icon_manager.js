@@ -207,4 +207,4 @@ async function displaySize(data, strTitle) {
     console.log(`Image ${strTitle}: ${image.naturalWidth} x ${image.naturalHeight}`);
 }
 
-export {FavIconController, FavIconSubscriber}
+export {FavIconController, FavIconSubscriber, ImageAdjuster}

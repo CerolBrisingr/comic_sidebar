@@ -2,6 +2,7 @@ import { PrefixSelector } from "./prefix_selector.js"
 import { ReaderData } from "../shared/reader_data.js";
 import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
+import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 
 class Editor {
     #prefixInfo;
@@ -20,12 +21,14 @@ class Editor {
         // Wait for instructions
     }
 
-    createReaderEntry(data, fcnFinalize) {
+    async createReaderEntry(data, fcnFinalize) {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditorFromData(data);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
         this.#setUpPrefixHandling(data.url);
-        this.#setUpPreview(data.favIcon);
+        const imageAdjuster = new ImageAdjuster();
+        const favIcon = await imageAdjuster.apply(data.favIcon);
+        this.#setUpPreview(favIcon);
         this.#setUpLabelInput();
         this.#setUpCreationExit();
     }
