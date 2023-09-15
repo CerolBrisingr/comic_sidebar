@@ -117,6 +117,7 @@ class WebReader {
         if (this._currentReader.urlIsCompatible(prefixMask))
             this._updateCurrentReader(new ReaderClassDummy());
         this._readerStorage.removeObject(prefixMask);
+        this.saveProgress();
     }
 
     relistViewers() {}

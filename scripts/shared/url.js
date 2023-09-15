@@ -1,4 +1,22 @@
+class OpenUrlCtrl {
+    static #doOpenUrls = true;
+
+    static setOpenUrls(value) {
+        OpenUrlCtrl.#doOpenUrls = Boolean(value);
+    }
+
+    static mayIOpenUrls() {
+        return OpenUrlCtrl.#doOpenUrls;
+    }
+
+    constructor() {
+        throw new Error("Use static methods only");
+    }
+}
+
 function openUrlInMyTab(url) {
+    if (!OpenUrlCtrl.mayIOpenUrls())
+        return;
     if (url === undefined)
         return;
     let test = dissectUrl(url);
@@ -36,4 +54,4 @@ function dissectUrl(url, prefix, fallback) {
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {openUrlInMyTab, dissectUrl}
+export {OpenUrlCtrl, openUrlInMyTab, dissectUrl}

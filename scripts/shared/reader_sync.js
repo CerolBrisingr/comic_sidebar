@@ -60,8 +60,8 @@ class ReaderSyncCore extends ReaderSync {
             this.#unpinRequestHandler(message.unpinRequest);
             return;
         }
-        if (message === "editRequest") {
-            this.#editRequestHandler(this.#readerData);
+        if (message.hasOwnProperty("editRequest")) {
+            this.#editRequestHandler(this.#readerData, message.editRequest);
             return;
         }
         if (message.hasOwnProperty("updateBookmarkLabelRequest")) {
@@ -82,8 +82,9 @@ class ReaderSyncCore extends ReaderSync {
         }
     }
     
-    #editRequestHandler(readerData) {
+    #editRequestHandler(readerData, favIcon) {
         let readerObject = readerData.returnAsObject();
+        readerObject.favIcon = favIcon;
         readerObject.mostRecentAutomaticUrl = readerData.getMostRecentAutomaticUrl();
         ReaderEditorControl.updateReaderEntry(readerObject, (readerObjectLike) => {
             this.#handleReaderEdit(readerObjectLike);
@@ -128,8 +129,8 @@ class ReaderSyncSatellite extends ReaderSync {
     }
     
     
-    sendEditRequest() {
-        this.port.sendMessage("editRequest");
+    sendEditRequest(favIcon) {
+        this.port.sendMessage({editRequest: favIcon});
     }
     
     sendBookmarkLabelUpdateRequest(url, newLabel) {

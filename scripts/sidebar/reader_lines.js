@@ -63,6 +63,14 @@ class ReaderLine {
         this.#link.setImg(src);
     }
 
+    getFavIcon() {
+        return this.#link.getImg();
+    }
+
+    setLabel(label) {
+        this.#link.setLabel(label);
+    }
+
     setLink(href) {
         this.#link.setLink(href);
     }
@@ -351,11 +359,17 @@ class IconLink {
         this.#link.classList.add("undecorated_link")
         this.#label.innerText = String(label);
 
-        this.#icon.src = String(imgPath);
+        this.setImg(imgPath);
     }
 
     setImg(imgPath) {
+        if (imgPath === undefined)
+            return;
         this.#icon.src = String(imgPath);
+    }
+
+    getImg() {
+        return this.#icon.src;
     }
 
     addImgClass(strClass) {
