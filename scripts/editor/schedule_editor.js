@@ -9,7 +9,9 @@ class ScheduleEditor {
     #importSchedule(rule, fcnUpdate) {
         for (const element of this.#ruleRadios) {
             element.checked = (element.value === rule);
-            element.onChange = () => {this.#updateSchedule(fcnUpdate);};
+            element.addEventListener("change", () => {
+                this.#updateSchedule(fcnUpdate);
+            });
         }
     }
 
@@ -20,7 +22,6 @@ class ScheduleEditor {
     #gatherSelectedSchedule() {
         for (const element of this.#ruleRadios) {
             if (element.checked) {
-                console.log(element.value);
                 return element.value;
             }
         }

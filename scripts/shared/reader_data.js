@@ -220,6 +220,10 @@ class ReaderData {
     getSchedule() {
         return this.#schedule;
     }
+
+    updateSchedule(scheduleObject) {
+        this.#schedule.updateSchedule(scheduleObject);
+    }
     
     returnAsObject() {
         let thisAsObject = {
