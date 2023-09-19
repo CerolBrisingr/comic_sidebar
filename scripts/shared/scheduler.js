@@ -12,18 +12,14 @@ class Scheduler {
     }
 
     updateRuleset(readerSchedule) {
-        switch (readerSchedule.getRule()) {
-            case "none":
+        const schedule = readerSchedule.getActiveSchedule();
+        switch (schedule.getType()) {
+            case "always":
                 this.#rule = () => {return true;};
                 break;
-            case "daily":
+            default:
                 this.#rule = (now, lastInteraction) => {
                     return (this.#startOfDay(now) - lastInteraction) > 0;
-                }
-                break;
-            case "hourly":
-                this.#rule = (now, lastInteraction) => {
-                    return (this.#startOfHour(now) - lastInteraction) > 0;
                 }
                 break;
         }

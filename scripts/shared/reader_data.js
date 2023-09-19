@@ -1,5 +1,6 @@
-import {dissectUrl} from "./url.js"
-import {ReaderSync} from "./reader_sync.js"
+import { dissectUrl } from "./url.js"
+import { ReaderSync } from "./reader_sync.js"
+import { ReaderSchedule } from "./reader_schedule.js";
 
 class ReaderData {
     #label;
@@ -260,33 +261,6 @@ function isArray(list) {
     return Array.isArray(list);
 }
 
-class ReaderSchedule {
-    #possibleRules = ["none", "daily", "hourly"];
-    #rule = "none";
-    
-    constructor(rule) {
-        this.updateSchedule(rule);
-    }
-
-    updateSchedule(rule) {
-        if (rule === undefined)
-            return;
-        if (this.#possibleRules.includes(rule)) {
-            this.#rule = rule;
-        } else {
-            console.log("Invalid scheduling rule");
-        }
-    }
-
-    getRule() {
-        return this.#rule;
-    }
-
-    returnAsObject() {
-        return this.#rule;
-    }
-}
-
 class Bookmark {
     #href = "#";
     #label = undefined;
@@ -345,4 +319,4 @@ class InterfaceDummy {
     deleteMe() {}
 }
 
-export {ReaderSchedule, ReaderData}
+export {ReaderData}
