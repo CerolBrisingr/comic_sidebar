@@ -1,10 +1,15 @@
 class ReaderSchedule {
+    #alwaysOn;
+    #duration;
+    #weekly;
+    #monthly;
+
     constructor() {
         const scheduleInterface = new ScheduleInterface(this);
-        this.alwaysOn = new AlwaysOn(scheduleInterface);
-        this.duration = new ScheduleDuration(scheduleInterface);
-        this.weekly = new WeeklyReset(scheduleInterface);
-        this.monthly = new MonthlyReset(scheduleInterface);
+        this.#alwaysOn = new AlwaysOn(scheduleInterface);
+        this.#duration = new ScheduleDuration(scheduleInterface);
+        this.#weekly = new WeeklyReset(scheduleInterface);
+        this.#monthly = new MonthlyReset(scheduleInterface);
     }
     
     constructor(scheduleObject) {
@@ -12,17 +17,33 @@ class ReaderSchedule {
     }
 
     updateSchedule(scheduleObject) {
-        this.alwaysOn.setActive(); // Make sure at least one is active in the end
+        this.#alwaysOn.setActive(); // Make sure at least one is active in the end
         if (scheduleObject === undefined)
             return;
-        this.alwaysOn.updateWith(scheduleObject.always_on);
-        this.duration.updateWith(scheduleObject.duration);
-        this.weekly.updateWith(scheduleObject.weekly);
-        this.monthly.updateWith(scheduleObject.weekly);
+        this.#alwaysOn.updateWith(scheduleObject.always_on);
+        this.#duration.updateWith(scheduleObject.duration);
+        this.#weekly.updateWith(scheduleObject.weekly);
+        this.#monthly.updateWith(scheduleObject.weekly);
     }
 
     #scheduleVariants() {
-        return [this.alwaysOn, this.duration, this.weekly, this.monthly];
+        return [this.#alwaysOn, this.#duration, this.#weekly, this.#monthly];
+    }
+
+    getAlwaysOption() {
+        return this.#alwaysOn;
+    }
+
+    getDurationOption() {
+        return this.#duration;
+    }
+
+    getWeeklyOption() {
+        return this.#weekly;
+    }
+
+    getMonthlyOption() {
+        return this.#monthly;
     }
 
     singleOut(activeSchedule) {
@@ -43,10 +64,10 @@ class ReaderSchedule {
 
     returnAsObject() {
         return {
-            always_on: this.alwaysOn.returnAsObject(),
-            duration: this.duration.returnAsObject(),
-            weekly: this.weekly.returnAsObject(),
-            monthly: this.monthly.returnAsObject()
+            always_on: this.#alwaysOn.returnAsObject(),
+            duration: this.#duration.returnAsObject(),
+            weekly: this.#weekly.returnAsObject(),
+            monthly: this.#monthly.returnAsObject()
         };
     }
 }
