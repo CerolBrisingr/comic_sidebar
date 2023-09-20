@@ -4,15 +4,12 @@ class ReaderSchedule {
     #weekly;
     #monthly;
 
-    constructor() {
+    constructor(scheduleObject) {
         const scheduleInterface = new ScheduleInterface(this);
         this.#alwaysOn = new AlwaysOn(scheduleInterface);
         this.#duration = new ScheduleDuration(scheduleInterface);
         this.#weekly = new WeeklyReset(scheduleInterface);
         this.#monthly = new MonthlyReset(scheduleInterface);
-    }
-    
-    constructor(scheduleObject) {
         this.updateSchedule(scheduleObject);
     }
 
@@ -47,14 +44,14 @@ class ReaderSchedule {
     }
 
     singleOut(activeSchedule) {
-        for (const schedule of this.#scheduleVariants) {
+        for (const schedule of this.#scheduleVariants()) {
             if (schedule !== activeSchedule)
                 schedule._deselect();
         }
     }
 
     getActiveSchedule() {
-        for (const schedule of this.#scheduleVariants) {
+        for (const schedule of this.#scheduleVariants()) {
             if (schedule.isActive()) {
                 return schedule;
             }
