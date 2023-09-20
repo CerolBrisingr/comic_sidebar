@@ -20,7 +20,7 @@ class ReaderSchedule {
         this.#alwaysOn.updateWith(scheduleObject.always_on);
         this.#duration.updateWith(scheduleObject.duration);
         this.#weekly.updateWith(scheduleObject.weekly);
-        this.#monthly.updateWith(scheduleObject.weekly);
+        this.#monthly.updateWith(scheduleObject.monthly);
     }
 
     #scheduleVariants() {
