@@ -46,6 +46,10 @@
     padding: 0 5px;
 }
 
+.schedule_option {
+    margin-left: 20px;
+}
+
 .label_box {
     width: 300px;
 }

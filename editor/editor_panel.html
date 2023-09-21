@@ -40,28 +40,35 @@
         <div>
             <input type="checkbox" id="always"/>
             <label for="always">Always show reader entry</label>
-            <div id="always_frame" class="no_draw">
+            <div id="always_frame" class="schedule_option no_draw">
                 Keep this title listed after you switch to another one.
             </div>
         </div>
         <div>
             <input type="checkbox" id="duration"/>
             <label for="duration">Hide for some time</label>
-            <div id="duration_frame" class="no_draw">
-                Some more settings
+            <div id="duration_frame" class="schedule_option no_draw">
+                Hide for 
+                <input type="number" id="duration_number" placeholder="1" step="1" min="1"/>
+                <select id="duration_unit">
+                    <option value="hours">hours</option>
+                    <option value="days">days</option>
+                    <option value="months">months</option>
+                    <option value="years">years</option>
+                </select>
             </div>
         </div>
         <div>
             <input type="checkbox" id="weekly"/>
             <label for="weekly">Show again on weekdays</label>
-            <div id="weekly_frame" class="no_draw">
+            <div id="weekly_frame" class="schedule_option no_draw">
                 Some more settings
             </div>
         </div>
         <div>
             <input type="checkbox" id="monthly"/>
             <label for="monthly">Show again on days of the month</label>
-            <div id="monthly_frame" class="no_draw">
+            <div id="monthly_frame" class="schedule_option no_draw">
                 Some more settings
             </div>
         </div>

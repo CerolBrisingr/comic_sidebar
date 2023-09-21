@@ -97,7 +97,8 @@ class BasicSchedule {
     }
 
     _deselect() {
-        // Deselect, don't trigger this independent of other entries
+        // Set schedule option to inactive
+        // Leave use of this method to ReaderSchedule.singleOut()
         this._isActive = false;
     }
 }
@@ -120,7 +121,7 @@ class AlwaysOn extends BasicSchedule {
 
 class ScheduleDuration extends BasicSchedule{
     #amount = 1;
-    unit = new TimeUnit();
+    #unit = new TimeUnit();
 
     constructor(scheduleInterface) {
         super(scheduleInterface);
@@ -134,7 +135,7 @@ class ScheduleDuration extends BasicSchedule{
         if (object.active)
             this.setActive();
         this.setAmount(object.amount);
-        this.unit.updateUnit(object.unit);
+        this.#unit.updateUnit(object.unit);
     }
 
     setAmount(amount) {
@@ -145,17 +146,29 @@ class ScheduleDuration extends BasicSchedule{
         this.#amount = amount;
     }
 
+    getAmount() {
+        return this.#amount;
+    }
+
+    setUnit(unit) {
+        this.#unit.updateUnit(unit);
+    }
+
+    getUnit() {
+        return this.#unit.getUnit();
+    }
+
     returnAsObject() {
         return {
             active: this._isActive,
             amount: this.#amount,
-            unit: this.unit.returnAsObject()
+            unit: this.#unit.getUnit()
         }
     }
 }
 
 class TimeUnit {
-    #possibleUnits = ["days", "weeks", "months"];
+    #possibleUnits = ["hours", "days", "weeks", "months"];
     #unit = "days";
 
     updateUnit(unit) {
@@ -168,7 +181,7 @@ class TimeUnit {
         }
     }
 
-    returnAsObject() {
+    getUnit() {
         return this.#unit;
     }
 }
