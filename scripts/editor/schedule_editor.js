@@ -10,8 +10,8 @@ class ScheduleEditor {
         let myInterface = new EditorInterface(this);
         this.#always = new BasicEditor("always", "always_frame", readerSchedule.getAlwaysOption(), myInterface);
         this.#duration = new DurationEditor("duration", "duration_frame", readerSchedule.getDurationOption(), myInterface);
-        this.#weekly = new BasicEditor("weekly", "weekly_frame", readerSchedule.getWeeklyOption(), myInterface);
-        this.#monthly = new BasicEditor("monthly", "monthly_frame", readerSchedule.getMonthlyOption(), myInterface);
+        this.#weekly = new WeeklyEditor("weekly", "weekly_frame", readerSchedule.getWeeklyOption(), myInterface);
+        this.#monthly = new MonthlyEditor("monthly", "monthly_frame", readerSchedule.getMonthlyOption(), myInterface);
         this.updateActivityChecks();
     }
 
@@ -107,6 +107,19 @@ class DurationEditor extends BasicEditor {
     #updateSelectedUnit() {
         this.#selectUnit.value = this._schedule.getUnit();
     }
+}
+
+class WeeklyEditor extends BasicEditor{
+    constructor(checkbox, div, schedule, parentInterface) {
+        super(checkbox, div, schedule, parentInterface);
+    }
+}
+
+class MonthlyEditor extends BasicEditor{
+    constructor(checkbox, div, schedule, parentInterface) {
+        super(checkbox, div, schedule, parentInterface);
+    }
+
 }
 
 export {ScheduleEditor}
