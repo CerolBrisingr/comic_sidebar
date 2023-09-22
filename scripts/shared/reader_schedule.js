@@ -228,6 +228,10 @@ class WeeklyReset  extends BasicSchedule {
         this.#days.delete(day);
     }
 
+    getDays() {
+        return Array.from(this.#days);
+    }
+
     #dayAllowed(day) {
         return (this.#possibleDays.includes(day));
     }
@@ -235,7 +239,7 @@ class WeeklyReset  extends BasicSchedule {
     returnAsObject() {
         return {
             active: this._isActive,
-            days: Array.from(this.#days)
+            days: this.getDays()
         };
     }
 
@@ -244,7 +248,7 @@ class WeeklyReset  extends BasicSchedule {
 class MonthlyReset extends BasicSchedule {
     #minDay = 1;
     #maxDay = 31;
-    #days = new Set([1]);
+    #days = new Set([1, 15]);
 
     constructor(scheduleInterface) {
         super(scheduleInterface);
@@ -261,12 +265,16 @@ class MonthlyReset extends BasicSchedule {
     }
 
     setDays(days) {
-        this.#days.clear();
+        this.clearDays();
         if (!Array.isArray(days))
             return;
         for (let day of days) {
             this.addDay(day);
         }
+    }
+
+    clearDays() {
+        this.#days.clear();
     }
 
     addDay(day) {
@@ -287,14 +295,27 @@ class MonthlyReset extends BasicSchedule {
         return ((day >= this.#minDay) && (day <= this.#maxDay));
     }
 
+    getDays() {
+        return Array.from(this.#days).sort(sortNumbers);
+    }
+
     returnAsObject() {
         return {
             active: this._isActive,
-            days: Array.from(this.#days)
+            days: this.getDays()
         };
     }
 }
 
+function sortNumbers(a, b) {
+    if (a > b) {
+        return 1;
+    } else if (a == b) {
+        return 0;
+    } else {
+        return -1;
+    }
+}
 class ScheduleInterface {
     #readerSchedule;
 

@@ -62,14 +62,24 @@
             <input type="checkbox" id="weekly"/>
             <label for="weekly">Show again on weekdays</label>
             <div id="weekly_frame" class="schedule_option no_draw">
-                Some more settings
+                <label for="week_days">Select days to refresh display:</label>
+                <div id="week_days" class="week_line">
+                    <span id="week_mo" class="week_day">Mo</span>
+                    <span id="week_tu" class="week_day">Tu</span>
+                    <span id="week_we" class="week_day">We</span>
+                    <span id="week_th" class="week_day">Th</span>
+                    <span id="week_fr" class="week_day">Fr</span>
+                    <span id="week_sa" class="week_day">Sa</span>
+                    <span id="week_su" class="week_day">So</span>
+                </div>
             </div>
         </div>
         <div>
             <input type="checkbox" id="monthly"/>
             <label for="monthly">Show again on days of the month</label>
             <div id="monthly_frame" class="schedule_option no_draw">
-                Some more settings
+                <label for="month_days">Enter list of days:</label>
+                <input type="text" id="month_days" placeholder="e.g. '1, 10'")>
             </div>
         </div>
     </div>
