@@ -1,9 +1,23 @@
 import { getShowAll } from "./backup_import.js";
 import { saveShowAll } from "./backup_export.js";
 
+let dayFactor = 1.0/(1000*60*60*24);
+let weekdayMap = new Map([
+    ["sunday", 0],
+    ["monday", 1],
+    ["tuesday", 2],
+    ["wednesday", 3],
+    ["thursday", 4],
+    ["friday", 5],
+    ["saturday", 6]
+])
+
+function mod(x, m) {
+    return ((x % m) + m) % m;
+}
+
 class Scheduler {
     #showAllInterface;
-    #dayFactor = 1.0/(1000*60*60*24);
     #rule;
 
     constructor(readerSchedule, showAllInterface) {
@@ -17,9 +31,13 @@ class Scheduler {
             case "always":
                 this.#rule = () => {return true;};
                 break;
+            case "weekly":
+                this.#rule = this.#getWeeklyFcn(schedule);
+                break;
             default:
                 this.#rule = (now, lastInteraction) => {
-                    return (this.#startOfDay(now) - lastInteraction) > 0;
+                    const compareTime = startOfDay(now);
+                    return compareTime > lastInteraction;
                 }
                 break;
         }
@@ -34,32 +52,52 @@ class Scheduler {
         return this.#rule(now, lastInteraction);
     }
 
-    #lastWeekday(now, intDay) {
-        // Get time of previous named weekday
-        // Just writing some methods. Probably need end of day for this
-        let timeToday = this.#startOfDay(now);
-        let today = now.getDay(); // 0 = Sunday .. 6 = Saturday
+    #getWeeklyFcn(schedule) {
+        let numDays = [];
+        for (let day of schedule.getDays()) {
+            let numDay = weekdayMap.get(day);
+            if (numDay !== undefined)
+                numDays.push(numDay);
+        }
+        return (now, lastInteraction) => {
+            const compareTime = startOfDay(now) - toDays(minWeekDaySpan(now, numDays));
+            return compareTime > lastInteraction;
+        };
     }
+}
 
-    #startOfHour(now) {
-        let start = new Date(now.getTime());
-        start.setHours(now.getHours(), 0, 0, 0);
-        return start.getTime();
-    }
+function startOfHour(now) {
+    let start = new Date(now.getTime());
+    start.setHours(now.getHours(), 0, 0, 0);
+    return start.getTime();
+}
 
-    #startOfDay(now) {
-        let start = new Date(now.getTime());
-        start.setHours(0, 0, 0, 0);
-        return start.getTime();
-    }
+function startOfDay(now) {
+    let start = new Date(now.getTime());
+    start.setHours(0, 0, 0, 0);
+    return start.getTime();
+}
 
-    #toSeconds(timespan) {
-        return timespan/1000;
+function minWeekDaySpan(now, numDays) {
+    let distance = 7;
+    let today = dayOfWeek(now);
+    for (let day of numDays) {
+        let thisDist = mod(today - day, 7);
+        if (thisDist < distance)
+            distance = thisDist;
     }
+}
 
-    #toDays(timespan) {
-        return timespan * this.#dayFactor;
-    }
+function dayOfWeek(now) {
+    return now.getDay(); // 0 = Sunday .. 6 = Saturday
+}
+
+function toDays(timespan) {
+    return timespan * dayFactor;
+}
+
+function toSeconds(timespan) {
+    return timespan/1000;
 }
 
 class ShowAllInterface {
