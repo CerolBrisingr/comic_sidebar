@@ -1,7 +1,7 @@
 import { getShowAll } from "./backup_import.js";
 import { saveShowAll } from "./backup_export.js";
 
-let dayFactor = 1.0/(1000*60*60*24);
+let milliSecondsInADay = 1000*60*60*24;
 let weekdayMap = new Map([
     ["sunday", 0],
     ["monday", 1],
@@ -60,7 +60,7 @@ class Scheduler {
                 numDays.push(numDay);
         }
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - toDays(minWeekDaySpan(now, numDays));
+            const compareTime = startOfDay(now) - fromDays(minWeekDaySpan(now, numDays));
             return compareTime > lastInteraction;
         };
     }
@@ -79,6 +79,7 @@ function startOfDay(now) {
 }
 
 function minWeekDaySpan(now, numDays) {
+    // Get number of days since last update date
     let distance = 7;
     let today = dayOfWeek(now);
     for (let day of numDays) {
@@ -86,14 +87,15 @@ function minWeekDaySpan(now, numDays) {
         if (thisDist < distance)
             distance = thisDist;
     }
+    return distance;
 }
 
 function dayOfWeek(now) {
     return now.getDay(); // 0 = Sunday .. 6 = Saturday
 }
 
-function toDays(timespan) {
-    return timespan * dayFactor;
+function fromDays(timespan) {
+    return timespan * milliSecondsInADay;
 }
 
 function toSeconds(timespan) {
