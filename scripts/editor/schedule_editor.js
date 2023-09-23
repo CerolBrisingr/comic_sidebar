@@ -3,10 +3,8 @@ class ScheduleEditor {
     #duration;
     #weekly;
     #monthly;
-    #schedule;
 
     constructor(readerSchedule) {
-        this.#schedule = readerSchedule;
         let myInterface = new EditorInterface(this);
         this.#always = new BasicEditor("always", "always_frame", readerSchedule.getAlwaysOption(), myInterface);
         this.#duration = new DurationEditor("duration", "duration_frame", readerSchedule.getDurationOption(), myInterface);
@@ -16,6 +14,7 @@ class ScheduleEditor {
     }
 
     updateActivityChecks() {
+        // States of schedules are linked, corresponding viusals are not
         this.#always.updateActiveState();
         this.#duration.updateActiveState();
         this.#weekly.updateActiveState();
