@@ -1,6 +1,7 @@
 import { getShowAll } from "./backup_import.js";
 import { saveShowAll } from "./backup_export.js";
 
+let logComparison = false;
 let millisecondsInADay = 1000*60*60*24;
 let millisecondsInAnHour = 1000*60*60;
 let weekdayMap = new Map([
@@ -29,20 +30,17 @@ class Scheduler {
     updateRuleset(readerSchedule) {
         const schedule = readerSchedule.getActiveSchedule();
         switch (schedule.getType()) {
-            case "always":
-                this.#rule = () => {return true;};
+            case "duration":
+                this.#rule = this.#getDurationFcn(schedule);
                 break;
             case "weekly":
                 this.#rule = this.#getWeeklyFcn(schedule);
                 break;
-            case "duration":
-                this.#rule = this.#getDurationFcn(schedule);
+            case "monthly":
+                this.#rule = this.#getMonthlyFcn(schedule);
                 break;
-            default:
-                this.#rule = (now, lastInteraction) => {
-                    const compareTime = startOfDay(now);
-                    return compareTime > lastInteraction;
-                }
+            default: // includes "always"
+                this.#rule = () => {return true;};
                 break;
         }
     }
@@ -112,12 +110,23 @@ class Scheduler {
             return compare(compareTime, lastInteraction);
         };
     }
+
+    #getMonthlyFcn(schedule) {
+        return (now, lastInteraction) => {
+            const compareTime = startOfDay(now) - fromDays(minMonthDaySpan(now, schedule));
+            return compare(compareTime, lastInteraction);
+        }
+    }
 }
 
 function compare(compareTime, lastInteraction) {
-    // TODO: replace this by first set of unit tests
-    //console.log(`Difference in hours: ${(compareTime - lastInteraction)/1000/60/60}`);
-    //console.log(`Difference in days:  ${(compareTime - lastInteraction)/1000/60/60/24}`);
+    if (logComparison) {
+        // TODO: replace this by first set of unit tests
+        console.log(`Difference in hours: ${(compareTime - lastInteraction)/1000/60/60}`);
+        console.log(`Difference in days:  ${(compareTime - lastInteraction)/1000/60/60/24}`);
+        console.log("Target:      " + new Date(compareTime).toLocaleString());
+        console.log("Interaction: " + new Date(lastInteraction).toLocaleString());
+    }
     return compareTime > lastInteraction;
 }
 
@@ -134,7 +143,7 @@ function startOfDay(now) {
 }
 
 function minWeekDaySpan(now, numDays) {
-    // Get number of days since last update date
+    // Get number of days since last weekly update date
     let distance = 7;
     let today = dayOfWeek(now);
     for (let day of numDays) {
@@ -145,6 +154,31 @@ function minWeekDaySpan(now, numDays) {
     return distance;
 }
 
+function minMonthDaySpan(now, schedule) {
+    // Get number of days since last monthly update date
+    let year = now.getFullYear();
+    let month = now.getMonth();
+    let date = now.getDate();
+    let daysInLastMonth = daysInPreviousMonth(year, month);
+    let distance = daysInLastMonth;
+    for (let day of schedule.getDays()) {
+        let thisDistance = getMonthlyDistance(date, day, daysInLastMonth);
+        if (thisDistance < distance)
+            distance = thisDistance;
+    }
+    return distance;
+}
+
+function  getMonthlyDistance(targetDay, scheduleDay, daysInLastMonth) {
+    if (targetDay > scheduleDay)
+        return targetDay - scheduleDay;
+    if (scheduleDay > daysInLastMonth) {
+        // Day not in last month? Trigger on first of this month
+        return targetDay - 1;
+    }
+    return targetDay - scheduleDay + daysInLastMonth;
+}
+
 function monthsAgo(now, amount) {
     let year = now.getFullYear();
     let month = now.getMonth();
@@ -153,18 +187,23 @@ function monthsAgo(now, amount) {
     year -= Math.floor(amount / 12);
     month -= amount % 12;
     // Fix negative month
-    if (month < 1) {
+    if (month < 0) {
         year -= 1;
         month += 12;
     }
     // Make sure that month has date, otherwise use 1st of next month
-    let daysInMonth = new Date(year, month, 0).getDate();
-    if (day > daysInMonth) {
+    let daysInThisMonth = daysInPreviousMonth(year, month + 1);
+    if (day > daysInThisMonth) {
         month +=1;
         day = 1;
         // December has 31 days, will not jump years this way
     }
     return new Date(year, month, day).getTime();
+}
+
+function daysInPreviousMonth(year, month) {
+    // TODO unit test edge cases
+    return new Date(year, month, 0).getDate();
 }
 
 function dayOfWeek(now) {
