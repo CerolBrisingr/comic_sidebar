@@ -36,6 +36,8 @@ class EditorInterface {
 }
 
 class BasicEditor {
+    // Covers interaction with active state and corresponding UI elements
+
     constructor(checkbox, div, schedule, parentInterface) {
         this._checkbox = document.getElementById(checkbox);
         this._div = document.getElementById(div);
@@ -91,6 +93,7 @@ class DurationEditor extends BasicEditor {
     }
 
     #updateNumberInput() {
+        // Update UI from schedule data
         this.#inputNumber.value = String(this._schedule.getAmount());
     }
 
@@ -104,6 +107,7 @@ class DurationEditor extends BasicEditor {
     }
 
     #updateSelectedUnit() {
+        // Update UI from schedule data
         this.#selectUnit.value = this._schedule.getUnit();
     }
 }
@@ -134,6 +138,7 @@ class WeeklyEditor extends BasicEditor{
     }
 
     #updateDay(day, value) {
+        // Adjust schedule to toggle state
         if (value) {
             this._schedule.addDay(day);
         } else {
@@ -142,6 +147,7 @@ class WeeklyEditor extends BasicEditor{
     }
 
     #setUpDayList() {
+        // Adjust toggle states to schedule
         for (let day of this._schedule.getDays()) {
             let toggle = this.#days.get(day);
             toggle.setValue(true);
@@ -151,7 +157,7 @@ class WeeklyEditor extends BasicEditor{
 
 class ToggleText {
     #span;
-    #ident;
+    #ident; // Store for easier debugging
     #fcnUpdate;
     #value = false;
 
@@ -168,6 +174,7 @@ class ToggleText {
     }
 
     #updateSpan() {
+        // Adjust UI to display state of #value
         if (this.#value) {
             this.#span.style.color = "black";
         } else {
@@ -199,10 +206,12 @@ class MonthlyEditor extends BasicEditor{
     }
 
     #updateDayList() {
+        // Update UI from schedule data
         this.#dayList.value = String(this._schedule.getDays());
     }
 
     #adaptDayList() {
+        // Replace schedule by content of UI input
         this._schedule.clearDays();
         let days = this.#dayList.value.split(",");
         for (let day of days) {
