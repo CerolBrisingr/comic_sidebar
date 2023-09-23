@@ -46,6 +46,10 @@
     padding: 0 5px;
 }
 
+.divider {
+    margin-top: 6px;
+}
+
 .schedule_option {
     margin-left: 20px;
 }

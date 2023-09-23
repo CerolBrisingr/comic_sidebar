@@ -9,29 +9,26 @@
 <body>
     <label class="div_label" for="reader_setup">Reader Setup</label>
     <div id="reader_setup" class="config_container">
-        <p>
-            <label for="label_box">Label:</label>
-            <br />
-            <input class="label_box" 
-                type="search" 
-                id="label_box" 
-                placeholder="some.comic">
-        </p>
-        <p>
-            <label for="prefix_line">Select the part all pages share:</label>
-            <div class="spans" id="prefix_line" tabindex="0">
-                <span class="prefix_main" id="prefix_main">https://some.comic/comics</span>
-                <span class="prefix_edge" id="prefix_edge">/</span>
-                <span class="prefix_trail" id="prefix_trail">4192</span>
-            </div>
-        </p>
-        <p>
-            <label for="prefix_showcase">This reader will track all pages with addresses that start like:</label>
-            <div class="spans" id="prefix_showcase">
-                <span class="prefix_output" id="prefix_output">https://some.comic/comics/</span>
-                <span class="append_stars">***</span>
-            </div>
-        </p>
+        <label for="label_box">Label:</label>
+        <br />
+        <input class="label_box" 
+            type="search" 
+            id="label_box" 
+            placeholder="some.comic">
+        <br />
+        <div class="divider"></div>
+        <label for="prefix_line">Select the part all pages share:</label>
+        <div class="spans" id="prefix_line" tabindex="0">
+            <span class="prefix_main" id="prefix_main">https://some.comic/comics</span>
+            <span class="prefix_edge" id="prefix_edge">/</span>
+            <span class="prefix_trail" id="prefix_trail">4192</span>
+        </div>
+        <div class="divider"></div>
+        <label for="prefix_showcase">This reader will track all pages with addresses that start like:</label>
+        <div class="spans" id="prefix_showcase">
+            <span class="prefix_output" id="prefix_output">https://some.comic/comics/</span>
+            <span class="append_stars">***</span>
+        </div>
     </div>
     <label class="div_label" for="preview_container">Reader Preview</label>
     <div id="preview_container" class="config_container"></div>
