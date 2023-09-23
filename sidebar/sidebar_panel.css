@@ -42,14 +42,10 @@
 .bookmark_icon {
     object-fit: contain;
     padding-left: 2.5em;
-    height: 98%;
-    width: 98%;
 }
 
 .thumbnail_icon {
     object-fit: contain;
-    height: 95%;
-    width: 95%;
 }
 
 .undecorated_link {
