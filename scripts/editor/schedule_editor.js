@@ -46,12 +46,13 @@ class BasicEditor {
         this._checkbox.addEventListener("click", (evt) => {
             this._schedule.setActive();
             // Seems like you cannot listen to the state of the scheduler.
-            // Doing it this way then.
+            // Going via ScheduleEditor then, update all others manually.
             this._interface.updateActivityChecks();
         });
     }
 
     updateActiveState() {
+        // Update UI using schedule state
         if (this._schedule.isActive()) {
             this._checkbox.checked = true;
             this._expand();
