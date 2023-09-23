@@ -1,7 +1,7 @@
-import {ReaderVisuals} from "./reader_visuals.js"
-import {ReaderData} from "../shared/reader_data.js"
-import {ReaderSync} from "../shared/reader_sync.js"
-import { Scheduler } from "../shared/schedule.js"
+import { ReaderVisuals } from "./reader_visuals.js"
+import { ReaderData } from "../shared/reader_data.js"
+import { ReaderSync } from "../shared/reader_sync.js"
+import { Scheduler } from "../shared/scheduler.js"
 
 class ReaderManager {
     #readerData;

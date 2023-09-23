@@ -37,21 +37,51 @@
     <div id="preview_container" class="config_container"></div>
     <label class="div_label" for="schedule_container">Display Schedule</label>
     <div id="schedule_container" class="config_container">
-        <fieldset class="input_frame">
-            <legend>Schedule</legend>
-            <div>
-                <input type="radio" id="none" name="schedule" value="none" checked/>
-                <label for="none">Always visible</label>
+        <div>
+            <input type="checkbox" id="always"/>
+            <label for="always">Always show reader entry</label>
+            <div id="always_frame" class="schedule_option no_draw">
+                This title will always be visible on the sidebar.
             </div>
-            <div>
-                <input type="radio" id="hourly" name="schedule" value="hourly"/>
-                <label for="hourly">Hide for one hour</label>
+        </div>
+        <div>
+            <input type="checkbox" id="duration"/>
+            <label for="duration">Hide for some time</label>
+            <div id="duration_frame" class="schedule_option no_draw">
+                Hide for 
+                <input type="number" id="duration_number" placeholder="1" step="1" min="1"/>
+                <select id="duration_unit">
+                    <option value="hours">hours</option>
+                    <option value="days">days</option>
+                    <option value="weeks">weeks</option>
+                    <option value="months">months</option>
+                </select>
             </div>
-            <div>
-                <input type="radio" id="daily" name="schedule" value="daily"/>
-                <label for="daily">Hide until next day</label>
+        </div>
+        <div>
+            <input type="checkbox" id="weekly"/>
+            <label for="weekly">Show again on weekdays</label>
+            <div id="weekly_frame" class="schedule_option no_draw">
+                <label for="week_days">Bring back to sidebar on:</label>
+                <div id="week_days" class="week_line">
+                    <span id="week_mo" class="week_day">Mo</span>
+                    <span id="week_tu" class="week_day">Tu</span>
+                    <span id="week_we" class="week_day">We</span>
+                    <span id="week_th" class="week_day">Th</span>
+                    <span id="week_fr" class="week_day">Fr</span>
+                    <span id="week_sa" class="week_day">Sa</span>
+                    <span id="week_su" class="week_day">So</span>
+                </div>
             </div>
-        </fieldset>
+        </div>
+        <div>
+            <input type="checkbox" id="monthly"/>
+            <label for="monthly">Show again on days of the month</label>
+            <div id="monthly_frame" class="schedule_option no_draw">
+                <label for="month_days">Enter list of days:</label>
+                <input type="text" id="month_days" placeholder="e.g. '1, 10'")>
+            </div>
+        </div>
     </div>
     <button id="cancel">Cancel</button>
     <button id="finalize">Finalize</button>

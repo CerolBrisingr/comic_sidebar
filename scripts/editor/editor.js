@@ -60,13 +60,7 @@ class Editor {
     }
 
     #setUpScheduleEditor() {
-        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule(), (scheduleObject) => {
-            this.#updateSchedule(scheduleObject);
-        });
-    }
-
-    #updateSchedule(scheduleObject) {
-        this.#reader.updateSchedule(scheduleObject);
+        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
     }
 
     #collectExitButtons() {
