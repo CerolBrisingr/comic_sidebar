@@ -14,7 +14,7 @@ class ScheduleEditor {
     }
 
     updateActivityChecks() {
-        // States of schedules are linked, corresponding viusals are not
+        // States of schedules are linked, corresponding visuals are not
         this.#always.updateActiveState();
         this.#duration.updateActiveState();
         this.#weekly.updateActiveState();

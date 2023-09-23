@@ -44,6 +44,8 @@ class ReaderSchedule {
     }
 
     singleOut(activeSchedule) {
+        // Deactivate any schedule option that is not "activeSchedule"
+        // Should be triggered by this one schedule going active
         for (const schedule of this.#scheduleVariants()) {
             if (schedule !== activeSchedule)
                 schedule._deselect();
@@ -70,9 +72,11 @@ class ReaderSchedule {
 }
 
 class BasicSchedule {
+    // Class handles active state link with other schedule options 
+    // and guarantees the "type" interface
     _type = "basic";
     _scheduleInterface;
-    _isActive = true;
+    _isActive = false;
 
     constructor(scheduleInterface) {
         this._scheduleInterface = scheduleInterface;
@@ -104,6 +108,8 @@ class BasicSchedule {
 }
 
 class AlwaysOn extends BasicSchedule {
+    // Most simple schedule, basically no schedule
+
     constructor(scheduleInterface) {
         super(scheduleInterface);
     }
@@ -120,12 +126,12 @@ class AlwaysOn extends BasicSchedule {
 }
 
 class ScheduleDuration extends BasicSchedule{
+    // Select a timespan, unit and amount
     #amount = 1;
     #unit = new TimeUnit();
 
     constructor(scheduleInterface) {
         super(scheduleInterface);
-        this._deselect();
         this._type = "duration";
     }
 
@@ -187,13 +193,13 @@ class TimeUnit {
 }
 
 class WeeklyReset  extends BasicSchedule {
+    // Gather days of the week, avoid duplications
     #possibleDays = ["monday", "tuesday", "wednesday", 
         "thursday", "friday", "saturday", "sunday"];
     #days = new Set(["monday"]);
 
     constructor(scheduleInterface) {
         super(scheduleInterface);
-        this._deselect();
         this._type = "weekly";
     }
 
@@ -246,13 +252,13 @@ class WeeklyReset  extends BasicSchedule {
 }
 
 class MonthlyReset extends BasicSchedule {
+    // Gather days in a month, avoid duplication
     #minDay = 1;
     #maxDay = 31;
     #days = new Set([1, 15]);
 
     constructor(scheduleInterface) {
         super(scheduleInterface);
-        this._deselect();
         this._type = "monthly";
     }
 
