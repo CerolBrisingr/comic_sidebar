@@ -39,7 +39,7 @@ class PrefixSelector {
             this.#reactToKey(evt.code);
         }
         const fctMouseMove = (evt) => {
-            this.#catchPosition(evt.x);
+            this.#catchPosition(evt);
         }
 
         const line = document.getElementById("prefix_line");
@@ -72,9 +72,16 @@ class PrefixSelector {
 
     #checkBounds(evt) {
         // Positions before start of text or after end of text are out of bounds
-        let trailBox = this.#trail.getBoundingClientRect();
+        // Clicking before or after the text should not elicit a reaction
         let mainBox = this.#main.getBoundingClientRect();
+        let edgeBox = this.#edge.getBoundingClientRect();
+        let trailBox = this.#trail.getBoundingClientRect();
+        // With multiple lines, any element can form the right border
+        // Be left of any of them
         let inBounds = evt.x <= trailBox.right;
+        inBounds |= evt.x <= edgeBox.right;
+        inBounds |= evt.x <= mainBox.right;
+        // The main/prefix is part of the left border in any way
         inBounds &= evt.x >= mainBox.left;
         return inBounds;
     }
@@ -89,6 +96,20 @@ class PrefixSelector {
         }
         this.#updateLine();
         this.#sendUpdate();
+    }
+
+    #hasRoomAbove() {
+        // Can the edge still move at least one row up?
+        let box_main = this.#main.getBoundingClientRect();
+        let box_edge = this.#edge.getBoundingClientRect();
+        return Math.abs(box_main.top - box_edge.top) > 0.1;
+    }
+
+    #hasRoomBelow() {
+        // Can the edge still move at least one row down?
+        let box_edge = this.#edge.getBoundingClientRect();
+        let box_tail = this.#trail.getBoundingClientRect();
+        return Math.abs(box_tail.bottom - box_edge.bottom) > 0.1;
     }
     
     #updateLine() {
@@ -107,13 +128,38 @@ class PrefixSelector {
     #decideDirection(target) {
         // returns [stepSize, fcnVerifyStillRunning]
         let box = this.#edge.getBoundingClientRect();
-        if (box.right < target) {
-            return [1, (val) => {return val < this.#url.length;}];
-        } else if (box.left > target) {
-            return [-1, (val) => {return val > this.#minIndex -1;}];
+        const reachedEnd = (index) => {return index < this.#url.length};
+        const reachedStart = (index) => {return index > this.#minIndex -1};
+        if (box.top > target.y && this.#hasRoomAbove()) {
+            return [-1, reachedStart];
+        } else if (box.bottom < target.y && this.#hasRoomBelow()) {
+            return [1, reachedEnd];
+        }
+        if (box.right < target.x) {
+            return [1, reachedEnd];
+        } else if (box.left > target.x) {
+            return [-1, reachedStart];
         } else {
             return [0, undefined];
         }
+    }
+
+    #foundPosition(target, box) {
+        if (!this.#rowMatches(target, box))
+            return false;
+        return this.#columnMatches(target, box);
+    }
+
+    #rowMatches(target, box) {
+        if (target.y > box.bottom && this.#hasRoomBelow())
+            return false;
+        if (target.y < box.top && this.#hasRoomAbove())
+            return false;
+        return true;
+    }
+
+    #columnMatches(target, box) {
+        return ((box.left <= target.x) & (box.right >= target.x));
     }
     
     #catchPosition(target) {
@@ -124,7 +170,7 @@ class PrefixSelector {
             this.#iSplit = iPos;
             this.#updateLine();
             let box = this.#edge.getBoundingClientRect();
-            if ((box.left <= target) & (box.right >= target)) {
+            if (this.#foundPosition(target, box)) {
                 break;
             }
         }
