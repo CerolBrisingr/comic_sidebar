@@ -42,6 +42,7 @@
 .bookmark_icon {
     object-fit: contain;
     padding-left: 2.5em;
+    opacity: 0.9;
 }
 
 .thumbnail_icon {
@@ -73,6 +74,7 @@
 
 .icon_button_expand {
     display: inline-flex;
+    opacity: 0.9;
 }
 
 .gridline:hover .icon_button {

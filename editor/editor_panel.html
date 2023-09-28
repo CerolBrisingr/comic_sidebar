@@ -7,35 +7,50 @@
         <script type="module" src="../scripts/editor/editor_panel.js"></script>
     </head>
 <body>
-    <label class="div_label" for="reader_setup">Reader Setup</label>
+    <label class="div_label" for="reader_setup">
+        <img class="field_type_icon" src="../icons/edit.svg"/>
+        Reader Setup
+    </label>
     <div id="reader_setup" class="config_container">
-        <label for="label_box">Label:</label>
+        <label for="label_box"><b>Label your reader:</b></label>
         <br />
+        <img class="field_type_icon" src="../icons/edit.svg"/>
         <input class="label_box" 
             type="search" 
             id="label_box" 
             placeholder="some.comic">
         <br />
         <div class="divider"></div>
-        <label for="prefix_line">Select the address that all pages share:</label>
+        <label for="prefix_line"><b>Select the address that all pages share:</b></label>
         <div class="spans" id="prefix_line" tabindex="0">
+            <img class="field_type_icon" src="../icons/edit.svg"/>
             <span class="prefix_main" id="prefix_main">https://some.comic/comics</span><span class="prefix_edge" id="prefix_edge">/</span><span class="prefix_trail" id="prefix_trail">4192</span>
         </div>
+        <img class="field_type_icon" src="../icons/information.svg"/>
+        Drag & Drop or use arrow keys
+        <br/>
         <div class="divider"></div>
-        <label for="prefix_showcase">This reader will track all pages with addresses that start like:</label>
+        <label for="prefix_showcase"><b>This reader will track all pages with addresses that start like:</b></label>
         <div class="spans" id="prefix_showcase">
-            <span class="prefix_output" id="prefix_output">https://some.comic/comics/</span>
-            <span class="append_stars">***</span>
+            <img class="field_type_icon" src="../icons/information.svg"/>
+            <span class="prefix_output" id="prefix_output">https://some.comic/comics/</span><span class="append_stars">***</span>
         </div>
     </div>
-    <label class="div_label" for="preview_container">Reader Preview</label>
+    <label class="div_label" for="preview_container">
+        <img class="field_type_icon" src="../icons/information.svg"/>
+        Reader Preview
+    </label>
     <div id="preview_container" class="config_container"></div>
-    <label class="div_label" for="schedule_container">Display Schedule</label>
+    <label class="div_label" for="schedule_container">
+        <img class="field_type_icon" src="../icons/edit.svg"/>
+        Display Schedule
+    </label>
     <div id="schedule_container" class="config_container">
         <div>
             <input type="checkbox" id="always"/>
             <label for="always">Always show reader entry</label>
             <div id="always_frame" class="schedule_option no_draw">
+                <img class="field_type_icon" src="../icons/information.svg"/>
                 This title will always be visible on the sidebar.
             </div>
         </div>
@@ -43,6 +58,7 @@
             <input type="checkbox" id="duration"/>
             <label for="duration">Hide for some time</label>
             <div id="duration_frame" class="schedule_option no_draw">
+                <img class="field_type_icon" src="../icons/edit.svg"/>
                 Hide for 
                 <input type="number" id="duration_number" placeholder="1" step="1" min="1"/>
                 <select id="duration_unit">
@@ -57,8 +73,9 @@
             <input type="checkbox" id="weekly"/>
             <label for="weekly">Show again on weekdays</label>
             <div id="weekly_frame" class="schedule_option no_draw">
-                <label for="week_days">Bring back to sidebar on:</label>
+                <label for="week_days">Bring back to sidebar on (click to toggle):</label>
                 <div id="week_days" class="week_line">
+                    <img class="field_type_icon" src="../icons/edit.svg"/>
                     <span id="week_mo" class="week_day">Mo</span>
                     <span id="week_tu" class="week_day">Tu</span>
                     <span id="week_we" class="week_day">We</span>
@@ -74,6 +91,8 @@
             <label for="monthly">Show again on days of the month</label>
             <div id="monthly_frame" class="schedule_option no_draw">
                 <label for="month_days">Enter list of days:</label>
+                <br/>
+                <img class="field_type_icon" src="../icons/edit.svg"/>
                 <input type="text" id="month_days" placeholder="e.g. '1, 10'")>
             </div>
         </div>

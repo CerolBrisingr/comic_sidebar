@@ -1,3 +1,9 @@
+.field_type_icon {
+    object-fit: contain;
+    margin-left: 6px;
+    opacity: 0.5;
+}
+
 .spans {
     line-break: anywhere;
 }
