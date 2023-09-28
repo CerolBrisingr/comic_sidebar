@@ -77,7 +77,7 @@ class PrefixSelector {
         let edgeBox = this.#edge.getBoundingClientRect();
         let trailBox = this.#trail.getBoundingClientRect();
         // With multiple lines, any element can form the right border
-        // Be left of any of them
+        // Be left of the rightmost one
         let inBounds = evt.x <= trailBox.right;
         inBounds |= evt.x <= edgeBox.right;
         inBounds |= evt.x <= mainBox.right;
