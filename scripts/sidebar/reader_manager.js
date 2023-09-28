@@ -70,7 +70,6 @@ class ReaderManager {
         this.#readerData.editReader(readerObjectLike);
         this.#schedule.updateRuleset(this.#readerData.getSchedule());
         this.#updateReaderVisuals();
-        this.expand();
         this.#parentInterface.relistViewerDisplay();
     }
     
