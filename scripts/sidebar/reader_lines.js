@@ -291,7 +291,7 @@ class EditableLabel {
 
     #extractLabel() {
         let linkPieces = dissectUrl(this.#bookmark.href, this.#prefix, true);
-        return this.#bookmark.getLabel(linkPieces.tail);
+        return this.#bookmark.getLabel(cleanEnd(linkPieces.tail));
     }
 
     updateLabel(newValue) {
@@ -435,13 +435,19 @@ class IconButton {
 
 function getBookmarkLabel(href, prefix) {
     let urlPieces = dissectUrl(href, prefix);
-    return urlPieces.tail;
+    return cleanEnd(urlPieces.tail);
 }
 
 function buildLine() {
     let line = document.createElement("div");
     line.classList.add("gridline");
     return line;
+}
+
+function cleanEnd(string) {
+    if (string.slice(-1) === "/")
+        return string.slice(0, -1);
+    return string;
 }
 
 export {ReaderLine, AutoBookmarkLine, ManualBookmarkLine}
