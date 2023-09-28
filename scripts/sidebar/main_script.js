@@ -3,7 +3,7 @@ import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
 import { SortControls } from "./reader_sort.js"
-import { ShowAllInterface } from "../shared/schedule.js"
+import { ShowAllInterface } from "../shared/scheduler.js"
 
 /* 
 Browser modified during development:

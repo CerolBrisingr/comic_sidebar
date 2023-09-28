@@ -90,6 +90,8 @@ class UrlListener {
         let tab = await browser.tabs.get(tabId);
         if (tab === undefined)
             return;
+        if (!tab.active) // This tab will fire again when finally viewed
+            return;
         this.#fireOnlyOnce(tab.url, tab.favIconUrl);
     }
 }

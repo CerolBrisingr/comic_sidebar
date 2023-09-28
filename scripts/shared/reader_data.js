@@ -1,5 +1,6 @@
-import {dissectUrl} from "./url.js"
-import {ReaderSync} from "./reader_sync.js"
+import { dissectUrl } from "./url.js"
+import { ReaderSync } from "./reader_sync.js"
+import { ReaderSchedule } from "./reader_schedule.js";
 
 class ReaderData {
     #label;
@@ -11,6 +12,19 @@ class ReaderData {
     #manual;
     #parentInterface;
     #schedule;
+
+    static buildForEditor(readerObject) {
+        // Build readerData without the connected behavior
+        return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
+    }
+
+    static buildForEditorFromData(data) {
+        // Build readerData without connected behavior and from basic assumptions
+        let urlPieces = dissectUrl(data.url);
+        let readerObject = {time: data.time, prefix_mask: urlPieces.base_url, label: urlPieces.host, manual: [], automatic: []};
+        readerObject.automatic.push({href: data.url});
+        return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
+    }
     
     constructor(data, parentInterface, readerSync) {
         // Import object from storage
@@ -58,9 +72,17 @@ class ReaderData {
     getLabel() {
         return this.#label;
     }
+
+    setLabel(label) {
+        this.#label = label;
+    }
     
     getPrefixMask() {
         return this.#prefixMask;
+    }
+
+    setPrefixMask(prefixMask) {
+        this.#prefixMask = prefixMask;
     }
     
     getPinnedBookmarks() {
@@ -199,6 +221,10 @@ class ReaderData {
     getSchedule() {
         return this.#schedule;
     }
+
+    updateSchedule(scheduleObject) {
+        this.#schedule.updateSchedule(scheduleObject);
+    }
     
     returnAsObject() {
         let thisAsObject = {
@@ -233,33 +259,6 @@ function isArray(list) {
     if (list === undefined)
         return false;
     return Array.isArray(list);
-}
-
-class ReaderSchedule {
-    #possibleRules = ["none", "daily", "hourly"];
-    #rule = "none";
-    
-    constructor(rule) {
-        this.updateSchedule(rule);
-    }
-
-    updateSchedule(rule) {
-        if (rule === undefined)
-            return;
-        if (this.#possibleRules.includes(rule)) {
-            this.#rule = rule;
-        } else {
-            console.log("Invalid scheduling rule");
-        }
-    }
-
-    getRule() {
-        return this.#rule;
-    }
-
-    returnAsObject() {
-        return this.#rule;
-    }
 }
 
 class Bookmark {
@@ -307,4 +306,17 @@ class Bookmark {
     }
 }
 
-export {ReaderSchedule, ReaderData}
+class ReaderSyncDummy {
+    getId() {
+        return 1;
+    }
+
+    disconnect() {}
+}
+
+class InterfaceDummy {
+    saveProgress() {}
+    deleteMe() {}
+}
+
+export {ReaderData}

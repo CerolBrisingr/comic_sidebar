@@ -1,62 +1,191 @@
-import { SubscriberPort } from "../sidebar/subscriber_port.js";
-import { ReaderEditor } from "./reader_editor.js";
+import { PrefixSelector } from "./prefix_selector.js"
+import { ReaderData } from "../shared/reader_data.js";
+import { ReaderVisuals } from "../sidebar/reader_visuals.js";
+import { OpenUrlCtrl } from "../shared/url.js";
+import { ImageAdjuster } from "../shared/fav_icon_manager.js";
+import { ScheduleEditor } from "./schedule_editor.js";
 
-let readerEditor;
-let port;
+class Editor {
+    #prefixInfo;
+    #prefixEdit;
+    
+    #reader;
+    #preview;
+    #scheduler;
+    #fcnFinalize;
 
-if (document.readySate === "loading") {
-    document.addEventListener('DOMContentLoaded', function (event) {
-        setUpScript();
-    });
-} else {
-    setUpScript();
-}
+    #cancel;
+    #finalizer;
+    #startDeleteBtn;
+    #confirmDeleteBtn;
 
-function setUpScript() {
-    setUpReaderEditor()
-    window.addEventListener("blur", () => {closeMe();});
-    port = new SubscriberPort(receive, "editor_form");
-    port.sendMessage("setUp");
-}
-
-function receive(message) {
-    if (message === "close") {
-        closeMe();
-        return;
+    constructor() {
+        // Wait for instructions
     }
-    if (message.hasOwnProperty("import")) {
-        readerEditor.createReaderEntry(message.import, finalize);
-        return;
+
+    async createReaderEntry(data, fcnFinalize) {
+        this.#fcnFinalize = fcnFinalize;
+        this.#reader = ReaderData.buildForEditorFromData(data);
+        this.#preview = ReaderVisuals.makePreview(this.#reader);
+        this.#setUpPrefixHandling(data.url);
+        const imageAdjuster = new ImageAdjuster();
+        const favIcon = await imageAdjuster.apply(data.favIcon);
+        this.#setUpPreview(favIcon);
+        this.#setUpLabelInput();
+        this.#setUpScheduleEditor();
+        this.#setUpCreationExit();
     }
-    if (message.hasOwnProperty("update")) {
-        readerEditor.updateReaderEntry(message.update, finalize);
-        return;
+
+    updateReaderEntry(readerObjectLike, fcnFinalize) {
+        this.#fcnFinalize = fcnFinalize;
+        this.#reader = ReaderData.buildForEditor(readerObjectLike);
+        this.#preview = ReaderVisuals.makePreview(this.#reader);
+        this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
+        this.#setUpPreview(readerObjectLike.favIcon);
+        this.#setUpLabelInput();
+        this.#setUpScheduleEditor();
+        this.#setUpUpdateExit();
+    }
+
+    #setUpCreationExit() {
+        this.#collectExitButtons();
+        this.#setDeleteSectionVisibility("off");
+        this.#finalizer.innerText = "Add Reader";
+    }
+
+    #setUpUpdateExit() {
+        this.#collectExitButtons();
+        this.#setDeleteSectionVisibility("idle");
+        this.#finalizer.innerText = "Update Reader";
+    }
+
+    #setUpScheduleEditor() {
+        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
+    }
+
+    #collectExitButtons() {
+        this.#cancel = document.getElementById("cancel");
+        this.#cancel.onclick = () => {window.close();};
+        this.#finalizer = document.getElementById("finalize");
+        this.#finalizer.onclick = () => {this.#finalize();};
+        let startDelete = document.getElementById("start_delete");
+        let fcnStartDelete = () => {this.#triggerDelete();};
+        this.#startDeleteBtn = new HideShowButton(startDelete, fcnStartDelete, false);
+        let confirmDelete = document.getElementById("confirm_delete");
+        let fcnConfirmDelte = () => {this.#confirmDelete();};
+        this.#confirmDeleteBtn = new HideShowButton(confirmDelete, fcnConfirmDelte, false);
+    }
+
+    #triggerDelete() {
+        if (this.#startDeleteBtn.getLabel() === "Delete") {
+            this.#setDeleteSectionVisibility("armed");
+        } else {
+            this.#setDeleteSectionVisibility("idle");
+        }
+    }
+
+    #confirmDelete() {
+        // User confirmed delete option. Send order
+        let deleteCommand = {deleteMe: true};
+        this.#fcnFinalize(deleteCommand);
+    }
+
+    #finalize() {
+        // Successful confiuration. Send data
+        let readerObjectLike = this.#reader.returnAsObject();
+        readerObjectLike.favIcon = this.#preview.getFavIcon();
+        readerObjectLike.url = this.#reader.getMostRecentAutomaticUrl();
+        this.#fcnFinalize(readerObjectLike);
+    }
+
+    #setUpPrefixHandling(url) {
+        this.#prefixInfo = document.getElementById("prefix_output");
+        this.#prefixEdit = new PrefixSelector(url, this.#reader.getPrefixMask(), (prefix) => {
+            this.#prefixUpdate(prefix);
+        });
+    }
+
+    #prefixUpdate(prefix) {
+        this.#reader.setPrefixMask(prefix);
+        this.#preview.updateReaderUrls(this.#reader);
+        this.#prefixInfo.innerText = prefix;
+    }
+
+    #setUpPreview(favIcon) {
+        const container = document.getElementById("preview_container");
+        container.appendChild(this.#preview.getListing());
+        OpenUrlCtrl.setOpenUrls(false);
+        this.#preview.updateFavIcon(favIcon);
+        this.#preview.expand();
+    }
+
+    #setUpLabelInput() {
+        const labelInput = document.getElementById("label_box");
+        labelInput.placeholder = this.#reader.getLabel();
+        labelInput.addEventListener("input", () => {
+            let text = labelInput.value.trim();
+            if (text === "")
+                text = labelInput.placeholder;
+            this.#reader.setLabel(text);
+            this.#preview.updateLabelOnly(text);
+        });
+    }
+
+    #setDeleteSectionVisibility(mode) {
+        switch (mode) {
+            case "idle":
+                this.#startDeleteBtn.setLabel("Delete");
+                this.#startDeleteBtn.setVisible(true);
+                this.#confirmDeleteBtn.setVisible(false);
+                break;
+            case "off":
+                this.#startDeleteBtn.setVisible(false);
+                this.#confirmDeleteBtn.setVisible(false);
+                break;
+            case "armed":
+                this.#startDeleteBtn.setLabel("Cancel");
+                this.#startDeleteBtn.setVisible(true);
+                this.#confirmDeleteBtn.setVisible(true);
+                break;
+            default:
+                this.#startDeleteBtn.setVisible(false);
+                this.#confirmDeleteBtn.setVisible(false);
+        }
     }
 }
 
-function finalize(data) {
-    port.sendMessage({data: data});
-    closeMe();
+class HideShowButton {
+    #objButton;
+    
+    constructor(objButton, fktClick, isVisible) {
+        this.#objButton = objButton;
+        objButton.onclick = fktClick;
+        this.setVisible(isVisible);
+    }
+    
+    setVisible(isVisible) {
+        if (isVisible) {
+            this.#setVisible();
+        } else {
+            this.#setInvisible();
+        }
+    }
+    
+    setLabel(newLabel) {
+        this.#objButton.innerText = newLabel;
+    }
+    
+    getLabel() {
+        return this.#objButton.innerText;
+    }
+    
+    #setInvisible() {
+        this.#objButton.style.display = "none";
+    }
+    
+    #setVisible() {
+        this.#objButton.style.removeProperty("display");
+    }
 }
 
-function closeMe() {
-    let winId = browser.windows.WINDOW_ID_CURRENT;
-    let removing = browser.windows.remove(winId);
-}
-
-function setUpReaderEditor() {
-    let fullLink = document.getElementById('new_comic_full_link');
-    let label = document.getElementById('new_comic_label');
-    let prefix = document.getElementById('new_comic_prefix');
-    let linkLabel = document.getElementById('new_comic_link_label');
-    let textMsg = document.getElementById('new_comic_message');
-    let errorMsg = document.getElementById('new_comic_error');
-    let cancelBtn = document.getElementById('new_comic_cancel');
-    let okBtn = document.getElementById('new_comic_finalize');
-    let startDel = document.getElementById('comic_start_delete');
-    let confirmDel = document.getElementById('comic_confirm_delete');
-    let schedule = document.getElementsByName('schedule');
-    readerEditor = new ReaderEditor(fullLink, label, prefix, linkLabel, 
-        textMsg, errorMsg, cancelBtn, okBtn, startDel, confirmDel, schedule);
-}
-
+export {Editor}

@@ -1,0 +1,70 @@
+.field_type_icon {
+    object-fit: contain;
+    margin-left: 6px;
+    opacity: 0.4;
+    height: 0.9em;
+    width: 0.9em;
+}
+
+.spans {
+    line-break: anywhere;
+}
+
+.spans:focus {
+    outline: none;
+}
+
+.prefix_main {
+    color: blue;
+}
+
+.prefix_main::selection {
+    background: white;
+}
+
+.prefix_edge {
+    background: lightgreen;
+}
+
+.prefix_edge::selection {
+    background: lightgreen;
+}
+
+.prefix_trail {
+    color: gray;
+}
+
+.prefix_trail::selection {
+    background: white;
+}
+
+.append_stars {
+    color: lightgray;
+}
+
+.config_container {
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 18px;
+}
+
+.div_label {
+    position: relative;
+    top: 1ex;
+    z-index: 1;
+    left: 2em;
+    background-color: white;
+    padding: 0 5px;
+}
+
+.divider {
+    margin-top: 6px;
+}
+
+.schedule_option {
+    margin-left: 20px;
+}
+
+.label_box {
+    width: 300px;
+}

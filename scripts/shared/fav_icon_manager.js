@@ -154,6 +154,10 @@ class ImageAdjuster {
         if (favIcon === undefined) {
             return favIcon;
         }
+        if (!favIcon.startsWith("data:image")) {
+            console.log(`Not scaling "${favIcon}"`);
+            return favIcon;
+        }
 
         let image = new Image();
         image.src = favIcon;
@@ -207,4 +211,4 @@ async function displaySize(data, strTitle) {
     console.log(`Image ${strTitle}: ${image.naturalWidth} x ${image.naturalHeight}`);
 }
 
-export {FavIconController, FavIconSubscriber}
+export {FavIconController, FavIconSubscriber, ImageAdjuster}

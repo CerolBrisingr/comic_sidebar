@@ -1,7 +1,7 @@
-import {ReaderVisuals} from "./reader_visuals.js"
-import {ReaderData} from "../shared/reader_data.js"
-import {ReaderSync} from "../shared/reader_sync.js"
-import { Scheduler } from "../shared/schedule.js"
+import { ReaderVisuals } from "./reader_visuals.js"
+import { ReaderData } from "../shared/reader_data.js"
+import { ReaderSync } from "../shared/reader_sync.js"
+import { Scheduler } from "../shared/scheduler.js"
 
 class ReaderManager {
     #readerData;
@@ -62,12 +62,13 @@ class ReaderManager {
     }
     
     prepareReaderEdit() {
-        this.#readerSync.sendEditRequest();
+        this.#readerSync.sendEditRequest(this.#favIcon);
         this.expand();
     }
     
-    editReader(readerEssentials) {
-        this.#readerData.editReader(readerEssentials);
+    editReader(readerObjectLike) {
+        this.#readerData.editReader(readerObjectLike);
+        this.#schedule.updateRuleset(this.#readerData.getSchedule());
         this.#updateReaderVisuals();
         this.expand();
         this.#parentInterface.relistViewerDisplay();
