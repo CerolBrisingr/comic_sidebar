@@ -2,6 +2,8 @@
     object-fit: contain;
     margin-left: 6px;
     opacity: 0.5;
+    height: 0.9em;
+    width: 0.9em;
 }
 
 .spans {

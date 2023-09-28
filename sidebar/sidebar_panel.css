@@ -47,6 +47,8 @@
 
 .thumbnail_icon {
     object-fit: contain;
+    height: 2.5ex;
+    width: 2.5ex;
 }
 
 .undecorated_link {
@@ -97,8 +99,8 @@
     overflow: hidden;
     text-overflow: clip;
     white-space: nowrap;
-    margin-top: 0.2vh;
-    margin-bottom: 0.2vh;
+    margin-top: 0.2ex;
+    margin-bottom: 0.2ex;
 } 
 
 .gridline:hover div > .label_input {
