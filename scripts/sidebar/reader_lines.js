@@ -291,7 +291,7 @@ class EditableLabel {
 
     #extractLabel() {
         let linkPieces = dissectUrl(this.#bookmark.href, this.#prefix, true);
-        return this.#bookmark.getLabel(cleanEnd(linkPieces.tail));
+        return this.#bookmark.getLabel(cleanEnd(linkPieces));
     }
 
     updateLabel(newValue) {
@@ -344,9 +344,14 @@ class IconLink {
     constructor(href, label, imgPath) {
         this.#link = document.createElement("a");
         this.#icon = document.createElement("img");
+        let space = document.createElement("pre");
         this.#label = document.createElement("div");
         this.#link.appendChild(this.#icon);
+        this.#link.appendChild(space);
         this.#link.appendChild(this.#label);
+
+        space.classList.add("hard_space");
+        space.innerText = " ";
 
         this.#label.classList.add("gridline_label");
 
@@ -435,7 +440,7 @@ class IconButton {
 
 function getBookmarkLabel(href, prefix) {
     let urlPieces = dissectUrl(href, prefix);
-    return cleanEnd(urlPieces.tail);
+    return cleanEnd(urlPieces);
 }
 
 function buildLine() {
@@ -444,7 +449,10 @@ function buildLine() {
     return line;
 }
 
-function cleanEnd(string) {
+function cleanEnd(urlPieces) {
+    if (urlPieces === undefined)
+        return "will no longer be tracked";
+    let string = urlPieces.tail;
     if (string.slice(-1) === "/")
         return string.slice(0, -1);
     return string;
