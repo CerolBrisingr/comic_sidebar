@@ -63,7 +63,6 @@ class ReaderManager {
     
     prepareReaderEdit() {
         this.#readerSync.sendEditRequest(this.#favIcon);
-        this.expand();
     }
     
     editReader(readerObjectLike) {
