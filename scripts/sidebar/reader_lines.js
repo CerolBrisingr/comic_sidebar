@@ -344,9 +344,14 @@ class IconLink {
     constructor(href, label, imgPath) {
         this.#link = document.createElement("a");
         this.#icon = document.createElement("img");
+        let space = document.createElement("pre");
         this.#label = document.createElement("div");
         this.#link.appendChild(this.#icon);
+        this.#link.appendChild(space);
         this.#link.appendChild(this.#label);
+
+        space.classList.add("hard_space");
+        space.innerText = " ";
 
         this.#label.classList.add("gridline_label");
 

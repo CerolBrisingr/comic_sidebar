@@ -3,6 +3,14 @@
     --button-hover-color: #abcc7a;
 }
 
+.hard_space {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    font: inherit;
+}
+
 .gridline {
     width: 100%;
     display: grid;
@@ -53,7 +61,7 @@
 
 .undecorated_link {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto auto 1fr;
     text-decoration: none;
     color: black;
     align-items: center;
