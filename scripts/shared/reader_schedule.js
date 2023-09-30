@@ -3,6 +3,7 @@ class ReaderSchedule {
     #duration;
     #weekly;
     #monthly;
+    #hiatus;
 
     constructor(scheduleObject) {
         const scheduleInterface = new ScheduleInterface(this);
@@ -10,6 +11,7 @@ class ReaderSchedule {
         this.#duration = new ScheduleDuration(scheduleInterface);
         this.#weekly = new WeeklyReset(scheduleInterface);
         this.#monthly = new MonthlyReset(scheduleInterface);
+        this.#hiatus = new Hiatus();
         this.updateSchedule(scheduleObject);
     }
 
@@ -21,6 +23,7 @@ class ReaderSchedule {
         this.#duration.updateWith(scheduleObject.duration);
         this.#weekly.updateWith(scheduleObject.weekly);
         this.#monthly.updateWith(scheduleObject.monthly);
+        this.#hiatus.updateWith(scheduleObject.hiatus);
     }
 
     #scheduleVariants() {
@@ -66,7 +69,8 @@ class ReaderSchedule {
             always_on: this.#alwaysOn.returnAsObject(),
             duration: this.#duration.returnAsObject(),
             weekly: this.#weekly.returnAsObject(),
-            monthly: this.#monthly.returnAsObject()
+            monthly: this.#monthly.returnAsObject(),
+            hiatus: this.#hiatus.returnAsObject()
         };
     }
 }
@@ -309,6 +313,46 @@ class MonthlyReset extends BasicSchedule {
         return {
             active: this._isActive,
             days: this.getDays()
+        };
+    }
+}
+
+class Hiatus extends BasicSchedule {
+    #targetDate = 0;
+
+    constructor() {
+        super(undefined);
+        this._type = "hiatus";
+    }
+
+    updateWith(object) {
+        if (object.active)
+            this.setActive();
+        this.setTarget(object.target_date);
+    }
+
+    setActive() {
+        // This one works independently
+        this._isActive = true;
+    }
+
+    setTarget(date) {
+        if (date === undefined)
+            return;
+        // We don't want a date object
+        if (typeof date.getTime === "function")
+            date = date.getTime(); 
+        this.#targetDate = date;
+    }
+
+    getTarget() {
+        return this.#targetDate;
+    }
+
+    returnAsObject() {
+        return {
+            active: this._isActive,
+            target_date: this.getTarget()
         };
     }
 }
