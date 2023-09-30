@@ -46,6 +46,10 @@ class ReaderSchedule {
         return this.#monthly;
     }
 
+    getHiatusOption() {
+        return this.#hiatus;
+    }
+
     singleOut(activeSchedule) {
         // Deactivate any schedule option that is not "activeSchedule"
         // Should be triggered by this one schedule going active
@@ -326,6 +330,8 @@ class Hiatus extends BasicSchedule {
     }
 
     updateWith(object) {
+        if (object === undefined)
+            return;
         if (object.active)
             this.setActive();
         this.setTarget(object.target_date);

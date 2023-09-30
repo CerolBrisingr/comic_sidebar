@@ -3,6 +3,7 @@ class ScheduleEditor {
     #duration;
     #weekly;
     #monthly;
+    #hiatus;
 
     constructor(readerSchedule) {
         let myInterface = new EditorInterface(this);
@@ -10,7 +11,9 @@ class ScheduleEditor {
         this.#duration = new DurationEditor("duration", "duration_frame", readerSchedule.getDurationOption(), myInterface);
         this.#weekly = new WeeklyEditor("weekly", "weekly_frame", readerSchedule.getWeeklyOption(), myInterface);
         this.#monthly = new MonthlyEditor("monthly", "monthly_frame", readerSchedule.getMonthlyOption(), myInterface);
+        this.#hiatus = new HiatusEditor(readerSchedule.getHiatusOption(), myInterface);
         this.updateActivityChecks();
+        this.updateAvailability();
     }
 
     updateActivityChecks() {
@@ -19,6 +22,21 @@ class ScheduleEditor {
         this.#duration.updateActiveState();
         this.#weekly.updateActiveState();
         this.#monthly.updateActiveState();
+    }
+
+    updateAvailability() {
+        // Signal blocking character of hiatus
+        if (this.#hiatus.isActive()) {
+            this.#always.disableInteraction();
+            this.#duration.disableInteraction();
+            this.#weekly.disableInteraction();
+            this.#monthly.disableInteraction();
+        } else {
+            this.#always.enableInteraction();
+            this.#duration.enableInteraction();
+            this.#weekly.enableInteraction();
+            this.#monthly.enableInteraction();
+        }
     }
 }
 
@@ -31,6 +49,10 @@ class EditorInterface {
 
     updateActivityChecks() {
         this.#scheduleEditor.updateActivityChecks();
+    }
+
+    updateAvailability() {
+        this.#scheduleEditor.updateAvailability();
     }
 
 }
@@ -60,6 +82,16 @@ class BasicEditor {
             this._checkbox.checked = false;
             this._collapse();
         }
+    }
+
+    enableInteraction() {
+        // TODO: allow user interaction
+        this.updateActiveState();
+    }
+
+    disableInteraction() {
+        // TODO: disable user interaction
+        this._collapse();
     }
 
     _expand() {
@@ -220,6 +252,42 @@ class MonthlyEditor extends BasicEditor{
         }
     }
 
+}
+
+class Hiatus {
+    #active;
+    #schedule;
+    #interface;
+    #checkbox;
+    #div;
+
+    constructor(schedule, parentInterface) {
+        this.#checkbox = document.getElementById("hiatus");
+        this.#div = document.getElementById("hiatus_frame");
+        this.#schedule = schedule;
+        this.#interface = parentInterface;
+        this.#updateInterface();
+        this.#checkbox.addEventListener("click", (evt) => {
+            this.#schedule.setState(evt.value);
+            // Seems like you cannot listen to the state of the scheduler.
+            // Going via ScheduleEditor then, update all others manually.
+            this.#interface.updateAvailability();
+        });
+    }
+
+    isActive() {
+        return this.#active;
+    }
+
+    #updateInterface() {
+        // read active state
+        // read targetDate
+        // targetDate in past?
+        //  -> targetDate tomorrow
+        //  -> active state false
+        // set checkmark
+        // set timing fields
+    }
 }
 
 export {ScheduleEditor}
