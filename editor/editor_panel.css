@@ -19,6 +19,7 @@
 
 .prefix_main {
     color: blue;
+    cursor: pointer;
 }
 
 .prefix_main::selection {
@@ -27,6 +28,7 @@
 
 .prefix_edge {
     background: lightgreen;
+    cursor: pointer;
 }
 
 .prefix_edge::selection {
@@ -35,6 +37,7 @@
 
 .prefix_trail {
     color: gray;
+    cursor: pointer;
 }
 
 .prefix_trail::selection {
