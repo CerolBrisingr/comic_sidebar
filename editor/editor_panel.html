@@ -99,7 +99,19 @@
                 <label for="month_days">Enter list of days:</label>
                 <br/>
                 <img class="field_type_icon" src="../icons/edit.svg"/>
-                <input type="text" id="month_days" placeholder="e.g. '1, 10'")>
+                <input type="text" id="month_days" placeholder="e.g. '1, 10'">
+            </div>
+        </div>
+        <div>
+            <input type="checkbox" id="hiatus"/>
+            <label for="hiatus">One-time break (hiatus):</label>
+            <div id="hiatus_frame" class="schedule_option no_draw">
+                <img class="field_type_icon" src="../icons/edit.svg"/>
+                <input type="number" id="hiatus_duration" placeholder="1"> days
+                <br/>
+                <img class="field_type_icon" src="../icons/edit.svg"/>
+                Ends on
+                <input type="text" id="hiatus_target" placeholder="11.11.2011">
             </div>
         </div>
     </div>

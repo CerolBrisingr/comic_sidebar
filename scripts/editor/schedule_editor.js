@@ -65,6 +65,10 @@ class BasicEditor {
         this._div = document.getElementById(div);
         this._schedule = schedule;
         this._interface = parentInterface;
+        this._install_listener();
+    }
+
+    _install_listener() {
         this._checkbox.addEventListener("click", (evt) => {
             this._schedule.setActive();
             // Seems like you cannot listen to the state of the scheduler.
@@ -85,12 +89,12 @@ class BasicEditor {
     }
 
     enableInteraction() {
-        // TODO: allow user interaction
+        this._checkbox.disabled = false;
         this.updateActiveState();
     }
 
     disableInteraction() {
-        // TODO: disable user interaction
+        this._checkbox.disabled = true;
         this._collapse();
     }
 
@@ -254,32 +258,33 @@ class MonthlyEditor extends BasicEditor{
 
 }
 
-class HiatusEditor {
-    // TODO: split BasicEditor constructor so we can use it here
-    // Mostly set up checkbox callback in separate method and overload that one
-
-    #active;
-    #schedule;
-    #interface;
-    #checkbox;
-    #div;
+class HiatusEditor extends BasicEditor{
 
     constructor(schedule, parentInterface) {
-        this.#checkbox = document.getElementById("hiatus");
-        this.#div = document.getElementById("hiatus_frame");
-        this.#schedule = schedule;
-        this.#interface = parentInterface;
-        this.#updateInterface();
-        this.#checkbox.addEventListener("click", (evt) => {
-            this.#schedule.setState(evt.value);
+        super("hiatus", "hiatus_frame", schedule, parentInterface);
+    }
+
+    _install_listener() {
+        this._checkbox.addEventListener("change", (evt) => {
+            this.setState(this._checkbox.checked);
             // Seems like you cannot listen to the state of the scheduler.
             // Going via ScheduleEditor then, update all others manually.
-            this.#interface.updateAvailability();
+            this._interface.updateAvailability();
         });
     }
 
+    setState(value) {
+        if (value) {
+            this._schedule.setActive();
+            this._expand();
+        } else {
+            this._schedule._deselect();
+            this._collapse();
+        }
+    }
+
     isActive() {
-        return this.#active;
+        return this._schedule.isActive();
     }
 
     #updateInterface() {

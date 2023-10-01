@@ -7,6 +7,10 @@
     align-self: center;
 }
 
+input:focus {
+    outline: none;
+}
+
 .week_day {
     font-weight: bold;
     cursor: pointer;
