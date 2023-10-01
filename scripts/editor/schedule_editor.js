@@ -8,9 +8,9 @@ class ScheduleEditor {
     constructor(readerSchedule) {
         let myInterface = new EditorInterface(this);
         this.#always = new BasicEditor("always", "always_frame", readerSchedule.getAlwaysOption(), myInterface);
-        this.#duration = new DurationEditor("duration", "duration_frame", readerSchedule.getDurationOption(), myInterface);
-        this.#weekly = new WeeklyEditor("weekly", "weekly_frame", readerSchedule.getWeeklyOption(), myInterface);
-        this.#monthly = new MonthlyEditor("monthly", "monthly_frame", readerSchedule.getMonthlyOption(), myInterface);
+        this.#duration = new DurationEditor(readerSchedule.getDurationOption(), myInterface);
+        this.#weekly = new WeeklyEditor(readerSchedule.getWeeklyOption(), myInterface);
+        this.#monthly = new MonthlyEditor(readerSchedule.getMonthlyOption(), myInterface);
         this.#hiatus = new HiatusEditor(readerSchedule.getHiatusOption(), myInterface);
         this.updateActivityChecks();
         this.updateAvailability();
@@ -107,8 +107,8 @@ class DurationEditor extends BasicEditor {
     #inputNumber;
     #selectUnit;
 
-    constructor(checkbox, div, schedule, parentInterface) {
-        super(checkbox, div, schedule, parentInterface);
+    constructor(schedule, parentInterface) {
+        super("duration", "duration_frame", schedule, parentInterface);
         this.#setUpNumberInput();
         this.#setUpUnitSelection();
     }
@@ -148,8 +148,8 @@ class DurationEditor extends BasicEditor {
 class WeeklyEditor extends BasicEditor{
     #days = new Map();
 
-    constructor(checkbox, div, schedule, parentInterface) {
-        super(checkbox, div, schedule, parentInterface);
+    constructor(schedule, parentInterface) {
+        super("weekly", "weekly_frame", schedule, parentInterface);
         this.#gatherSpans();
         this.#setUpDayList();
     }
@@ -224,8 +224,8 @@ class ToggleText {
 class MonthlyEditor extends BasicEditor{
     #dayList;
 
-    constructor(checkbox, div, schedule, parentInterface) {
-        super(checkbox, div, schedule, parentInterface);
+    constructor(schedule, parentInterface) {
+        super("monthly", "monthly_frame", schedule, parentInterface);
         this.#setUpDayList();
     }
 
@@ -254,7 +254,10 @@ class MonthlyEditor extends BasicEditor{
 
 }
 
-class Hiatus {
+class HiatusEditor {
+    // TODO: split BasicEditor constructor so we can use it here
+    // Mostly set up checkbox callback in separate method and overload that one
+
     #active;
     #schedule;
     #interface;
