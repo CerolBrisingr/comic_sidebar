@@ -111,7 +111,6 @@ class BasicSchedule {
     _deselect() {
         // Set schedule option to inactive
         // Leave use of this method to ReaderSchedule.singleOut()
-        // Exception: hiatus
         this._isActive = false;
     }
 }
@@ -341,6 +340,10 @@ class Hiatus extends BasicSchedule {
     setActive() {
         // This one works independently
         this._isActive = true;
+    }
+
+    setInactive() {
+        this._deselect();
     }
 
     setTarget(date) {

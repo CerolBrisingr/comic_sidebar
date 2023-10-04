@@ -259,9 +259,15 @@ class MonthlyEditor extends BasicEditor{
 }
 
 class HiatusEditor extends BasicEditor{
+    #target;
+    #duration;
 
     constructor(schedule, parentInterface) {
         super("hiatus", "hiatus_frame", schedule, parentInterface);
+        this.#target = document.getElementById("hiatus_target");
+        this.#duration = document.getElementById("hiatus_duration");
+        this.#installMoreListeners();
+        this.#updateMyUI();
     }
 
     _install_listener() {
@@ -269,7 +275,18 @@ class HiatusEditor extends BasicEditor{
             this.setState(this._checkbox.checked);
             // Seems like you cannot listen to the state of the scheduler.
             // Going via ScheduleEditor then, update all others manually.
+            this.#updateMyUI();
             this._interface.updateAvailability();
+        });
+    }
+
+    #installMoreListeners() {
+        this.#target.addEventListener("change", () => {
+            this.#adaptTarget();
+        });
+
+        this.#duration.addEventListener("change", () => {
+            this.#adaptDuration();
         });
     }
 
@@ -278,7 +295,7 @@ class HiatusEditor extends BasicEditor{
             this._schedule.setActive();
             this._expand();
         } else {
-            this._schedule._deselect();
+            this._schedule.setInactive();
             this._collapse();
         }
     }
@@ -287,7 +304,34 @@ class HiatusEditor extends BasicEditor{
         return this._schedule.isActive();
     }
 
-    #updateInterface() {
+    #adaptDuration() {
+        let days = Math.round(Math.abs(this.#duration.value));
+        if (days !== undefined)
+            this._schedule.setTarget(this.#inNDays(days));
+        this.#updateMyUI();
+    }
+
+    #adaptTarget() {
+        let day = this.#target.valueAsNumber;
+        if (day !== undefined)
+            this._schedule.setTarget(day);
+        this.#updateMyUI();
+    }
+
+    #updateMyUI() {
+        this.updateActiveState();
+        const now = new Date();
+        let targetDate = this.#startOfDay(this._schedule.getTarget());
+        if ((targetDate === undefined) || (now.getTime() > targetDate)) {
+            this._schedule.setInactive();
+            targetDate = this.#inNDays(1);
+            this._schedule.setTarget(targetDate);
+        }
+        let isActive = this.isActive();
+        this._checkbox.checked = isActive;
+        this.#target.valueAsNumber = targetDate;
+        this.#duration.value = this.#daysBetween(now, targetDate);
+
         // read active state
         // read targetDate
         // targetDate in past?
@@ -295,6 +339,24 @@ class HiatusEditor extends BasicEditor{
         //  -> active state false
         // set checkmark
         // set timing fields
+    }
+
+    #daysBetween(now, targetDate) {
+        const today = this.#startOfDay(now);
+        let diff = Math.abs(today - targetDate) / 1000 / 60 / 60 / 24;
+        return Math.round(diff);
+    }
+
+    #startOfDay(date) {
+        date = new Date(date);
+        const tomorrow = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        return tomorrow.getTime();
+    }
+
+    #inNDays(offsetDays) {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
+        return tomorrow.getTime();
     }
 }
 
