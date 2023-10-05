@@ -282,11 +282,11 @@ class HiatusEditor extends BasicEditor{
 
     #installMoreListeners() {
         this.#target.addEventListener("change", () => {
-            this.#adaptTarget();
+            this.#adaptToNewTarget();
         });
 
         this.#duration.addEventListener("change", () => {
-            this.#adaptDuration();
+            this.#adaptToNewDuration();
         });
     }
 
@@ -304,18 +304,39 @@ class HiatusEditor extends BasicEditor{
         return this._schedule.isActive();
     }
 
-    #adaptDuration() {
+    #adaptToNewDuration() {
         let days = Math.round(Math.abs(this.#duration.value));
         if (days !== undefined)
             this._schedule.setTarget(this.#inNDays(days));
         this.#updateMyUI();
     }
 
-    #adaptTarget() {
-        let day = this.#target.valueAsNumber;
+    #adaptToNewTarget() {
+        let day = this.#readTargetAsLocal();
         if (day !== undefined)
             this._schedule.setTarget(day);
         this.#updateMyUI();
+    }
+
+    #readTargetAsLocal() {
+        // Input works in UTC, we work in local time. We just want the numbers.
+        const fromUTC = new Date(this.#target.valueAsNumber);
+        const year = fromUTC.getUTCFullYear();
+        const month = fromUTC.getUTCMonth();
+        const day = fromUTC.getUTCDate();
+        return new Date(year, month, day).getTime();
+    }
+
+    #writeTargetFromLocal(timeLocal) {
+        // Input shows days in UTC, we use local and are working at 00:00
+        // Avoid irritations
+        const timeLoc = new Date(timeLocal);
+        const year = timeLoc.getFullYear();
+        const month = timeLoc.getMonth();
+        const day = timeLoc.getDate();
+        const hour = - timeLoc.getTimezoneOffset() / 60; // min -> hour
+        const utcTime = new Date(year, month, day, hour);
+        this.#target.valueAsNumber = utcTime.getTime();
     }
 
     #updateMyUI() {
@@ -323,22 +344,12 @@ class HiatusEditor extends BasicEditor{
         const now = new Date();
         let targetDate = this.#startOfDay(this._schedule.getTarget());
         if ((targetDate === undefined) || (now.getTime() > targetDate)) {
-            this._schedule.setInactive();
             targetDate = this.#inNDays(1);
             this._schedule.setTarget(targetDate);
         }
-        let isActive = this.isActive();
-        this._checkbox.checked = isActive;
-        this.#target.valueAsNumber = targetDate;
+        this._checkbox.checked = this.isActive();
+        this.#writeTargetFromLocal(targetDate);
         this.#duration.value = this.#daysBetween(now, targetDate);
-
-        // read active state
-        // read targetDate
-        // targetDate in past?
-        //  -> targetDate tomorrow
-        //  -> active state false
-        // set checkmark
-        // set timing fields
     }
 
     #daysBetween(now, targetDate) {
