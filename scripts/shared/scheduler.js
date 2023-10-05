@@ -29,19 +29,21 @@ class Scheduler {
 
     updateRuleset(readerSchedule) {
         const schedule = readerSchedule.getActiveSchedule();
+        this.#rule = this.#findRule(schedule);
+    }
+
+    #findRule(schedule) {
         switch (schedule.getType()) {
             case "duration":
-                this.#rule = this.#getDurationFcn(schedule);
-                break;
+                return this.#getDurationFcn(schedule);
             case "weekly":
-                this.#rule = this.#getWeeklyFcn(schedule);
-                break;
+                return this.#getWeeklyFcn(schedule);
             case "monthly":
-                this.#rule = this.#getMonthlyFcn(schedule);
-                break;
-            default: // includes "always"
-                this.#rule = () => {return true;};
-                break;
+                return this.#getMonthlyFcn(schedule);
+            case "hiatus":
+                return this.#getHiatusFcn(schedule);
+            default: // defaults to "always"
+                return () => {return true;};
         }
     }
 
@@ -115,6 +117,15 @@ class Scheduler {
         return (now, lastInteraction) => {
             const compareTime = startOfDay(now) - fromDays(minMonthDaySpan(now, schedule));
             return compare(compareTime, lastInteraction);
+        }
+    }
+
+    #getHiatusFcn(schedule) {
+        const followUpFcn = this.#findRule(schedule.getFollowUp());
+        return (now, lastInteraction) => {
+            if (now.getTime() > schedule.getTarget())
+                return followUpFcn(now, lastInteraction);
+            return false;
         }
     }
 }

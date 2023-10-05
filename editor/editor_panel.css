@@ -7,6 +7,19 @@
     align-self: center;
 }
 
+input:focus {
+    outline: none;
+}
+
+.week_day {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.week_day::selection {
+    background: inherit;
+}
+
 .spans {
     display: grid;
     grid-template-columns: auto auto 1fr;
@@ -23,7 +36,7 @@
 }
 
 .prefix_main::selection {
-    background: white;
+    background: inherit;
 }
 
 .prefix_edge {
@@ -41,7 +54,7 @@
 }
 
 .prefix_trail::selection {
-    background: white;
+    background: inherit;
 }
 
 .append_stars {
