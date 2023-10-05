@@ -60,6 +60,14 @@ class ReaderSchedule {
     }
 
     getActiveSchedule() {
+        if (this.#hiatus.isActiveValid()) {
+            this.#hiatus.setFollowUp(this.#getActiveReturningSchedule());
+            return this.#hiatus;
+        }
+        return this.#getActiveReturningSchedule();
+    }
+
+    #getActiveReturningSchedule() {
         for (const schedule of this.#scheduleVariants()) {
             if (schedule.isActive()) {
                 return schedule;
@@ -323,10 +331,22 @@ class MonthlyReset extends BasicSchedule {
 
 class Hiatus extends BasicSchedule {
     #targetDate = 0;
+    #followUp;
 
     constructor() {
         super(undefined);
         this._type = "hiatus";
+    }
+
+    isActiveValid() {
+        // Test if hiatus is active and still applies
+        if (!this.isActive())
+            return false;
+        if (new Date().getTime() > this.#targetDate) {
+            this.setInactive();
+            return false;
+        }
+        return true;
     }
 
     updateWith(object) {
@@ -340,6 +360,14 @@ class Hiatus extends BasicSchedule {
     setActive() {
         // This one works independently
         this._isActive = true;
+    }
+
+    setFollowUp(schedule) {
+        this.#followUp = schedule;
+    }
+
+    getFollowUp() {
+        return this.#followUp;
     }
 
     setInactive() {

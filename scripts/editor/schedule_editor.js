@@ -266,11 +266,12 @@ class HiatusEditor extends BasicEditor{
         super("hiatus", "hiatus_frame", schedule, parentInterface);
         this.#target = document.getElementById("hiatus_target");
         this.#duration = document.getElementById("hiatus_duration");
+        this.#verifyOnce();
         this.#installMoreListeners();
         this.#updateMyUI();
     }
 
-    _install_listener() {
+    _install_listener() { // override
         this._checkbox.addEventListener("change", (evt) => {
             this.setState(this._checkbox.checked);
             // Seems like you cannot listen to the state of the scheduler.
@@ -278,6 +279,12 @@ class HiatusEditor extends BasicEditor{
             this.#updateMyUI();
             this._interface.updateAvailability();
         });
+    }
+
+    #verifyOnce() {
+        if (!this._schedule.isActiveValid()) {
+            this._schedule.setInactive();
+        }
     }
 
     #installMoreListeners() {
