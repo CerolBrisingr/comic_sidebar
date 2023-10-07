@@ -128,12 +128,12 @@ class AlwaysOn extends BasicSchedule {
 
     constructor(scheduleInterface) {
         super(scheduleInterface);
+        this._type = "always";
     }
 
     updateWith(object) {
         if (object)
             this.setActive();
-        this._type = "always";
     }
 
     returnAsObject() {
@@ -417,4 +417,4 @@ class ScheduleInterface {
     }
 }
 
-export {ReaderSchedule}
+export { ReaderSchedule }
