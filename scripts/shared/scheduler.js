@@ -1,7 +1,6 @@
 import { getShowAll } from "./backup_import.js";
 import { saveShowAll } from "./backup_export.js";
 
-let logComparison = false;
 let millisecondsInADay = 1000*60*60*24;
 let millisecondsInAnHour = 1000*60*60;
 let weekdayMap = new Map([
@@ -86,10 +85,8 @@ class Scheduler {
 
     _getDayDurationFcn(amount) {
         amount = Math.max(1, amount);
-        // startOfDay is already fulfilling 1 day distance
-        const distance = fromDays(amount -1);
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - distance;
+            const compareTime = daysBack(now, amount);
             return compare(compareTime, lastInteraction);
         }
     }
@@ -97,8 +94,7 @@ class Scheduler {
     _getMonthDurationFcn(amount) {
         amount = Math.max(1, amount);
         return (now, lastInteraction) => {
-            let compareTime = monthsAgo(now, amount) 
-            compareTime += fromDays(1); // Interact on 10th, allow again on 10th
+            const compareTime = monthsBack(now, amount);
             return compare(compareTime, lastInteraction);
         }
     }
@@ -134,20 +130,24 @@ class Scheduler {
 }
 
 function compare(compareTime, lastInteraction) {
-    if (logComparison) {
-        // TODO: replace this by first set of unit tests
-        console.log(`Difference in hours: ${(compareTime - lastInteraction)/1000/60/60}`);
-        console.log(`Difference in days:  ${(compareTime - lastInteraction)/1000/60/60/24}`);
-        console.log("Target:      " + new Date(compareTime).toLocaleString());
-        console.log("Interaction: " + new Date(lastInteraction).toLocaleString());
-    }
-    return compareTime > lastInteraction;
+    return compareTime >= lastInteraction;
 }
 
-function startOfHour(now) {
-    let start = new Date(now.getTime());
-    start.setHours(now.getHours(), 0, 0, 0);
-    return start.getTime();
+function daysBack(now, nDays) {
+    // Date() handles overflow
+    nDays -= 1; // One day off for going to start of day
+    let year = now.getFullYear();
+    let month = now.getMonth();
+    let day = now.getDate() - nDays;
+    return new Date(year, month, day).getTime();
+}
+
+function monthsBack(now, nMonths) {
+    // Date() handles overflow
+    let year = now.getFullYear();
+    let month = now.getMonth() - nMonths;
+    let day = now.getDate() + 1; // One day off for going to start of day
+    return new Date(year, month, day).getTime();
 }
 
 function startOfDay(now) {
@@ -191,28 +191,6 @@ function  getMonthlyDistance(targetDay, scheduleDay, daysInLastMonth) {
         return targetDay - 1;
     }
     return targetDay - scheduleDay + daysInLastMonth;
-}
-
-function monthsAgo(now, amount) {
-    let year = now.getFullYear();
-    let month = now.getMonth();
-    let day = now.getDate();
-    // apply duration
-    year -= Math.floor(amount / 12);
-    month -= amount % 12;
-    // Fix negative month
-    if (month < 0) {
-        year -= 1;
-        month += 12;
-    }
-    // Make sure that month has date, otherwise use 1st of next month
-    let daysInThisMonth = daysInPreviousMonth(year, month + 1);
-    if (day > daysInThisMonth) {
-        month +=1;
-        day = 1;
-        // December has 31 days, will not jump years this way
-    }
-    return new Date(year, month, day).getTime();
 }
 
 function daysInPreviousMonth(year, month) {

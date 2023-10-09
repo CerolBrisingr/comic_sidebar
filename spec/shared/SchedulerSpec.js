@@ -71,15 +71,54 @@ describe('Duration Option', function() {
         expect(durationSchedule.getAmount()).toBe(3);
 
         lastInteraction = new Date(2000, 0, 1, 10).getTime();
+
         now = new Date(2000, 0, 2);
         expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
 
-        lastInteraction = new Date(2000, 0, 1, 10).getTime();
-        now = new Date(2000, 0, 4);
+        now = new Date(2000, 0, 4, 0, 1);
         expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
 
-        lastInteraction = new Date(2000, 0, 1, 10).getTime();
         now = new Date(2000, 0, 3, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+    });
+
+    it('should work well with 4 weeks', function() {
+        durationSchedule.setUnit('weeks');
+        durationSchedule.setAmount(4);
+        scheduler.updateRuleset(readerSchedule);
+
+        expect(durationSchedule.getUnit()).toBe('weeks');
+        expect(durationSchedule.getAmount()).toBe(4);
+
+        lastInteraction = new Date(2000, 6, 2, 10).getTime();
+
+        now = new Date(2000, 6, 3, 4);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+
+        now = new Date(2000, 6, 30, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        now = new Date(2000, 6, 29, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+    });
+    
+    it('should work well with 2 months', function() {
+        durationSchedule.setUnit('months');
+        durationSchedule.setAmount(2);
+        scheduler.updateRuleset(readerSchedule);
+
+        expect(durationSchedule.getUnit()).toBe('months');
+        expect(durationSchedule.getAmount()).toBe(2);
+
+        lastInteraction = new Date(2000, 6, 2, 10).getTime();
+
+        now = new Date(2000, 6, 3, 4);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+
+        now = new Date(2000, 8, 2, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        now = new Date(2000, 8, 1, 23, 59);
         expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
     });
 });
