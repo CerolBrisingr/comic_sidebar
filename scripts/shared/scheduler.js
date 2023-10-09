@@ -29,19 +29,19 @@ class Scheduler {
 
     updateRuleset(readerSchedule) {
         const schedule = readerSchedule.getActiveSchedule();
-        this.#rule = this.#findRule(schedule);
+        this.#rule = this._findRule(schedule);
     }
 
-    #findRule(schedule) {
+    _findRule(schedule) {
         switch (schedule.getType()) {
             case "duration":
-                return this.#getDurationFcn(schedule);
+                return this._getDurationFcn(schedule);
             case "weekly":
-                return this.#getWeeklyFcn(schedule);
+                return this._getWeeklyFcn(schedule);
             case "monthly":
-                return this.#getMonthlyFcn(schedule);
+                return this._getMonthlyFcn(schedule);
             case "hiatus":
-                return this.#getHiatusFcn(schedule);
+                return this._getHiatusFcn(schedule);
             default: // defaults to "always"
                 return () => {return true;};
         }
@@ -49,30 +49,33 @@ class Scheduler {
 
     canShow(lastInteraction) {
         if (this.#showAllInterface.getValue()){
-            // Scheduler is deactivated
+            // Ignore schedule, show!
             return true;
         }
-        const now = new Date();
-        return this.#rule(now, lastInteraction);
+        return this.isScheduled(new Date(), lastInteraction);
     }
 
-    #getDurationFcn(schedule) {
+    isScheduled(time, lastInteraction) {
+        return this.#rule(time, lastInteraction);
+    }
+
+    _getDurationFcn(schedule) {
         const amount = schedule.getAmount();
         switch (schedule.getUnit()) {
             case "hours":
-                return this.#getHourDurationFcn(amount);
+                return this._getHourDurationFcn(amount);
             case "days":
-                return this.#getDayDurationFcn(amount);
+                return this._getDayDurationFcn(amount);
             case "weeks":
-                return this.#getDayDurationFcn(amount * 7);
+                return this._getDayDurationFcn(amount * 7);
             case "months":
-                return this.#getMonthDurationFcn(amount);
+                return this._getMonthDurationFcn(amount);
             default:
                 throw new Error("Unknown duration unit");
         }
     }
 
-    #getHourDurationFcn(amount) {
+    _getHourDurationFcn(amount) {
         amount = Math.max(1, amount);
         const distance = fromHours(amount);
         return (now, lastInteraction) => {
@@ -81,7 +84,7 @@ class Scheduler {
         }
     }
 
-    #getDayDurationFcn(amount) {
+    _getDayDurationFcn(amount) {
         amount = Math.max(1, amount);
         // startOfDay is already fulfilling 1 day distance
         const distance = fromDays(amount -1);
@@ -91,7 +94,7 @@ class Scheduler {
         }
     }
 
-    #getMonthDurationFcn(amount) {
+    _getMonthDurationFcn(amount) {
         amount = Math.max(1, amount);
         return (now, lastInteraction) => {
             let compareTime = monthsAgo(now, amount) 
@@ -100,7 +103,7 @@ class Scheduler {
         }
     }
 
-    #getWeeklyFcn(schedule) {
+    _getWeeklyFcn(schedule) {
         let numDays = [];
         for (let day of schedule.getDays()) {
             let numDay = weekdayMap.get(day);
@@ -113,15 +116,15 @@ class Scheduler {
         };
     }
 
-    #getMonthlyFcn(schedule) {
+    _getMonthlyFcn(schedule) {
         return (now, lastInteraction) => {
             const compareTime = startOfDay(now) - fromDays(minMonthDaySpan(now, schedule));
             return compare(compareTime, lastInteraction);
         }
     }
 
-    #getHiatusFcn(schedule) {
-        const followUpFcn = this.#findRule(schedule.getFollowUp());
+    _getHiatusFcn(schedule) {
+        const followUpFcn = this._findRule(schedule.getFollowUp());
         return (now, lastInteraction) => {
             if (now.getTime() > schedule.getTarget())
                 return followUpFcn(now, lastInteraction);
