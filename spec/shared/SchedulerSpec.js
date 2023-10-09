@@ -54,12 +54,17 @@ describe('Duration Option', function() {
 
         expect(durationSchedule.getUnit()).toBe('hours');
         expect(durationSchedule.getAmount()).toBe(2);
+        
+        lastInteraction = new Date(2000, 0, 1, 10).getTime();
 
-        lastInteraction = new Date().getTime() - toHours(1.9);
-        expect(scheduler.canShow(lastInteraction)).toBeFalse();
+        now = new Date(2000, 0, 1, 10, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
 
-        lastInteraction = new Date().getTime() - toHours(2.1);
-        expect(scheduler.canShow(lastInteraction)).toBeTrue();
+        now = new Date(2000, 0, 1, 12, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        now = new Date(2000, 0, 1, 11, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
     });
 
     it('should work well with 3 days', function() {
@@ -122,10 +127,6 @@ describe('Duration Option', function() {
         expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
     });
 });
-
-function toHours(time) {
-    return time * 1000 * 60 * 60;
-}
 
 class ShowAllInterfaceStub {
     #showAll;
