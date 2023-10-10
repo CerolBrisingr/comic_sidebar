@@ -26,6 +26,54 @@ describe('Scheduler', function() {
     });
 });
 
+
+describe('Show All', function() {
+    let readerSchedule;
+    let scheduler;
+    let showAll;
+    let lastInteraction;
+    let now;
+
+    beforeEach(function() {
+        readerSchedule = new ReaderSchedule();
+        showAll = new ShowAllInterfaceStub();
+        let duration = readerSchedule.getDurationOption();
+        duration.setActive();
+        duration.setUnit('weeks');
+        duration.setAmount(1);
+        scheduler = new Scheduler(readerSchedule, showAll);
+    });
+
+    it('should be possible to hide things', function(){
+        showAll.setValue(false);
+        lastInteraction = new Date().getTime() - toDays(1);
+        expect(scheduler.canShow(lastInteraction)).toBeFalse();
+    });
+
+    it('should be possible to ignore schedule', function(){
+        showAll.setValue(true);
+        lastInteraction = new Date().getTime() - toDays(1);
+        expect(scheduler.canShow(lastInteraction)).toBeTrue();
+    });
+
+    it('A clear schedule should push through anyway', function() {
+        showAll.setValue(false);
+        lastInteraction = new Date().getTime() - toDays(10);
+        expect(scheduler.canShow(lastInteraction)).toBeTrue();
+    });
+
+    it('A clear schedule should surely work with showAll', function() {
+        showAll.setValue(true);
+        lastInteraction = new Date().getTime() - toDays(10);
+        expect(scheduler.canShow(lastInteraction)).toBeTrue();
+    });
+
+});
+
+function toDays(amount) {
+    return amount * 1000 * 60 * 60 * 24;
+}
+
 describe('Duration Option', function() {
     let readerSchedule;
     let durationSchedule;
