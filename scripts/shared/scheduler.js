@@ -107,14 +107,16 @@ class Scheduler {
                 numDays.push(numDay);
         }
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - fromDays(minWeekDaySpan(now, numDays));
+            // Add one day to move to start of day
+            const dayDelta = minWeekDaySpan(now, numDays) + 1;
+            const compareTime = daysBack(now, dayDelta);
             return compare(compareTime, lastInteraction);
         };
     }
 
     _getMonthlyFcn(schedule) {
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - fromDays(minMonthDaySpan(now, schedule));
+            const compareTime =  nearestMonthlyReset(now, schedule);
             return compare(compareTime, lastInteraction);
         }
     }
@@ -150,15 +152,9 @@ function monthsBack(now, nMonths) {
     return new Date(year, month, day).getTime();
 }
 
-function startOfDay(now) {
-    let start = new Date(now.getTime());
-    start.setHours(0, 0, 0, 0);
-    return start.getTime();
-}
-
 function minWeekDaySpan(now, numDays) {
     // Get number of days since last weekly update date
-    let distance = 7;
+    let distance = 6;
     let today = dayOfWeek(now);
     for (let day of numDays) {
         let thisDist = mod(today - day, 7);
@@ -168,29 +164,34 @@ function minWeekDaySpan(now, numDays) {
     return distance;
 }
 
-function minMonthDaySpan(now, schedule) {
+function nearestMonthlyReset(now, schedule) {
     // Get number of days since last monthly update date
     let year = now.getFullYear();
     let month = now.getMonth();
     let date = now.getDate();
     let daysInLastMonth = daysInPreviousMonth(year, month);
-    let distance = daysInLastMonth;
-    for (let day of schedule.getDays()) {
-        let thisDistance = getMonthlyDistance(date, day, daysInLastMonth);
-        if (thisDistance < distance)
-            distance = thisDistance;
-    }
-    return distance;
-}
+    let target = new Date(1, 0, 1); // Unused backup
 
-function  getMonthlyDistance(targetDay, scheduleDay, daysInLastMonth) {
-    if (targetDay > scheduleDay)
-        return targetDay - scheduleDay;
-    if (scheduleDay > daysInLastMonth) {
-        // Day not in last month? Trigger on first of this month
-        return targetDay - 1;
+    let days = schedule.getDays();
+    if(days.length === 0) {
+        // Full month back if unset
+        date = Math.min(daysInLastMonth, date);
+        return new Date(year, month-1, date + 1).getTime();
     }
-    return targetDay - scheduleDay + daysInLastMonth;
+
+    for (let day of days) {
+        let thisTarget;
+        if (date >= day) {
+            thisTarget = new Date(year, month, day);
+        } else if (day > daysInLastMonth) {
+            thisTarget = new Date(year, month, 1);
+        } else {
+            thisTarget = new Date(year, month - 1, day + 1);
+        }
+        if (thisTarget > target)
+            target = thisTarget;
+    }
+    return target.getTime();
 }
 
 function daysInPreviousMonth(year, month) {

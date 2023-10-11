@@ -176,6 +176,194 @@ describe('Duration Option', function() {
     });
 });
 
+describe('Weekly', function() {
+    let readerSchedule;
+    let weeklySchedule;
+    let scheduler;
+    let lastInteraction;
+    let now;
+
+    beforeEach(function() {
+        readerSchedule = new ReaderSchedule();
+        weeklySchedule = readerSchedule.getWeeklyOption();
+        weeklySchedule.setActive();
+        let showAll = new ShowAllInterfaceStub();
+        scheduler = new Scheduler(readerSchedule, showAll);
+    });
+
+    it('should call _getWeeklyFcn', function() {
+        spyOn(scheduler, '_getWeeklyFcn');
+        scheduler.updateRuleset(readerSchedule);
+        expect(scheduler._getWeeklyFcn).toHaveBeenCalledTimes(1);
+    });
+
+    it('works with single reset day', function() {
+        // Monday is default
+        expect(weeklySchedule.getDays()).toEqual(['monday']);
+
+        lastInteraction = new Date(2023, 5, 3, 13, 0).getTime(); // SA
+
+        now = new Date(2023, 5, 4, 23, 59); // SO
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+
+        now = new Date(2023, 5, 5, 0, 1); // MO
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+
+    it('does fall back to 7 days', function() {
+        weeklySchedule.setDays([]);
+        expect(weeklySchedule.getDays()).toEqual([]);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2023, 5, 3, 13, 0).getTime(); // SA
+
+        now = new Date(2023, 5, 9, 23, 59); // FR
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+
+        now = new Date(2023, 5, 10, 0, 1); // SA
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+
+    it('uses the nearest reset available', function() {
+        weeklySchedule.addDay('wednesday');
+        expect(weeklySchedule.getDays()).toEqual(['monday', 'wednesday']);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2023, 5, 5, 13, 0).getTime(); // MO
+
+        now = new Date(2023, 5, 6, 23, 59); // TU
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+
+        now = new Date(2023, 5, 7, 0, 1); // WE
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+});
+
+describe('Monthly', function() {
+    let readerSchedule;
+    let monthlySchedule;
+    let scheduler;
+    let lastInteraction;
+    let now;
+
+    beforeEach(function() {
+        readerSchedule = new ReaderSchedule();
+        monthlySchedule = readerSchedule.getMonthlyOption();
+        monthlySchedule.setActive();
+        let showAll = new ShowAllInterfaceStub();
+        scheduler = new Scheduler(readerSchedule, showAll);
+    });
+
+    it('should call _getMonthlyFcn', function() {
+        spyOn(scheduler, '_getMonthlyFcn');
+        scheduler.updateRuleset(readerSchedule);
+        expect(scheduler._getMonthlyFcn).toHaveBeenCalledTimes(1);
+    });
+
+    it('should fall back to same day in last month', function() {
+        monthlySchedule.setDays([]);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2020, 1, 12, 0, 1).getTime();
+        now = new Date(2020, 2, 11, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 2, 12, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+        
+        lastInteraction = new Date(2020, 5, 12, 0, 1).getTime();
+        now = new Date(2020, 6, 11, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 6, 12, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+
+    it('should behave for day 31', function() {
+        monthlySchedule.setDays([31]);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2020, 1, 12, 0, 1).getTime();
+        now = new Date(2020, 1, 29, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 2, 1, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        lastInteraction = new Date(2020, 5, 12, 0, 1).getTime();
+        now = new Date(2020, 5, 30, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 5, 31, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+
+    it('should behave for day 1', function() {
+        monthlySchedule.setDays([1]);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2020, 0, 12, 0, 1).getTime();
+        now = new Date(2020, 0, 31, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 1, 1, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        lastInteraction = new Date(2020, 0, 1, 0, 1).getTime();
+        now = new Date(2020, 0, 31, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 1, 1, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+
+    it('should behave for day 15', function() {
+        monthlySchedule.setDays([15]);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2020, 0, 1, 0, 1).getTime();
+        now = new Date(2020, 0, 14, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 0, 15, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        lastInteraction = new Date(2020, 0, 31, 0, 1).getTime();
+        now = new Date(2020, 1, 14, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 1, 15, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+
+    it('should behave for multiple days', function() {
+        monthlySchedule.setDays([10, 15, 20]);
+        scheduler.updateRuleset(readerSchedule);
+
+        lastInteraction = new Date(2020, 0, 1, 0, 1).getTime();
+        now = new Date(2020, 0, 9, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 0, 10, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        lastInteraction = new Date(2020, 0, 11, 0, 1).getTime();
+        now = new Date(2020, 0, 14, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 0, 15, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        lastInteraction = new Date(2020, 0, 17, 0, 1).getTime();
+        now = new Date(2020, 0, 19, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 0, 20, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+
+        lastInteraction = new Date(2020, 0, 25, 0, 1).getTime();
+        now = new Date(2020, 1, 9, 23, 59);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        now = new Date(2020, 1, 10, 0, 1);
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
+    });
+});
+
+describe('Hiatus', function() {
+    it('TODO', function() {
+        expect(true).toBeFalse();
+    });
+});
+
 class ShowAllInterfaceStub {
     #showAll;
 
