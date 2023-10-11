@@ -1,7 +1,6 @@
 import { getShowAll } from "./backup_import.js";
 import { saveShowAll } from "./backup_export.js";
 
-let logComparison = false;
 let millisecondsInADay = 1000*60*60*24;
 let millisecondsInAnHour = 1000*60*60;
 let weekdayMap = new Map([
@@ -29,48 +28,53 @@ class Scheduler {
 
     updateRuleset(readerSchedule) {
         const schedule = readerSchedule.getActiveSchedule();
+        this.#rule = this._findRule(schedule);
+    }
+
+    _findRule(schedule) {
         switch (schedule.getType()) {
             case "duration":
-                this.#rule = this.#getDurationFcn(schedule);
-                break;
+                return this._getDurationFcn(schedule);
             case "weekly":
-                this.#rule = this.#getWeeklyFcn(schedule);
-                break;
+                return this._getWeeklyFcn(schedule);
             case "monthly":
-                this.#rule = this.#getMonthlyFcn(schedule);
-                break;
-            default: // includes "always"
-                this.#rule = () => {return true;};
-                break;
+                return this._getMonthlyFcn(schedule);
+            case "hiatus":
+                return this._getHiatusFcn(schedule);
+            default: // defaults to "always"
+                return () => {return true;};
         }
     }
 
     canShow(lastInteraction) {
         if (this.#showAllInterface.getValue()){
-            // Scheduler is deactivated
+            // Ignore schedule, show!
             return true;
         }
-        const now = new Date();
-        return this.#rule(now, lastInteraction);
+        return this.isScheduled(new Date(), lastInteraction);
     }
 
-    #getDurationFcn(schedule) {
+    isScheduled(time, lastInteraction) {
+        return this.#rule(time, lastInteraction);
+    }
+
+    _getDurationFcn(schedule) {
         const amount = schedule.getAmount();
         switch (schedule.getUnit()) {
             case "hours":
-                return this.#getHourDurationFcn(amount);
+                return this._getHourDurationFcn(amount);
             case "days":
-                return this.#getDayDurationFcn(amount);
+                return this._getDayDurationFcn(amount);
             case "weeks":
-                return this.#getDayDurationFcn(amount * 7);
+                return this._getDayDurationFcn(amount * 7);
             case "months":
-                return this.#getMonthDurationFcn(amount);
+                return this._getMonthDurationFcn(amount);
             default:
                 throw new Error("Unknown duration unit");
         }
     }
 
-    #getHourDurationFcn(amount) {
+    _getHourDurationFcn(amount) {
         amount = Math.max(1, amount);
         const distance = fromHours(amount);
         return (now, lastInteraction) => {
@@ -79,26 +83,23 @@ class Scheduler {
         }
     }
 
-    #getDayDurationFcn(amount) {
+    _getDayDurationFcn(amount) {
         amount = Math.max(1, amount);
-        // startOfDay is already fulfilling 1 day distance
-        const distance = fromDays(amount -1);
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - distance;
+            const compareTime = daysBack(now, amount);
             return compare(compareTime, lastInteraction);
         }
     }
 
-    #getMonthDurationFcn(amount) {
+    _getMonthDurationFcn(amount) {
         amount = Math.max(1, amount);
         return (now, lastInteraction) => {
-            let compareTime = monthsAgo(now, amount) 
-            compareTime += fromDays(1); // Interact on 10th, allow again on 10th
+            const compareTime = monthsBack(now, amount);
             return compare(compareTime, lastInteraction);
         }
     }
 
-    #getWeeklyFcn(schedule) {
+    _getWeeklyFcn(schedule) {
         let numDays = [];
         for (let day of schedule.getDays()) {
             let numDay = weekdayMap.get(day);
@@ -106,45 +107,54 @@ class Scheduler {
                 numDays.push(numDay);
         }
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - fromDays(minWeekDaySpan(now, numDays));
+            // Add one day to move to start of day
+            const dayDelta = minWeekDaySpan(now, numDays) + 1;
+            const compareTime = daysBack(now, dayDelta);
             return compare(compareTime, lastInteraction);
         };
     }
 
-    #getMonthlyFcn(schedule) {
+    _getMonthlyFcn(schedule) {
         return (now, lastInteraction) => {
-            const compareTime = startOfDay(now) - fromDays(minMonthDaySpan(now, schedule));
+            const compareTime =  nearestMonthlyReset(now, schedule);
             return compare(compareTime, lastInteraction);
+        }
+    }
+
+    _getHiatusFcn(schedule) {
+        const followUpFcn = this._findRule(schedule.getFollowUp());
+        return (now, lastInteraction) => {
+            if (now.getTime() > schedule.getTarget())
+                return followUpFcn(now, lastInteraction);
+            return false;
         }
     }
 }
 
 function compare(compareTime, lastInteraction) {
-    if (logComparison) {
-        // TODO: replace this by first set of unit tests
-        console.log(`Difference in hours: ${(compareTime - lastInteraction)/1000/60/60}`);
-        console.log(`Difference in days:  ${(compareTime - lastInteraction)/1000/60/60/24}`);
-        console.log("Target:      " + new Date(compareTime).toLocaleString());
-        console.log("Interaction: " + new Date(lastInteraction).toLocaleString());
-    }
-    return compareTime > lastInteraction;
+    return compareTime >= lastInteraction;
 }
 
-function startOfHour(now) {
-    let start = new Date(now.getTime());
-    start.setHours(now.getHours(), 0, 0, 0);
-    return start.getTime();
+function daysBack(now, nDays) {
+    // Date() handles overflow
+    nDays -= 1; // One day off for going to start of day
+    let year = now.getFullYear();
+    let month = now.getMonth();
+    let day = now.getDate() - nDays;
+    return new Date(year, month, day).getTime();
 }
 
-function startOfDay(now) {
-    let start = new Date(now.getTime());
-    start.setHours(0, 0, 0, 0);
-    return start.getTime();
+function monthsBack(now, nMonths) {
+    // Date() handles overflow
+    let year = now.getFullYear();
+    let month = now.getMonth() - nMonths;
+    let day = now.getDate() + 1; // One day off for going to start of day
+    return new Date(year, month, day).getTime();
 }
 
 function minWeekDaySpan(now, numDays) {
     // Get number of days since last weekly update date
-    let distance = 7;
+    let distance = 6;
     let today = dayOfWeek(now);
     for (let day of numDays) {
         let thisDist = mod(today - day, 7);
@@ -154,51 +164,34 @@ function minWeekDaySpan(now, numDays) {
     return distance;
 }
 
-function minMonthDaySpan(now, schedule) {
+function nearestMonthlyReset(now, schedule) {
     // Get number of days since last monthly update date
     let year = now.getFullYear();
     let month = now.getMonth();
     let date = now.getDate();
     let daysInLastMonth = daysInPreviousMonth(year, month);
-    let distance = daysInLastMonth;
-    for (let day of schedule.getDays()) {
-        let thisDistance = getMonthlyDistance(date, day, daysInLastMonth);
-        if (thisDistance < distance)
-            distance = thisDistance;
-    }
-    return distance;
-}
+    let target = new Date(1, 0, 1); // Unused backup
 
-function  getMonthlyDistance(targetDay, scheduleDay, daysInLastMonth) {
-    if (targetDay > scheduleDay)
-        return targetDay - scheduleDay;
-    if (scheduleDay > daysInLastMonth) {
-        // Day not in last month? Trigger on first of this month
-        return targetDay - 1;
+    let days = schedule.getDays();
+    if(days.length === 0) {
+        // Full month back if unset
+        date = Math.min(daysInLastMonth, date);
+        return new Date(year, month-1, date + 1).getTime();
     }
-    return targetDay - scheduleDay + daysInLastMonth;
-}
 
-function monthsAgo(now, amount) {
-    let year = now.getFullYear();
-    let month = now.getMonth();
-    let day = now.getDate();
-    // apply duration
-    year -= Math.floor(amount / 12);
-    month -= amount % 12;
-    // Fix negative month
-    if (month < 0) {
-        year -= 1;
-        month += 12;
+    for (let day of days) {
+        let thisTarget;
+        if (date >= day) {
+            thisTarget = new Date(year, month, day);
+        } else if (day > daysInLastMonth) {
+            thisTarget = new Date(year, month, 1);
+        } else {
+            thisTarget = new Date(year, month - 1, day + 1);
+        }
+        if (thisTarget > target)
+            target = thisTarget;
     }
-    // Make sure that month has date, otherwise use 1st of next month
-    let daysInThisMonth = daysInPreviousMonth(year, month + 1);
-    if (day > daysInThisMonth) {
-        month +=1;
-        day = 1;
-        // December has 31 days, will not jump years this way
-    }
-    return new Date(year, month, day).getTime();
+    return target.getTime();
 }
 
 function daysInPreviousMonth(year, month) {

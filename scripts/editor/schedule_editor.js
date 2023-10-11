@@ -3,14 +3,17 @@ class ScheduleEditor {
     #duration;
     #weekly;
     #monthly;
+    #hiatus;
 
     constructor(readerSchedule) {
         let myInterface = new EditorInterface(this);
         this.#always = new BasicEditor("always", "always_frame", readerSchedule.getAlwaysOption(), myInterface);
-        this.#duration = new DurationEditor("duration", "duration_frame", readerSchedule.getDurationOption(), myInterface);
-        this.#weekly = new WeeklyEditor("weekly", "weekly_frame", readerSchedule.getWeeklyOption(), myInterface);
-        this.#monthly = new MonthlyEditor("monthly", "monthly_frame", readerSchedule.getMonthlyOption(), myInterface);
+        this.#duration = new DurationEditor(readerSchedule.getDurationOption(), myInterface);
+        this.#weekly = new WeeklyEditor(readerSchedule.getWeeklyOption(), myInterface);
+        this.#monthly = new MonthlyEditor(readerSchedule.getMonthlyOption(), myInterface);
+        this.#hiatus = new HiatusEditor(readerSchedule.getHiatusOption(), myInterface);
         this.updateActivityChecks();
+        this.updateAvailability();
     }
 
     updateActivityChecks() {
@@ -19,6 +22,21 @@ class ScheduleEditor {
         this.#duration.updateActiveState();
         this.#weekly.updateActiveState();
         this.#monthly.updateActiveState();
+    }
+
+    updateAvailability() {
+        // Signal blocking character of hiatus
+        if (this.#hiatus.isActive()) {
+            this.#always.disableInteraction();
+            this.#duration.disableInteraction();
+            this.#weekly.disableInteraction();
+            this.#monthly.disableInteraction();
+        } else {
+            this.#always.enableInteraction();
+            this.#duration.enableInteraction();
+            this.#weekly.enableInteraction();
+            this.#monthly.enableInteraction();
+        }
     }
 }
 
@@ -33,6 +51,10 @@ class EditorInterface {
         this.#scheduleEditor.updateActivityChecks();
     }
 
+    updateAvailability() {
+        this.#scheduleEditor.updateAvailability();
+    }
+
 }
 
 class BasicEditor {
@@ -43,6 +65,10 @@ class BasicEditor {
         this._div = document.getElementById(div);
         this._schedule = schedule;
         this._interface = parentInterface;
+        this._install_listener();
+    }
+
+    _install_listener() {
         this._checkbox.addEventListener("click", (evt) => {
             this._schedule.setActive();
             // Seems like you cannot listen to the state of the scheduler.
@@ -62,6 +88,16 @@ class BasicEditor {
         }
     }
 
+    enableInteraction() {
+        this._checkbox.disabled = false;
+        this.updateActiveState();
+    }
+
+    disableInteraction() {
+        this._checkbox.disabled = true;
+        this._collapse();
+    }
+
     _expand() {
         this._div.classList.remove("no_draw");
     }
@@ -75,8 +111,8 @@ class DurationEditor extends BasicEditor {
     #inputNumber;
     #selectUnit;
 
-    constructor(checkbox, div, schedule, parentInterface) {
-        super(checkbox, div, schedule, parentInterface);
+    constructor(schedule, parentInterface) {
+        super("duration", "duration_frame", schedule, parentInterface);
         this.#setUpNumberInput();
         this.#setUpUnitSelection();
     }
@@ -116,8 +152,8 @@ class DurationEditor extends BasicEditor {
 class WeeklyEditor extends BasicEditor{
     #days = new Map();
 
-    constructor(checkbox, div, schedule, parentInterface) {
-        super(checkbox, div, schedule, parentInterface);
+    constructor(schedule, parentInterface) {
+        super("weekly", "weekly_frame", schedule, parentInterface);
         this.#gatherSpans();
         this.#setUpDayList();
     }
@@ -192,8 +228,8 @@ class ToggleText {
 class MonthlyEditor extends BasicEditor{
     #dayList;
 
-    constructor(checkbox, div, schedule, parentInterface) {
-        super(checkbox, div, schedule, parentInterface);
+    constructor(schedule, parentInterface) {
+        super("monthly", "monthly_frame", schedule, parentInterface);
         this.#setUpDayList();
     }
 
@@ -220,6 +256,126 @@ class MonthlyEditor extends BasicEditor{
         }
     }
 
+}
+
+class HiatusEditor extends BasicEditor{
+    #target;
+    #duration;
+
+    constructor(schedule, parentInterface) {
+        super("hiatus", "hiatus_frame", schedule, parentInterface);
+        this.#target = document.getElementById("hiatus_target");
+        this.#duration = document.getElementById("hiatus_duration");
+        this.#verifyOnce();
+        this.#installMoreListeners();
+        this.#updateMyUI();
+    }
+
+    _install_listener() { // override
+        this._checkbox.addEventListener("change", (evt) => {
+            this.setState(this._checkbox.checked);
+            // Seems like you cannot listen to the state of the scheduler.
+            // Going via ScheduleEditor then, update all others manually.
+            this.#updateMyUI();
+            this._interface.updateAvailability();
+        });
+    }
+
+    #verifyOnce() {
+        if (!this._schedule.isActiveValid()) {
+            this._schedule.setInactive();
+        }
+    }
+
+    #installMoreListeners() {
+        this.#target.addEventListener("change", () => {
+            this.#adaptToNewTarget();
+        });
+
+        this.#duration.addEventListener("change", () => {
+            this.#adaptToNewDuration();
+        });
+    }
+
+    setState(value) {
+        if (value) {
+            this._schedule.setActive();
+            this._expand();
+        } else {
+            this._schedule.setInactive();
+            this._collapse();
+        }
+    }
+
+    isActive() {
+        return this._schedule.isActive();
+    }
+
+    #adaptToNewDuration() {
+        let days = Math.round(Math.abs(this.#duration.value));
+        if (days !== undefined)
+            this._schedule.setTarget(this.#inNDays(days));
+        this.#updateMyUI();
+    }
+
+    #adaptToNewTarget() {
+        let day = this.#readTargetAsLocal();
+        if (day !== undefined)
+            this._schedule.setTarget(day);
+        this.#updateMyUI();
+    }
+
+    #readTargetAsLocal() {
+        // Input works in UTC, we work in local time. We just want the numbers.
+        const fromUTC = new Date(this.#target.valueAsNumber);
+        const year = fromUTC.getUTCFullYear();
+        const month = fromUTC.getUTCMonth();
+        const day = fromUTC.getUTCDate();
+        return new Date(year, month, day).getTime();
+    }
+
+    #writeTargetFromLocal(timeLocal) {
+        // Input shows days in UTC, we use local and are working at 00:00
+        // Avoid irritations
+        const timeLoc = new Date(timeLocal);
+        const year = timeLoc.getFullYear();
+        const month = timeLoc.getMonth();
+        const day = timeLoc.getDate();
+        const hour = - timeLoc.getTimezoneOffset() / 60; // min -> hour
+        const utcTime = new Date(year, month, day, hour);
+        this.#target.valueAsNumber = utcTime.getTime();
+    }
+
+    #updateMyUI() {
+        this.updateActiveState();
+        const now = new Date();
+        let targetDate = this.#startOfDay(this._schedule.getTarget());
+        if ((targetDate === undefined) || (now.getTime() > targetDate)) {
+            targetDate = this.#inNDays(1);
+            this._schedule.setTarget(targetDate);
+        }
+        this._checkbox.checked = this.isActive();
+        this.#writeTargetFromLocal(targetDate);
+        this.#duration.value = this.#daysBetween(now, targetDate);
+    }
+
+    #daysBetween(now, targetDate) {
+        const today = this.#startOfDay(now);
+        let diff = Math.abs(today - targetDate) / 1000 / 60 / 60 / 24;
+        return Math.round(diff);
+    }
+
+    #startOfDay(date) {
+        date = new Date(date);
+        const tomorrow = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        return tomorrow.getTime();
+    }
+
+    #inNDays(offsetDays) {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offsetDays);
+        return tomorrow.getTime();
+    }
 }
 
 export {ScheduleEditor}
