@@ -359,8 +359,65 @@ describe('Monthly', function() {
 });
 
 describe('Hiatus', function() {
-    it('TODO', function() {
-        expect(true).toBeFalse();
+    let readerSchedule;
+    let hiatusSchedule;
+    let scheduler;
+    let lastInteraction;
+    let now;
+
+    beforeEach(function() {
+        readerSchedule = new ReaderSchedule();
+        hiatusSchedule = readerSchedule.getHiatusOption();
+        let showAll = new ShowAllInterfaceStub();
+        scheduler = new Scheduler(readerSchedule, showAll);
+        hiatusSchedule.setActive();
+    });
+
+    it('should call isActiveValid()', function() {
+        spyOn(hiatusSchedule, 'isActiveValid');
+        scheduler.updateRuleset(readerSchedule);
+        expect(hiatusSchedule.isActiveValid).toHaveBeenCalledTimes(1);
+    });
+
+    it('should never look for follow up on passed hiatus', function() {
+        spyOn(hiatusSchedule, 'setFollowUp');
+        let now = new Date().getTime();
+        hiatusSchedule.setTarget(now - toDays(2));
+        scheduler.updateRuleset(readerSchedule);
+
+        expect(hiatusSchedule.setFollowUp).toHaveBeenCalledTimes(0);
+    });
+
+    it('should look for follow up on still active hiatus', function() {
+        spyOn(hiatusSchedule, 'setFollowUp');
+        let now = new Date().getTime();
+        hiatusSchedule.setTarget(now + toDays(2));
+        try {
+            // Spy on getFollowUp() returns 'undefined' and causes problems
+            scheduler.updateRuleset(readerSchedule);
+        } catch(error) {}
+
+        expect(hiatusSchedule.setFollowUp).toHaveBeenCalledTimes(1);
+    });
+
+    it('should allow follow up on passed hiatus', function() {
+        let now = new Date().getTime();
+        hiatusSchedule.setTarget(now - toDays(2));
+        scheduler.updateRuleset(readerSchedule);
+
+        expect(scheduler.isScheduled(new Date(now), now)).toBeTrue();
+        expect(hiatusSchedule.isActive()).toBeFalse();
+        expect(readerSchedule.getActiveSchedule().getType()).toBe('always');
+    });
+
+    it('should block follow up on active hiatus', function() {
+        let now = new Date().getTime();
+        hiatusSchedule.setTarget(now + toDays(2));
+        scheduler.updateRuleset(readerSchedule);
+
+        expect(scheduler.isScheduled(new Date(now), now)).toBeFalse();
+        expect(hiatusSchedule.isActive()).toBeTrue();
+        expect(readerSchedule.getActiveSchedule().getType()).toBe('hiatus');
     });
 });
 
