@@ -16,8 +16,7 @@
             placeholder="Search for title..">
         <div class="dropdown">
             <button class="dropdown_toggle" id="dropdown_toggle">
-                More ..
-                <img class="more_icon" src="../icons/chevron_down.svg">
+                <img class="more_icon" src="../icons/sort.svg">
             </button>
             <div id="dropdown_option_box" class="dropdown_option_box">
                 <button class="dropdown_option" id="sort_name">
@@ -42,6 +41,16 @@
                     <div class="dropdown_label" id="show_all_label">Show all</div>
                 </button>
             </div>
+        </div>
+        <div>
+            <button id="sidebar_show_all" class="searchbar_icon">
+                <img id="sidebar_show_all_icon" src="../icons/eye-slash.svg">
+            </button>
+        </div>
+        <div>
+            <button id="sidebar_tracking_state" class="searchbar_icon">
+                <canvas id="sidebar_tracking_state_icon" width="16" height="16"></canvas>
+            </button>
         </div>
     </div>
     <div id="container">

@@ -4,11 +4,14 @@ import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
 import { SortControls } from "./reader_sort.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
+import { CanvasIcon } from "./canvas_icon.js"
 
 // Tab management
 let webReader;
 let sortControls;
 let isSetUp = false;
+let trackingStateBtn;
+let showAllBtn;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 
@@ -22,6 +25,8 @@ function setUpUserInterface() {
 
     setUpSearchBar();
     setUpDropdownMenu();
+    setUpShowAll();
+    setUpTrackingState();
 }
 
 function setUpSearchBar() {
@@ -29,6 +34,22 @@ function setUpSearchBar() {
     searchBox.addEventListener("input", (event) => {
         ReaderFilter.setFilter(event.target.value);
         webReader.relistViewers();
+    });
+}
+
+function setUpShowAll() {
+    const showAllIcon = document.getElementById("sidebar_show_all_icon");
+    showAllBtn = document.getElementById("sidebar_show_all");
+    showAllBtn.addEventListener("click", () => {
+        showAllIcon.src = "../../icons/eye.svg";
+    });
+}
+
+function setUpTrackingState() {
+    const trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
+    trackingStateBtn = document.getElementById("sidebar_tracking_state");
+    trackingStateBtn.addEventListener("click", () => {
+        trackingStateImage.setImage("../../icons/icon_gray.png");
     });
 }
 

@@ -19,7 +19,7 @@
 }
 
 .search_line {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto auto;
 }
 
 .reader {
@@ -57,6 +57,12 @@
     object-fit: contain;
     height: 2.5ex;
     width: 2.5ex;
+}
+
+.searchbar_icon {
+    object-fit: contain;
+    height: 3ex;
+    width: 3ex;
 }
 
 .undecorated_link {
