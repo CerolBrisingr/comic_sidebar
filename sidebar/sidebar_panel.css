@@ -60,9 +60,13 @@
 }
 
 .searchbar_icon {
-    object-fit: contain;
+    display: flex;
+    padding: 0;
+    margin: 0;
     height: 3ex;
     width: 3ex;
+    align-items: center;
+    justify-content: center;
 }
 
 .undecorated_link {
