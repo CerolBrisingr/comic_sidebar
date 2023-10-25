@@ -12,6 +12,7 @@ let webReader;
 let sortControls;
 let isSetUp = false;
 let trackingStateImage;
+let trackingStateBtn;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
 let activeStateConnection = new SubscriberPort(receiveStateMessage, "options_script");
@@ -41,7 +42,7 @@ function setUpTrackingState() {
     trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
     let trackingState = new TrackingState(activeStateConnection);
     trackingState.requestCurrentState();
-    let trackingStateBtn = document.getElementById("sidebar_tracking_state");
+    trackingStateBtn = document.getElementById("sidebar_tracking_state");
     trackingStateBtn.addEventListener("click", () => {
         trackingState.requestToggleState();
     });
@@ -177,18 +178,12 @@ function receiveStateMessage(message) {
     console.log(message);
 }
 
-function requestActiveState() {
-    activeStateConnection.sendMessage("requestActiveState");
-}
-
-function requestActiveStateChange() {
-    activeStateConnection.sendMessage("requestActiveStateChange");
-}
-
 function updateActiveState(activeState) {
     if (activeState) {
         trackingStateImage.setImage("../../icons/icon_48.png");
+        trackingStateBtn.title="Deactivate URL tracking";
     } else {
         trackingStateImage.setImage("../../icons/icon_gray_48.png");
+        trackingStateBtn.title="Activate URL tracking";
     }
 }

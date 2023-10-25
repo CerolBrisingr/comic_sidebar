@@ -247,10 +247,12 @@ class ShowAllInterface {
 
     #setTrueVisuals() {
         this.#showAllUi.icon.src = "../../icons/eye.svg";
+        this.#showAllUi.button.title = "Hide unscheduled readers";
     }
 
     #setFalseVisuals() {
         this.#showAllUi.icon.src = "../../icons/eye-slash.svg";
+        this.#showAllUi.button.title = "Show unscheduled readers";
 
     }
 
