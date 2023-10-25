@@ -1,7 +1,6 @@
 import { getShowAll } from "./backup_import.js";
 import { saveShowAll } from "./backup_export.js";
 
-let millisecondsInADay = 1000*60*60*24;
 let millisecondsInAnHour = 1000*60*60;
 let weekdayMap = new Map([
     ["sunday", 0],
@@ -207,10 +206,6 @@ function fromHours(timespan) {
     return timespan * millisecondsInAnHour;
 }
 
-function fromDays(timespan) {
-    return timespan * millisecondsInADay;
-}
-
 class ShowAllInterface {
     #showAllUi;
     #showAll;
@@ -252,12 +247,10 @@ class ShowAllInterface {
 
     #setTrueVisuals() {
         this.#showAllUi.icon.src = "../../icons/eye.svg";
-        this.#showAllUi.label.innerText = "Showing hidden";
     }
 
     #setFalseVisuals() {
         this.#showAllUi.icon.src = "../../icons/eye-slash.svg";
-        this.#showAllUi.label.innerText = "Show hidden";
 
     }
 

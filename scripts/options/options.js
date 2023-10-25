@@ -1,7 +1,6 @@
 import {SubscriberPort} from "../sidebar/subscriber_port.js"
 
 let bsConnection = new SubscriberPort(receiveMessage, "options_script");
-let isActive = true;
 let iconToggleState;
 let textToggleState;
 
@@ -56,12 +55,7 @@ function requestLoadBackup(file) {
 }
 
 function updateActiveState(activeState) {
-    isActive = activeState;
-    updateStateControls();
-}
-
-function updateStateControls() {
-    if (isActive) {
+    if (activeState) {
         iconToggleState.src = "../icons/icon_gray_48.png";
         textToggleState.innerText = "Disable tracking";
     } else {

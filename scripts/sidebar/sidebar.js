@@ -10,10 +10,10 @@ import { CanvasIcon } from "./canvas_icon.js"
 let webReader;
 let sortControls;
 let isSetUp = false;
-let trackingStateBtn;
-let showAllBtn;
+let trackingStateImage;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
+let activeStateConnection = new SubscriberPort(receiveStateMessage, "options_script");
 
 document.addEventListener('DOMContentLoaded', function () {
     requestWebReader();
@@ -25,7 +25,6 @@ function setUpUserInterface() {
 
     setUpSearchBar();
     setUpDropdownMenu();
-    setUpShowAll();
     setUpTrackingState();
 }
 
@@ -37,19 +36,12 @@ function setUpSearchBar() {
     });
 }
 
-function setUpShowAll() {
-    const showAllIcon = document.getElementById("sidebar_show_all_icon");
-    showAllBtn = document.getElementById("sidebar_show_all");
-    showAllBtn.addEventListener("click", () => {
-        showAllIcon.src = "../../icons/eye.svg";
-    });
-}
-
 function setUpTrackingState() {
-    const trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
-    trackingStateBtn = document.getElementById("sidebar_tracking_state");
+    trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
+    requestActiveState();
+    let trackingStateBtn = document.getElementById("sidebar_tracking_state");
     trackingStateBtn.addEventListener("click", () => {
-        trackingStateImage.setImage("../../icons/icon_gray.png");
+        requestActiveStateChange();
     });
 }
 
@@ -84,9 +76,8 @@ function setUpWebReader(readerObjectList) {
         return;
     const container = document.getElementById('container');
     const showAll = {
-        button: document.getElementById("show_all"),
-        icon: document.getElementById("show_all_tick"),
-        label: document.getElementById("show_all_label")
+        button: document.getElementById("sidebar_show_all"),
+        icon: document.getElementById("sidebar_show_all_icon")
     }
     let showAllInterface = new ShowAllInterface(showAll);
     webReader = new WebReaderSidebar(container, showAllInterface);
@@ -173,4 +164,29 @@ function receiveMessage(message) {
     }
     console.log("Don't know how to act on this message:");
     console.log(message);
+}
+
+function receiveStateMessage(message) {
+    if (message.hasOwnProperty("activeState")) {
+        updateActiveState(message.activeState);
+        return;
+    }
+    console.log("Don't know how to act on this background message:");
+    console.log(message);
+}
+
+function requestActiveState() {
+    activeStateConnection.sendMessage("requestActiveState");
+}
+
+function requestActiveStateChange() {
+    activeStateConnection.sendMessage("requestActiveStateChange");
+}
+
+function updateActiveState(activeState) {
+    if (activeState) {
+        trackingStateImage.setImage("../../icons/icon_48.png");
+    } else {
+        trackingStateImage.setImage("../../icons/icon_gray_48.png");
+    }
 }
