@@ -1,12 +1,14 @@
 import {SubscriberPort} from "../sidebar/subscriber_port.js"
+import { TrackingState } from "../shared/tracking_state.js";
 
 let bsConnection = new SubscriberPort(receiveMessage, "options_script");
+let trackingState = new TrackingState(bsConnection);
 let iconToggleState;
 let textToggleState;
 
 document.addEventListener('DOMContentLoaded', function () {
     importInterface();
-    requestActiveState();
+    trackingState.requestCurrentState();
 });
 
 function importInterface() {
@@ -15,7 +17,7 @@ function importInterface() {
     textToggleState = document.getElementById('text_toggle_enable');
     let buttonToggleState = document.getElementById('button_toggle_enable');
     buttonToggleState.onclick = () => {
-        requestActiveStateChange();
+        trackingState.requestToggleState();
     };
     
     // File selector
@@ -36,14 +38,6 @@ function importInterface() {
     buttonLoadBackup.onclick = () => {
         fileSelector.click();
     };
-}
-
-function requestActiveState() {
-    bsConnection.sendMessage("requestActiveState");
-}
-
-function requestActiveStateChange() {
-    bsConnection.sendMessage("requestActiveStateChange");
 }
 
 function requestSaveBackup() {

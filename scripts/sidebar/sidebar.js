@@ -5,6 +5,7 @@ import { ReaderFilter } from "./reader_filter.js"
 import { SortControls } from "./reader_sort.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
+import { TrackingState } from "../shared/tracking_state.js"
 
 // Tab management
 let webReader;
@@ -38,10 +39,11 @@ function setUpSearchBar() {
 
 function setUpTrackingState() {
     trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
-    requestActiveState();
+    let trackingState = new TrackingState(activeStateConnection);
+    trackingState.requestCurrentState();
     let trackingStateBtn = document.getElementById("sidebar_tracking_state");
     trackingStateBtn.addEventListener("click", () => {
-        requestActiveStateChange();
+        trackingState.requestToggleState();
     });
 }
 
