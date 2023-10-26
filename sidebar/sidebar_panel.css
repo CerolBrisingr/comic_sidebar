@@ -196,3 +196,7 @@
     color: black;
     background-color: var(--button-hover-color);
 }
+.add_reader:disabled {
+    color: grey;
+    background-color: lightgrey;
+}

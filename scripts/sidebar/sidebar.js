@@ -6,9 +6,11 @@ import { SortControls } from "./reader_sort.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
 import { TrackingState } from "../shared/tracking_state.js"
+import { dissectUrl } from "../shared/url.js"
 
 // Tab management
 let webReader;
+let addComicBtn
 let sortControls;
 let isSetUp = false;
 let trackingStateImage;
@@ -22,8 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function setUpUserInterface() {
-    const addComic = document.getElementById('add_reader');
-    addComic.onclick = function () {addCurrentPage()};
+    addComicBtn = document.getElementById('add_reader');
+    addComicBtn.onclick = function () {addCurrentPage()};
 
     setUpSearchBar();
     setUpDropdownMenu();
@@ -133,6 +135,16 @@ function addCurrentPage() {
             }, onError);
 }
 
+function updateAddButtonActivity(url) {
+    let test = dissectUrl(url);
+    if (test === undefined) {
+        // Link is reserved or no valid URL
+        addComicBtn.disabled = true;
+    } else {
+        addComicBtn.disabled = false;
+    }
+}
+
 // Display error for failed promises
 function onError(error) {
     console.log(`Error: ${error}`);
@@ -141,6 +153,7 @@ function onError(error) {
 async function updateBookmark(data) {
     if (webReader === undefined)
         return;
+    updateAddButtonActivity(data.url);
     await webReader.updateBookmark(data);
 }
 
