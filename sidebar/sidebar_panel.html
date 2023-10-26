@@ -3,7 +3,7 @@
     <head>
         <link rel="stylesheet" href="sidebar_panel.css">
         <meta charset="utf-8">
-        <script type="module" src="../scripts/sidebar/main_script.js"></script>
+        <script type="module" src="../scripts/sidebar/sidebar.js"></script>
     </head>
 <body>
     <div>
@@ -15,9 +15,8 @@
             id="search_box" 
             placeholder="Search for title..">
         <div class="dropdown">
-            <button class="dropdown_toggle" id="dropdown_toggle">
-                More ..
-                <img class="more_icon" src="../icons/chevron_down.svg">
+            <button class="dropdown_toggle" id="dropdown_toggle" title="Sort reader list ..">
+                <img class="more_icon" src="../icons/sort.svg">
             </button>
             <div id="dropdown_option_box" class="dropdown_option_box">
                 <button class="dropdown_option" id="sort_name">
@@ -36,12 +35,17 @@
                     <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_oldest_tick">
                     <div class="dropdown_label">sort by oldest Access</div>
                 </button>
-                <div class="dropdown_divider"></div>
-                <button class="dropdown_option" id="show_all">
-                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="show_all_tick">
-                    <div class="dropdown_label" id="show_all_label">Show all</div>
-                </button>
             </div>
+        </div>
+        <div>
+            <button id="sidebar_show_all" class="searchbar_icon" title="Show unscheduled readers">
+                <img id="sidebar_show_all_icon" src="../icons/eye-slash.svg">
+            </button>
+        </div>
+        <div>
+            <button id="sidebar_tracking_state" class="searchbar_icon" title="Deactivate URL tracking">
+                <canvas id="sidebar_tracking_state_icon" width="16" height="16"></canvas>
+            </button>
         </div>
     </div>
     <div id="container">

@@ -3,6 +3,7 @@ class UrlListener {
     #isActive;
     #fktTabEvent;
     #fktTabUpdateEvent;
+    #fktWindowChanged;
     #lastUrl = "";
     #hasFavIcon = false;
 
@@ -38,7 +39,12 @@ class UrlListener {
                 return;
             }
         }
-        this.activate();
+        this.#fktWindowChanged = (windowId) => {
+            if (windowId === -1) // No window selected
+                return;
+            this.retransmit();
+        }
+        this.deactivate();
     }
 
     #sendUrl(url, favIconUrl) {
@@ -61,6 +67,7 @@ class UrlListener {
             return;
         browser.tabs.onActivated.addListener(this.#fktTabEvent);
         browser.tabs.onUpdated.addListener(this.#fktTabUpdateEvent);
+        browser.windows.onFocusChanged.addListener(this.#fktWindowChanged);
         this.#isActive = true;
     }
     
@@ -69,9 +76,10 @@ class UrlListener {
             return;
         browser.tabs.onActivated.removeListener(this.#fktTabEvent);
         browser.tabs.onUpdated.removeListener(this.#fktTabUpdateEvent);
+        browser.windows.onFocusChanged.removeListener(this.#fktWindowChanged);
         this.#isActive = false;
     }
-    
+
     activate() {
         this.#connect();
         this.retransmit();

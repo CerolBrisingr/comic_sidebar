@@ -4,33 +4,32 @@ import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
 import { SortControls } from "./reader_sort.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
-
-/* 
-Browser modified during development:
-about:config
-    extensions.webextensions.keepStorageOnUninstall -> true (was false)
-    extensions.webextensions.keepUuidOnUninstall    -> true (was false)
-  Not yet: xpinstall.signatures.required            -> false (only works in dev build)
-Source: https://extensionworkshop.com/documentation/develop/testing-persistent-and-restart-features/#what-do-i-do-to-ensure-i-can-test-my-extension
-*/
+import { CanvasIcon } from "./canvas_icon.js"
+import { TrackingState } from "../shared/tracking_state.js"
+import { dissectUrl } from "../shared/url.js"
 
 // Tab management
 let webReader;
+let addComicBtn
 let sortControls;
 let isSetUp = false;
+let trackingStateImage;
+let trackingStateBtn;
 // Connection to background script
 let bsConnection = new SubscriberPort(receiveMessage);
+let activeStateConnection = new SubscriberPort(receiveStateMessage, "options_script");
 
 document.addEventListener('DOMContentLoaded', function () {
     requestWebReader();
 });
 
 function setUpUserInterface() {
-    const addComic = document.getElementById('add_reader');
-    addComic.onclick = function () {addCurrentPage()};
+    addComicBtn = document.getElementById('add_reader');
+    addComicBtn.onclick = function () {addCurrentPage()};
 
     setUpSearchBar();
     setUpDropdownMenu();
+    setUpTrackingState();
 }
 
 function setUpSearchBar() {
@@ -38,6 +37,16 @@ function setUpSearchBar() {
     searchBox.addEventListener("input", (event) => {
         ReaderFilter.setFilter(event.target.value);
         webReader.relistViewers();
+    });
+}
+
+function setUpTrackingState() {
+    trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
+    let trackingState = new TrackingState(activeStateConnection);
+    trackingState.requestCurrentState();
+    trackingStateBtn = document.getElementById("sidebar_tracking_state");
+    trackingStateBtn.addEventListener("click", () => {
+        trackingState.requestToggleState();
     });
 }
 
@@ -72,9 +81,8 @@ function setUpWebReader(readerObjectList) {
         return;
     const container = document.getElementById('container');
     const showAll = {
-        button: document.getElementById("show_all"),
-        icon: document.getElementById("show_all_tick"),
-        label: document.getElementById("show_all_label")
+        button: document.getElementById("sidebar_show_all"),
+        icon: document.getElementById("sidebar_show_all_icon")
     }
     let showAllInterface = new ShowAllInterface(showAll);
     webReader = new WebReaderSidebar(container, showAllInterface);
@@ -127,6 +135,16 @@ function addCurrentPage() {
             }, onError);
 }
 
+function updateAddButtonActivity(url) {
+    let test = dissectUrl(url);
+    if (test === undefined) {
+        // Link is reserved or no valid URL
+        addComicBtn.disabled = true;
+    } else {
+        addComicBtn.disabled = false;
+    }
+}
+
 // Display error for failed promises
 function onError(error) {
     console.log(`Error: ${error}`);
@@ -135,6 +153,7 @@ function onError(error) {
 async function updateBookmark(data) {
     if (webReader === undefined)
         return;
+    updateAddButtonActivity(data.url);
     await webReader.updateBookmark(data);
 }
 
@@ -161,4 +180,23 @@ function receiveMessage(message) {
     }
     console.log("Don't know how to act on this message:");
     console.log(message);
+}
+
+function receiveStateMessage(message) {
+    if (message.hasOwnProperty("activeState")) {
+        updateActiveState(message.activeState);
+        return;
+    }
+    console.log("Don't know how to act on this background message:");
+    console.log(message);
+}
+
+function updateActiveState(activeState) {
+    if (activeState) {
+        trackingStateImage.setImage("../../icons/icon_48.png");
+        trackingStateBtn.title="Deactivate URL tracking";
+    } else {
+        trackingStateImage.setImage("../../icons/icon_gray_48.png");
+        trackingStateBtn.title="Activate URL tracking";
+    }
 }
