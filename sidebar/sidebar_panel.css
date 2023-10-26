@@ -19,7 +19,7 @@
 }
 
 .search_line {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto auto;
 }
 
 .reader {
@@ -129,9 +129,15 @@
 }
 
 /* Sorting dropdown */
-.dropdown_toggle {
+.dropdown_toggle,
+.searchbar_icon {
     display: flex;
+    padding: 0;
+    margin: 0;
+    height: 3ex;
+    width: 3ex;
     align-items: center;
+    justify-content: center;
 }
 
 .dropdown {
