@@ -4,6 +4,7 @@ import {WebReaderBackground} from "../shared/web_reader.js"
 import {getActiveState} from "../shared/backup_import.js"
 import {saveActiveState} from "../shared/backup_export.js"
 import { ReaderEditorControl } from "../editor/reader_editor_control.js"
+import { dissectUrl } from "../shared/url.js"
 
 let isActive = true;
 let isSetUp = false;
@@ -16,6 +17,7 @@ let webReader = new WebReaderBackground();
 async function initialize() {
     isActive = await getActiveState();
     updateBrowserAction();
+    updateUrlListener();
     await webReader.loadInterface();
     ReaderEditorControl.setUpController();
     isSetUp = true;
@@ -41,8 +43,7 @@ async function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("requestPageAddition")) {
-        let data = message.requestPageAddition;
-        ReaderEditorControl.createReaderEntry(data, handleImport);
+        handlePageAddition(message.requestPageAddition);
         return;
     }
     if (message === "requestReaderTransmission") {
@@ -55,6 +56,13 @@ async function receiveMessage(message) {
     }
     console.log("Don't know how to act on this message:");
     console.log(message);
+}
+
+function handlePageAddition(data) {
+    let test = dissectUrl(data.url);
+    if (test === undefined) // Invalid or reserved URL, not useful
+        return;
+    ReaderEditorControl.createReaderEntry(data, handleImport);
 }
 
 async function handleImport(readerObjectLike) {
