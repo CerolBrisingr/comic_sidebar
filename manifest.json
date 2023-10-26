@@ -3,11 +3,11 @@
   "manifest_version": 2,
   "name": "WebReader Bookmarks",
   "description": "Convenient bookmarks for things you read over a long time. Like webcomics.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "browser_specific_settings": {
     "gecko": {
       "id": "sb_webcomic_sidebar@whythis.format",
-      "strict_min_version": "112"
+      "strict_min_version": "112.0"
     }
   },
 
