@@ -53,4 +53,4 @@ function unpackReaderObjectList(data) {
     return data.data;
 }
 
-export {importBackup, unpackReaderObjectList, getActiveState, getShowAll}
+export {importBackup, unpackReaderObjectList, getActiveState, getShowAll, getBoolean}

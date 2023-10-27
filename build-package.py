@@ -21,5 +21,6 @@ with ZipFile("../webReader-" + versionString + ".xpi", "w") as myzip:
     addFolder("options", myzip)
     addFolder("popup", myzip)
     addFolder("scripts", myzip)
+    addFolder("shared", myzip)
     addFolder("sidebar", myzip)
     myzip.write("manifest.json")
