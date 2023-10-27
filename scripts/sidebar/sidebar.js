@@ -7,6 +7,7 @@ import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
 import { TrackingState } from "../shared/tracking_state.js"
 import { dissectUrl } from "../shared/url.js"
+import { HideableHint } from "../shared/hideable_hint.js"
 
 // Tab management
 let webReader;
@@ -30,6 +31,7 @@ function setUpUserInterface() {
     setUpSearchBar();
     setUpDropdownMenu();
     setUpTrackingState();
+    setUpHint();
 }
 
 function setUpSearchBar() {
@@ -41,7 +43,7 @@ function setUpSearchBar() {
 }
 
 function setUpTrackingState() {
-    trackingStateImage = new CanvasIcon(sidebar_tracking_state_icon, "../../icons/icon.png");
+    trackingStateImage = new CanvasIcon("sidebar_tracking_state_icon", "../../icons/icon.png");
     let trackingState = new TrackingState(activeStateConnection);
     trackingState.requestCurrentState();
     trackingStateBtn = document.getElementById("sidebar_tracking_state");
@@ -198,5 +200,14 @@ function updateActiveState(activeState) {
     } else {
         trackingStateImage.setImage("../../icons/icon_gray_48.png");
         trackingStateBtn.title="Activate URL tracking";
+    }
+}
+
+async function setUpHint() {
+    let hint = new HideableHint();
+    hint.init("show_searchbar_hint", "searchbar_hint", "searchbar_hint_dismiss");
+    if (hint.isActive()) {
+        const icon = new CanvasIcon("hint_icon", "../../icons/icon.png");
+        const iconGrey = new CanvasIcon("hint_icon_grey", "../../icons/icon_gray.png");
     }
 }
