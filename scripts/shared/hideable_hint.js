@@ -4,13 +4,16 @@ import { saveBoolean } from "./backup_export.js"
 class HideableHint {
     #active = false;
 
-    constructor(propertyName, divId, btnId) {
-        if (btnId === undefined)
+    constructor(hintName) {
+        if (hintName === undefined)
             return;
-        this.init(propertyName, divId, btnId);
+        this.init(hintName);
     }
 
-    async init(propertyName, divId, btnId) {
+    async init(hintName) {
+        const propertyName = "show_" + hintName + "_hint";
+        const divId = hintName + "_hint";
+        const btnId = hintName + "_hint_dismiss";
         this.#active = await getBoolean(propertyName, true);
         if (this.#active) {
             let div = document.getElementById(divId);

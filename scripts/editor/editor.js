@@ -63,8 +63,8 @@ class Editor {
     }
 
     #setUpHints() {
-        const prefixHint = new HideableHint("show_prefix_hint", "prefix_hint", "prefix_hint_dismiss");
-        const previewHint = new HideableHint("show_preview_hint", "preview_hint", "preview_hint_dismiss");
+        const prefixHint = new HideableHint("prefix");
+        const previewHint = new HideableHint("preview");
     }
 
     #setUpScheduleEditor() {
