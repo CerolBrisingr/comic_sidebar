@@ -4,6 +4,7 @@ import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
 import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 import { ScheduleEditor } from "./schedule_editor.js";
+import { HideableHint } from "../shared/hideable_hint.js";
 
 class Editor {
     #prefixInfo;
@@ -30,6 +31,7 @@ class Editor {
         this.#setUpPrefixHandling(data.url);
         const imageAdjuster = new ImageAdjuster();
         const favIcon = await imageAdjuster.apply(data.favIcon);
+        this.#setUpHints();
         this.#setUpPreview(favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
@@ -41,6 +43,7 @@ class Editor {
         this.#reader = ReaderData.buildForEditor(readerObjectLike);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
         this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
+        this.#setUpHints();
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
@@ -57,6 +60,11 @@ class Editor {
         this.#collectExitButtons();
         this.#setDeleteSectionVisibility("idle");
         this.#finalizer.innerText = "Update Reader";
+    }
+
+    #setUpHints() {
+        const prefixHint = new HideableHint("show_prefix_hint", "prefix_hint", "prefix_hint_dismiss");
+        const previewHint = new HideableHint("show_preview_hint", "preview_hint", "preview_hint_dismiss");
     }
 
     #setUpScheduleEditor() {

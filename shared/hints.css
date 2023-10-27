@@ -1,12 +1,13 @@
 .hint {
     display: none;
+    overflow: hidden;
     background-color: #abcc7a;
     padding: 0.5ex;
 }
 
 .hint_grid {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto 1fr;
     row-gap: 1ex;
     column-gap: 0.5ex;
 }

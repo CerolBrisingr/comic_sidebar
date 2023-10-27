@@ -4,7 +4,11 @@ import { saveBoolean } from "./backup_export.js"
 class HideableHint {
     #active = false;
 
-    constructor() {}
+    constructor(propertyName, divId, btnId) {
+        if (btnId === undefined)
+            return;
+        this.init(propertyName, divId, btnId);
+    }
 
     async init(propertyName, divId, btnId) {
         this.#active = await getBoolean(propertyName, true);
