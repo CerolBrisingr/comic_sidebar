@@ -65,6 +65,7 @@ class Editor {
     #setUpHints() {
         const prefixHint = new HideableHint("prefix");
         const previewHint = new HideableHint("preview");
+        const scheduleHint = new HideableHint("schedule");
     }
 
     #setUpScheduleEditor() {
