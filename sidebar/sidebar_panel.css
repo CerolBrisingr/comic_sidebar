@@ -182,32 +182,6 @@
     border-color: lightgray;
 }
 
-.hint {
-    display: none;
-    background-color: #abcc7a;
-    padding: 0.5ex;
-}
-
-.hint_grid {
-    display: grid;
-    grid-template-columns: auto auto;
-    row-gap: 1ex;
-    column-gap: 0.5ex;
-}
-
-.hint_images {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-}
-
-.hint_dismiss {
-    float: right;
-    margin-top: 0.5ex;
-}
-
 /* Add comic button */
 .add_reader {
 	/*height: 2em;*/
