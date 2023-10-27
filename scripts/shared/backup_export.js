@@ -18,6 +18,13 @@ function saveShowAll(showAll) {
     browser.storage.local.set({showAll: showAll});
 }
 
+function saveBoolean(strName, value) {
+    value = Boolean(value);
+    let data = {};
+    data[strName] = value;
+    browser.storage.local.set(data);
+}
+
 function buildWebReaderObject(readerClassList) {
     let webReaderObject = {data: [], type: "sb_webcomic_sidebar_backup"};
     for (let readerClass of readerClassList) {
@@ -39,4 +46,4 @@ function replacer(key, value) {
     }
 }
 
-export {saveBackup, buildWebReaderObject, saveActiveState, saveShowAll}
+export {saveBackup, buildWebReaderObject, saveActiveState, saveShowAll, saveBoolean}

@@ -2,21 +2,85 @@
 <html lang="en">
     <head>
         <link rel="stylesheet" href="sidebar_panel.css">
+        <link rel="stylesheet" href="../shared/hints.css">
         <meta charset="utf-8">
         <script type="module" src="../scripts/sidebar/sidebar.js"></script>
     </head>
 <body>
+    <div id="add_reader_hint" class="hint">
+        <b>Click on "Add Reader" and register your first reader for this extension!</b>
+        <div class="hint_grid">
+            <div class="hint_images">
+                <b>Avoid</b>
+            </div>
+            <div class="hint_explain">
+                Most cases of referral links will not work properly. Avoid URLs with a format like: <br />
+                http://some.page/comic/latest_page.html
+            </div>
+
+            <div class="hint_images">
+                <b>Use</b>
+            </div>
+            <div class="hint_explain">
+                Use a direct link. The first page of a online comic or novel will usually do fine. The second-to-last page is a good candidate as well! <br />
+                http://some.page/comic/page_1.html <br />
+                http://some.page/comic/page_132.html
+            </div>
+        </div>
+        <button class="hint_dismiss" id="add_reader_hint_dismiss">Dismiss Hint</button>
+    </div>
     <div>
         <button class="add_reader" id="add_reader">Add Reader</button>
     </div>
+    <div id="searchbar_hint" class="hint">
+        <b>This is your search+ bar</b>
+        <div class="hint_grid">
+            <div class="hint_images">
+                <img src="../icons/search.svg">
+            </div>
+            <div class="hint_explain">
+                Search for entries on your list. <br />
+                The list will only show elements with titles that contain your text.
+            </div>
+
+            <div class="hint_images">
+                <img src="../icons/sort.svg">
+            </div>
+            <div class="hint_explain">
+                Change the order of your list entries.
+            </div>
+
+            <div class="hint_images">
+                <img src="../icons/eye-slash.svg">
+                /
+                <img src="../icons/eye.svg">
+            </div>
+            <div class="hint_explain">
+                You can hide list entries for some time after you visited them. If the eye is open, you'll see those anyway.
+            </div>
+
+            <div class="hint_images">
+                <canvas id="hint_icon" width="16" height="16"></canvas>
+                /
+                <canvas id="hint_icon_grey" width="16" height="16"></canvas>
+            </div>
+            <div class="hint_explain">
+                Colored: URL tracking is on and booksmarks will update automatically even if the sidebar is closed.
+                <br />
+                Gray: URL tracking is off and the extension will know nothing about your browsing.
+            </div>
+        </div>
+        <button class="hint_dismiss" id="searchbar_hint_dismiss">Dismiss Hint</button>
+    </div>
     <div class="gridline search_line">
         <input class="search_box" 
+            size="1"
             type="search" 
             id="search_box" 
             placeholder="Search for title..">
         <div class="dropdown">
             <button class="dropdown_toggle" id="dropdown_toggle" title="Sort reader list ..">
-                <img class="more_icon" src="../icons/sort.svg">
+                <img src="../icons/sort.svg">
             </button>
             <div id="dropdown_option_box" class="dropdown_option_box">
                 <button class="dropdown_option" id="sort_name">

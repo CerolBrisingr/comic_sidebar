@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <link rel="stylesheet" href="../sidebar/sidebar_panel.css">
+        <link rel="stylesheet" href="../shared/hints.css">
         <link rel="stylesheet" href="editor_panel.css">
         <meta charset="utf-8">
         <script type="module" src="../scripts/editor/editor_panel.js"></script>
@@ -22,6 +23,32 @@
         <br />
         <div class="divider"></div>
         <label for="prefix_line"><b>Select the address that all pages share:</b></label>
+        <div id="prefix_hint" class="hint">
+            <b>This mask is used to match a page you visit with the reader you are about to create.</b>
+            <div class="hint_grid">
+                <div class="hint_images">
+                    <img src="../icons/information.svg"/>
+                </div>
+                <div class="hint_explain">
+                    Try to use as much of the link as you can but avoid chapter names or parts of the page name.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/information.svg"/>
+                </div>
+                <div class="hint_explain">
+                    You can drag & drop the edge of your mask using your mouse.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/information.svg"/>
+                </div>
+                <div class="hint_explain">
+                    Once you clicked on this, you can also use the left and right keyboard buttons.
+                </div>
+            </div>
+            <button class="hint_dismiss" id="prefix_hint_dismiss">Dismiss Hint</button>
+        </div>
         <div class="spans" id="prefix_line" tabindex="0">
             <img class="field_type_icon" src="../icons/edit.svg"/>
             &nbsp;
@@ -29,9 +56,6 @@
                 <span class="prefix_main" id="prefix_main">https://some.comic/comics</span><span class="prefix_edge" id="prefix_edge">/</span><span class="prefix_trail" id="prefix_trail">4192</span>
             </div>
         </div>
-        <img class="field_type_icon" src="../icons/information.svg"/>
-        Drag & Drop or use arrow keys
-        <br/>
         <div class="divider"></div>
         <label for="prefix_showcase"><b>This reader will track all pages with addresses that start like:</b></label>
         <div class="spans" id="prefix_showcase">
@@ -46,12 +70,77 @@
         <img class="field_type_icon" src="../icons/information.svg"/>
         Reader Preview
     </label>
-    <div id="preview_container" class="config_container"></div>
+    <div class="config_container">
+        <div id="preview_container"></div>
+        <div id="preview_hint" class="hint">
+            <b>This is what the entry in the sidebar will look like. Some elements only show up once you hover over their line.</b>
+            <div class="hint_grid">
+                <div class="hint_images">
+                    <img src="../icons/settings.svg"/>
+                </div>
+                <div class="hint_explain">
+                    Come back to this editor.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/bookmark.svg"/>
+                </div>
+                <div class="hint_explain">
+                    This is an automatic bookmark. You will have up to 4 of them. <br />
+                    Each time you visit a matching page, those bookmarks will update.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/pin_fill.svg"/>
+                </div>
+                <div class="hint_explain">
+                    You can add automantc bookmarks to your manual bookmark list. <br />
+                    Manual bookmarks will no longer be added to automatic list and can therefore be used as blockers.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/bookmark-fill.svg"/>
+                </div>
+                <div class="hint_explain">
+                    This is a manual bookmark. You can have as many as you like.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/pin_slash.svg"/>
+                </div>
+                <div class="hint_explain">
+                    Click this to remove a manual bookmark from the list.
+                </div>
+
+                <div class="hint_images">
+                    <img src="../icons/edit.svg"/>
+                </div>
+                <div class="hint_explain">
+                    Manual bookmarks can have custom labels. Click here to start editing one.
+                </div>
+                
+                <div class="hint_images">
+                    <img src="../icons/edit_squiggle.svg"/>
+                </div>
+                <div class="hint_explain">
+                    You are editing a bookmark. Hit enter or click this to confirm your choice. <br />
+                    You can press escape to cancel editing.<br />
+                    Leave the label empty to go back to the generic label.
+                </div>
+            </div>
+            <button class="hint_dismiss" id="preview_hint_dismiss">Dismiss Hint</button>
+        </div>
+    </div>
     <label class="div_label" for="schedule_container">
         <img class="field_type_icon" src="../icons/edit.svg"/>
         Display Schedule
     </label>
     <div id="schedule_container" class="config_container">
+        <div id="schedule_hint" class="hint">
+            <b>Reduce clutter on your list and hide this entry after you visited one or more of its pages.</b> <br />
+            Use the following options to see it again once you expect news or simply want to revisit.
+            <button class="hint_dismiss" id="schedule_hint_dismiss">Dismiss Hint</button>
+        </div>
         <div>
             <input type="checkbox" id="always"/>
             <label for="always">Always show reader entry</label>
