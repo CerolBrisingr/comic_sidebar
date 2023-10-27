@@ -205,7 +205,7 @@ function updateActiveState(activeState) {
 
 async function setUpHint() {
     let hint = new HideableHint();
-    hint.init("show_searchbar_hint", "searchbar_hint", "searchbar_hint_dismiss");
+    await hint.init("show_searchbar_hint", "searchbar_hint", "searchbar_hint_dismiss");
     if (hint.isActive()) {
         const icon = new CanvasIcon("hint_icon", "../../icons/icon.png");
         const iconGrey = new CanvasIcon("hint_icon_grey", "../../icons/icon_gray.png");
