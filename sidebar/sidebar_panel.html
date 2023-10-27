@@ -9,6 +9,36 @@
     <div>
         <button class="add_reader" id="add_reader">Add Reader</button>
     </div>
+    <div id="searchbar_hint" class="hint">
+        <div class="hint_grid">
+            <div class="hint_images">
+                <img src="../icons/sort.svg">
+            </div>
+            <div>
+                Change sorting of reader list
+            </div>
+
+            <div class="hint_images">
+                <img src="../icons/eye-slash.svg">
+                /
+                <img src="../icons/eye.svg">
+            </div>
+            <div>
+                Hide/Show currently not scheduled readers
+            </div>
+
+            <div class="hint_images">
+                <canvas id="hint_icon" width="16" height="16"></canvas>
+                /
+                <canvas id="hint_icon_grey" width="16" height="16"></canvas>
+            </div>
+            <div>
+                Colored: URL tracking is on and booksmark will update automatically even if sidebar is closed.
+                Gray: URL tracking is off and the extension will know nothing about your browsing.
+            </div>
+        </div>
+        <button class="hint_dismiss">Dismiss Hint</button>
+    </div>
     <div class="gridline search_line">
         <input class="search_box" 
             size="1"
