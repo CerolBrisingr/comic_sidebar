@@ -7,6 +7,28 @@
         <script type="module" src="../scripts/sidebar/sidebar.js"></script>
     </head>
 <body>
+    <div id="add_reader_hint" class="hint">
+        <b>Click on "Add Reader" and register your first reader for this extension!</b>
+        <div class="hint_grid">
+            <div class="hint_images">
+                <b>Avoid</b>
+            </div>
+            <div>
+                Most cases of referral links will not work properly. Avoid URLs with a format like: <br />
+                http://some.page/comic/latest_page.html
+            </div>
+
+            <div class="hint_images">
+                <b>Use</b>
+            </div>
+            <div>
+                Use a direct link. The first page of a online comic or novel will usually do fine. The second-to-last page is a good candidate as well! <br />
+                http://some.page/comic/page_1.html <br />
+                http://some.page/comic/page_132.html
+            </div>
+        </div>
+        <button class="hint_dismiss" id="add_reader_hint_dismiss">Dismiss Hint</button>
+    </div>
     <div>
         <button class="add_reader" id="add_reader">Add Reader</button>
     </div>

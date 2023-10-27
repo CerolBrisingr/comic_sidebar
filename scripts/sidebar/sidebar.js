@@ -31,7 +31,7 @@ function setUpUserInterface() {
     setUpSearchBar();
     setUpDropdownMenu();
     setUpTrackingState();
-    setUpHint();
+    setUpHints();
 }
 
 function setUpSearchBar() {
@@ -203,10 +203,11 @@ function updateActiveState(activeState) {
     }
 }
 
-async function setUpHint() {
-    let hint = new HideableHint();
-    await hint.init("searchbar");
-    if (hint.isActive()) {
+async function setUpHints() {
+    const addReaderHint = new HideableHint("add_reader");
+    let searchbarHint = new HideableHint();
+    await searchbarHint.init("searchbar");
+    if (searchbarHint.isActive()) {
         const icon = new CanvasIcon("hint_icon", "../../icons/icon.png");
         const iconGrey = new CanvasIcon("hint_icon_grey", "../../icons/icon_gray.png");
     }
