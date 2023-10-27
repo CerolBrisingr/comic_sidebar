@@ -1,7 +1,7 @@
 .hint {
     display: none;
     overflow: hidden;
-    background-color: #abcc7a;
+    background-color: #8bc77f;
     padding: 0.5ex;
 }
 
@@ -23,4 +23,11 @@
 .hint_dismiss {
     float: right;
     margin-top: 0.5ex;
+}
+
+.hint_explain {
+    border: solid;
+    border-color: #637973;
+    padding: 0.5ex;
+    border-radius: 0.5ex;
 }
