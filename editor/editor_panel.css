@@ -89,6 +89,7 @@ input:focus {
 }
 
 .hint {
+    /*Specific changes for the editor window*/
     border-radius: 1ex;
     margin-top: 0.5ex;
     margin-bottom: 0.5ex;
