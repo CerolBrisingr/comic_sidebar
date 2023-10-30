@@ -1,7 +1,7 @@
 .hint {
     display: none;
     overflow: hidden;
-    background-color: #8bc77f;
+    background-color: #c8fabd;
     padding: 0.5ex;
 }
 
@@ -27,6 +27,7 @@
 
 .hint_explain {
     border: solid;
+    border-width: 1px;
     border-color: #637973;
     padding: 0.5ex;
     border-radius: 0.5ex;
