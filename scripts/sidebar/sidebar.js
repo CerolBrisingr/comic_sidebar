@@ -22,6 +22,8 @@ let activeStateConnection = new SubscriberPort(receiveStateMessage, "options_scr
 
 document.addEventListener('DOMContentLoaded', function () {
     requestWebReader();
+    setUpTrackingState();
+    setUpHints();
 });
 
 function setUpUserInterface() {
@@ -30,8 +32,6 @@ function setUpUserInterface() {
 
     setUpSearchBar();
     setUpDropdownMenu();
-    setUpTrackingState();
-    setUpHints();
 }
 
 function setUpSearchBar() {
