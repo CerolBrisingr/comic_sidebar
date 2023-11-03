@@ -41,8 +41,8 @@ function dissectUrl(url, prefix, fallback) {
         prefix = currentUrl.origin;
     if (arguments.length < 3)
         fallback = false;
-    
-    if (!url.startsWith(prefix)) {
+
+    if (!urlFitsPrefix(url, prefix)) {
         if (fallback) {
             prefix = currentUrl.origin;
         } else {
@@ -50,8 +50,35 @@ function dissectUrl(url, prefix, fallback) {
             return;
         }
     }
-    let tail = url.slice(prefix.length);
+    let tail = getTail(url, currentUrl, prefix);
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
-export {OpenUrlCtrl, openUrlInMyTab, dissectUrl}
+function urlFitsPrefix(url, prefix) {
+    if (prefix === undefined)
+        return false;
+    // Currently set to ignore https/http differences
+    let urlObj = new URL(url);
+    let prefixObj = new URL(prefix);
+    if (!(isHttpS(urlObj.protocol) && isHttpS(prefixObj.protocol))) {
+        return url.startsWith(prefix);
+    }
+    url = url.slice(urlObj.protocol.length);
+    prefix = prefix.slice(prefixObj.protocol.length);
+    return url.startsWith(prefix);
+}
+
+function isHttpS(protocol) {
+    return (protocol === "http:") || (protocol === "https:");
+}
+
+function getTail(url, urlObj, prefix) {
+    let prefixObj = new URL(prefix);
+    if (isHttpS(urlObj.protocol) && isHttpS(prefixObj.protocol)) {
+        url = url.slice(urlObj.protocol.length);
+        prefix = prefix.slice(prefixObj.protocol.length);
+    }
+    return url.slice(prefix.length);
+}
+
+export {OpenUrlCtrl, openUrlInMyTab, dissectUrl, urlFitsPrefix, getTail}
