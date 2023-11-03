@@ -45,30 +45,27 @@ describe('urlFitsPrefix()', function() {
 
 describe('getTail()', function() {
     let url;
-    let urlObj;
 
     beforeEach(function() {
         url = "https://www.test.com/page1/";
-        urlObj = new URL(url);
     });
 
     it('should be able to get a tail via prefix', () => {
         let prefix = "https://www.test.com/";
-        let tail = getTail(url, urlObj, prefix);
+        let tail = getTail(url, prefix);
         expect(tail).toBe("page1/");
     });
 
     it('should be able to get a tail via prefix on http instead of https', () => {
         let prefix = "http://www.test.com/";
-        let tail = getTail(url, urlObj, prefix);
+        let tail = getTail(url, prefix);
         expect(tail).toBe("page1/");
     });
 
     it('should work for different protocol', () => {
         url = "ftp://www.test.com/page1/";
-        urlObj = new URL(url);
         let prefix = "ftp://www.test.com/";
-        let tail = getTail(url, urlObj, prefix);
+        let tail = getTail(url, prefix);
         expect(tail).toBe("page1/");
     });
 
