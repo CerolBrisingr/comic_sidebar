@@ -5,7 +5,7 @@ describe('Reader Schedule', function() {
 
     beforeEach(function() {
         readerSchedule = new ReaderSchedule();
-      });
+    });
 
     it('should be able to create instance from undefined', function() {
         expect(readerSchedule).not.toBeUndefined();

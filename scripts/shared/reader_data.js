@@ -1,4 +1,4 @@
-import { dissectUrl } from "./url.js"
+import { dissectUrl, urlFitsPrefix } from "./url.js"
 import { ReaderSync } from "./reader_sync.js"
 import { ReaderSchedule } from "./reader_schedule.js";
 
@@ -104,7 +104,7 @@ class ReaderData {
     urlIsCompatible(url_string) {
         if (!(typeof url_string === "string"))
             return false;
-        return url_string.startsWith(this.#prefixMask);
+        return urlFitsPrefix(url_string, this.#prefixMask);
     }
 
     addAutomatic(data) {
