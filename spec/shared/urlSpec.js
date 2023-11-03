@@ -78,7 +78,39 @@ describe('getTail()', function() {
 });
 
 describe('dissectUrl()', function() {
-    it('needs some tests', () => {
-        expect(false).toBeTrue();
+
+    it('should return undefined on reserved url', () => {
+        let stuff = dissectUrl('about:config');
+        expect(stuff).toBeUndefined();
+    });
+
+    it('should return undefined on url without protocol', () => {
+        let stuff = dissectUrl('www.test.com');
+        expect(stuff).toBeUndefined();
+    });
+
+    it('should return use origin as prefix for url only', () => {
+        let stuff = dissectUrl('http://www.test.com/1/');
+        expect(stuff.host).toBe('www.test.com');
+        expect(stuff.tail).toBe("/1/");
+        expect(stuff.base_url).toBe("http://www.test.com");
+    });
+
+    it('should return undefined on wrong prefix without fallback', () => {
+        let stuff = dissectUrl('http://www.test.com/1/', 'http://www.test.cm');
+        expect(stuff).toBeUndefined();
+
+        stuff = dissectUrl('http://www.test.com/1/', 'http://www.test.cm', false);
+        expect(stuff).toBeUndefined();
+    });
+
+    it('should return use origin as prefix for wrong prefix with fallback', () => {
+        let stuff = dissectUrl('http://www.test.com/1/', 'http://www.test.cm', true);
+        expect(stuff.tail).toBe("/1/");
+    });
+
+    it('should cope with https -> http transition', () => {
+        let stuff = dissectUrl('http://www.test.com/1/', 'https://www.test.com');
+        expect(stuff.tail).toBe("/1/");
     });
 });
