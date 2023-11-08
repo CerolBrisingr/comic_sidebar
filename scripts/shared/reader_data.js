@@ -12,6 +12,7 @@ class ReaderData {
     #manual;
     #parentInterface;
     #schedule;
+    #tags;
 
     static buildForEditor(readerObject) {
         // Build readerData without the connected behavior
@@ -36,6 +37,7 @@ class ReaderData {
             this.#prefixMask = String(data.prefix_mask);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
+        this.#importTags(data.tags);
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
@@ -67,6 +69,36 @@ class ReaderData {
             if ((bookmark !== undefined) && entry.hasOwnProperty("label"))
                 bookmark.setLabel(String(entry.label));
         }
+    }
+
+    #importTags(tagData) {
+        this.#tags = new Set();
+        if (tagData === undefined)
+            return;
+        if (!isArray(tagData))
+            return;
+        for (let tag of tagData) {
+            this.addTag(tag);
+        }
+    }
+
+    removeTag(tag) {
+        return this.#tags.delete(tag);
+    }
+
+    addTag(tag) {
+        if (typeof tag !== "string")
+            return;
+        tag = tag.trim();
+        if (tag === "untagged")
+            return;
+        if (tag === "")
+            return;
+        this.#tags.add(tag);
+    }
+
+    getTags() {
+        return Array.from(this.#tags);
     }
     
     getLabel() {
@@ -233,6 +265,7 @@ class ReaderData {
             label:this.#label,
             prefix_mask:this.#prefixMask,
             schedule:this.#schedule.returnAsObject(),
+            tags:this.getTags(),
             automatic: [],
             manual: []
         }
