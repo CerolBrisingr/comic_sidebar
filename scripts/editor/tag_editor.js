@@ -19,7 +19,7 @@ class TagEditor {
         this.#container = document.getElementById("reader_tags");
         this.#tags = [];
         for (let tag of tagData) {
-            this.addTagObject(tag);
+            this.#addTagObject(tag);
         }
     }
 
@@ -56,9 +56,18 @@ class TagEditor {
         return wasRemoved;
     }
 
-    addTagObject(tagString) {
+    addTag(tagString) {
+        let addedTag = this.#readerData.addTag(tagString);
+        if (addedTag !== "") {
+            // addTag() will return emtpy string if rejected
+            this.#addTagObject(addedTag);
+            return true;
+        }
+        return false;
+    }
+
+    #addTagObject(tagString) {
         this.#tags.push(new TagObject(this.#myInterface, tagString));
-        return true;
     }
 }
 
@@ -75,7 +84,7 @@ class EditorInterface {
     }
 
     createTag(tagString) {
-        let canCreate = this.#tagEditor.addTagObject(tagString);
+        let canCreate = this.#tagEditor.addTag(tagString);
         if (canCreate)
             this.#tagEditor.updateTagContainer();
         return canCreate;

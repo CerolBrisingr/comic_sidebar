@@ -88,14 +88,16 @@ class ReaderData {
 
     addTag(tag) {
         if (typeof tag !== "string")
-            return false;
+            return "";
         tag = tag.trim();
         if (tag === "untagged")
-            return false;
+            return "";
         if (tag === "")
-            return false;
+            return "";
+        if (this.#tags.has(tag))
+            return "";
         this.#tags.add(tag);
-        return true;
+        return tag;
     }
 
     getTags() {
