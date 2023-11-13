@@ -37,7 +37,7 @@ class ReaderData {
             this.#prefixMask = String(data.prefix_mask);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
-        this.#importTags(data.tags);
+        this._importTags(data.tags);
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
@@ -71,7 +71,7 @@ class ReaderData {
         }
     }
 
-    #importTags(tagData) {
+    _importTags(tagData) {
         this.#tags = new Set();
         if (tagData === undefined)
             return;
@@ -198,6 +198,7 @@ class ReaderData {
     editReader(readerObjectLike) {
         this.#label = readerObjectLike.label;
         this.#prefixMask = readerObjectLike.prefix_mask;
+        this._importTags(readerObjectLike.tags);
         this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();
     }

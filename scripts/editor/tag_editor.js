@@ -92,7 +92,6 @@ class EditorInterface {
 
     removeTag(tagObject) {
         let canRemove = this.#tagEditor.removeTag(tagObject);
-        console.log(canRemove);
         if (canRemove)
             this.#tagEditor.updateTagContainer();
         return canRemove;
