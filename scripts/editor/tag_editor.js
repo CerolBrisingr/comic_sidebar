@@ -2,26 +2,47 @@ class TagEditor {
     #readerData;
     #container;
     #tags;
+    #addTagButton;
+    #createInterface;
+    #tagBuilder;
 
     constructor(readerData) {
         this.#readerData = readerData;
         let tagData = this.#readerData.getTags();
-        this.#setUpTags(tagData);
-        this.#setUpTagAdder(tagData);
+        let editorInterface = new EditorInterface(this);
+        this.#setUpTags(tagData, editorInterface);
+        this.#setUpTagAdder(tagData, editorInterface);
     }
 
-    #setUpTags(tagData) {
+    #setUpTags(tagData, editorInterface) {
         this.#container = document.getElementById("reader_tags");
         this.#tags = [];
-        let editorInterface = new EditorInterface(this);
         for (let tag of tagData) {
             this._addTagObject(editorInterface, tag);
         }
     }
 
-    #setUpTagAdder(tagData) {
+    #setUpTagAdder(tagData, editorInterface) {
         // For now: just button to add a new tag (id: tag_add_button)
         // later: dropdown menu with "add tag" and all existing tags that are not listed yet
+        this.#addTagButton = document.getElementById("tag_add_button");
+        this.#addTagButton.addEventListener("click", () => {
+            this.#tagBuilder = new TagCreator(editorInterface);
+        })
+    }
+
+    removeCreateInterface() {
+        if (this.#createInterface !== undefined) {
+            this.#container.removeChild(this.#createInterface);
+            this.#createInterface = undefined;
+        }
+    }
+
+    installCreateInterface(createInterface) {
+        this.removeCreateInterface();
+        this.#createInterface = createInterface;
+        let objects = [createInterface].concat(...this.#container.children);
+        this.#container.replaceChildren(...objects);
     }
 
     _removeTag(tagObject) {
@@ -45,6 +66,14 @@ class EditorInterface {
         this.#tagEditor = tagEditor;
     }
 
+    removeCreateInterface() {
+        this.#tagEditor.removeCreateInterface();
+    }
+
+    addCreateInterface(createButton) {
+        this.#tagEditor.installCreateInterface(createButton);
+    }
+
     removeTag(tagObject) {
         return this.#tagEditor._removeTag(tagObject);
     }
@@ -52,18 +81,54 @@ class EditorInterface {
 
 class TagCreator {
     #editorInterface;
+    #ui;
 
-    constructor(edtorInterface) {
-        this.#editorInterface = this.#editorInterface;
+    constructor(editorInterface) {
+        this.#editorInterface = editorInterface;
+        this.#createUi();
+        this.#editorInterface.addCreateInterface(this.#ui);
     }
 
     #createUi() {
         // div class: tag_create_div
+        this.#ui = document.createElement("div");
+        this.#ui.classList.add("tag_create_div");
+
         //   text input class: tag_create_edit
+        let input = document.createElement("input");
+        input.type = "text";
+        input.classList.add("tag_create_edit");
+        this.#ui.appendChild(input);
+
+        let cancel = this.#createButton("../../icons/cross.svg");
+        this.#ui.appendChild(cancel);
+        cancel.addEventListener('click', () => {
+            this.#editorInterface.removeCreateInterface();
+        })
+
+        let create = this.#createButton("../../icons/plus.svg");
+        this.#ui.appendChild(create);
+        create.addEventListener('click', () => {
+            this.#editorInterface.removeCreateInterface();
+        })
+
+        return this.#ui;
+    }
+
+    #createButton(image_path) {
         //   tag cancel button class: tag_create_button
         //      cancel button image class: tag_create_image, cross.svg
         //   tag create button class: tag_create_button
         //      create button image class: tag_create_image, plus.svg
+        let button = document.createElement("button");
+        button.classList.add("tag_create_button");
+
+        let image = document.createElement("img");
+        image.classList.add("tag_create_image");
+        image.src = image_path;
+        button.appendChild(image);
+
+        return button;
     }
 }
 
