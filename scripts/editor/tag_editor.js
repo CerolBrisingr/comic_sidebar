@@ -30,6 +30,7 @@ class TagEditor {
         this.#addTagButton.addEventListener("click", () => {
             this.#tagBuilder = new TagCreator(this.#myInterface);
             this.updateTagContainer();
+            this.#tagBuilder.select();
         });
     }
 
@@ -107,6 +108,7 @@ class TagCreatorDummy {
 class TagCreator {
     #editorInterface;
     #ui;
+    #input;
 
     constructor(editorInterface) {
         this.#editorInterface = editorInterface;
@@ -123,26 +125,49 @@ class TagCreator {
         this.#ui.classList.add("tag_create_div");
 
         //   text input class: tag_create_edit
-        let input = document.createElement("input");
-        input.type = "text";
-        input.classList.add("tag_create_edit");
-        this.#ui.appendChild(input);
+        this.#input = document.createElement("input");
+        this.#input.type = "text";
+        this.#input.classList.add("tag_create_edit");
+        this.#ui.appendChild(this.#input);
 
         let cancel = this.#createButton("../../icons/cross.svg");
         this.#ui.appendChild(cancel);
         cancel.addEventListener('click', () => {
-            this.#editorInterface.removeCreateInterface();
+            this._doCancel();
         })
 
         let create = this.#createButton("../../icons/plus.svg");
         this.#ui.appendChild(create);
         create.addEventListener('click', () => {
-            // Next: add new tag UI in any case
-            if (this.#editorInterface.createTag(input.value))
-                this.#editorInterface.removeCreateInterface();
+            this._tryCreate(this.#input.value);
         })
 
+        this.#ui.addEventListener("keyup", ({key}) => {
+            switch (key) {
+                case "Enter":
+                    this._tryCreate(this.#input.value);
+                    break;
+                case "Escape":
+                    this._doCancel();
+                    break;
+            }
+        });
+
         return this.#ui;
+    }
+
+    _doCancel() {
+        this.#editorInterface.removeCreateInterface();
+    }
+
+    _tryCreate(tagString) {
+        // Next: add new tag UI in any case
+        if (this.#editorInterface.createTag(tagString))
+            this.#editorInterface.removeCreateInterface();
+    }
+
+    select() {
+        this.#input.select();
     }
 
     #createButton(image_path) {
