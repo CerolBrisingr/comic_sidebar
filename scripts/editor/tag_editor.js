@@ -47,7 +47,7 @@ class TagEditor {
         this.#container.replaceChildren(...list);
     }
 
-    _removeTag(tagObject) {
+    removeTag(tagObject) {
         let wasRemoved = this.#readerData.removeTag(tagObject.getString());
         let iFound = this.#tags.indexOf(tagObject);
         if (iFound === -1)
@@ -91,7 +91,8 @@ class EditorInterface {
     }
 
     removeTag(tagObject) {
-        let canRemove = this.#tagEditor._removeTag(tagObject);
+        let canRemove = this.#tagEditor.removeTag(tagObject);
+        console.log(canRemove);
         if (canRemove)
             this.#tagEditor.updateTagContainer();
         return canRemove;
@@ -188,10 +189,20 @@ class TagObject {
         this.#ui.appendChild(text);
 
         //    image with class: tag_remove_image, cross-circle.svg + hover?
+        let button = this.#createRemoveButton();
+        this.#ui.appendChild(button);
+    }
+
+    #createRemoveButton() {
         let button = document.createElement("img");
         button.src = "../../icons/cross-circle.svg";
         button.classList.add("tag_remove_image");
-        this.#ui.appendChild(button);
+
+        button.addEventListener('click', () => {
+            this.#editorInterface.removeTag(this);
+        });
+
+        return button;
     }
 
     getUi() {
