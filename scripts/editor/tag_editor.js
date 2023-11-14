@@ -68,7 +68,61 @@ class TagEditor {
     }
 
     #addTagObject(tagString) {
-        this.#tags.push(new TagObject(this.#myInterface, tagString));
+        let nTags = this.#tags.length;
+        console.log(`We adding a tag to ${nTags} others`);
+        if (nTags === 0) {
+            this.#tags.push(new TagObject(this.#myInterface, tagString));
+            console.log(`Creating a first one!`);
+            return;
+        } 
+        let slot = SlotFinder.findTagSlot(tagString, this.#tags);
+        console.log(`Insert at slot ${slot}`);
+        this.#addTagObjectInSlot(tagString, slot);
+    }
+
+    #addTagObjectInSlot(tagString, slot) {
+        let newTag = new TagObject(this.#myInterface, tagString);
+        this.#tags.splice(slot, 0, newTag);
+    }
+
+}
+
+class SlotFinder {
+    static findTagSlot(tagString, tags) {
+        tagString = tagString.toLowerCase();
+        let [firstCandidate, lastCandidate] = SlotFinder._fastSearch(tagString, tags);
+        return SlotFinder._slowSearch(tagString, tags, firstCandidate, lastCandidate);
+    }
+
+    static _fastSearch(tagString, tags) {
+        let start = 0;
+        let last = tags.length - 1;
+        while ((last - start) >= 2) {
+            let center = SlotFinder._getCenter(start, last);
+            if (SlotFinder._isAfter(tagString, tags[center])) {
+                start = center + 1;
+            } else {
+                last = center - 1;
+            }
+        }
+        return [start, last];
+    }
+
+    static _slowSearch(tagString, tags, start, last) {
+        for (let id = start; id <= last; id++) {
+            if (!SlotFinder._isAfter(tagString, tags[id])) {
+                return id;
+            }
+        }
+        return last + 1;
+    }
+
+    static _getCenter(a, b) {
+        return Math.floor((a + b) / 2);
+    }
+
+    static _isAfter(tagString, tag) {
+        return tagString > tag.getString().toLowerCase();
     }
 }
 
@@ -242,4 +296,4 @@ class TagObject {
     }
 }
 
-export {TagEditor}
+export {TagEditor, SlotFinder}
