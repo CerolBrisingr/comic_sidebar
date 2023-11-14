@@ -277,6 +277,14 @@ class TagObject {
             this.#editorInterface.removeTag(this);
         });
 
+        button.addEventListener('mouseenter', () => {
+            button.src = "../../icons/cross-circle-fill.svg";
+        })
+
+        button.addEventListener('mouseleave', () => {
+            button.src = "../../icons/cross-circle.svg";
+        })
+
         return button;
     }
 
