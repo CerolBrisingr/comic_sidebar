@@ -28,6 +28,8 @@ describe("ReaderData", function() {
     it('should be possible to modify a reader Object', function() {
         readerData = ReaderData.buildForEditor(object);
         readerData.addTag("test");
+        readerData.setLabel("Updated");
+        readerData.setPrefixMask("http://www.somecomic.com/");
         readerObject = readerData.returnAsObject();
         let newReaderData = ReaderData.buildForEditor(object);
         newReaderData.editReader(readerObject);
@@ -39,18 +41,16 @@ describe("ReaderData", function() {
 
 describe("ReaderData tags", function() {
     let object = readerObjectStub();
-    let readerData;
-    let readerObject;
 
     it('should not accept identical tags', function() {
-        readerData = ReaderData.buildForEditor(object);
+        let readerData = ReaderData.buildForEditor(object);
         readerData.addTag("test");
         readerData.addTag("test");
         expect(readerData.getTags()).toEqual(["test"]);
     });
 
     it('should accept different tags', function() {
-        readerData = ReaderData.buildForEditor(object);
+        let readerData = ReaderData.buildForEditor(object);
         readerData.addTag("test");
         readerData.addTag("test2");
         expect(readerData.getTags()).toEqual(["test", "test2"]);
