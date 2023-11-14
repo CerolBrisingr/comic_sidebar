@@ -3,6 +3,8 @@
     <head>
         <link rel="stylesheet" href="../sidebar/sidebar_panel.css">
         <link rel="stylesheet" href="../shared/hints.css">
+        <link rel="stylesheet" href="../shared/tags.css">
+        <link rel="stylesheet" href="../shared/dropdown.css">
         <link rel="stylesheet" href="editor_panel.css">
         <meta charset="utf-8">
         <script type="module" src="../scripts/editor/editor_panel.js"></script>
@@ -65,6 +67,12 @@
                 <span class="prefix_output" id="prefix_output">https://some.comic/comics/</span><span class="append_stars">***</span>
             </div>
         </div>
+        <label for="reader_tags"><b>Add tags so you can filter for them:</b></label>        
+        <div class="tag_container" id="reader_tags">
+            <button class="tag_add_button" id="tag_add_button">
+                <img class="tag_add_image" src="../icons/plus.svg" />
+            </button>
+        </div>
     </div>
     <label class="div_label" for="preview_container">
         <img class="field_type_icon" src="../icons/information.svg"/>
@@ -95,7 +103,7 @@
                 </div>
                 <div class="hint_explain">
                     You can add automantc bookmarks to your manual bookmark list. <br />
-                    Manual bookmarks will no longer be added to automatic list and can therefore be used as blockers.
+                    Manual bookmarks will no longer be added to the automatic list and can therefore be used as blockers.
                 </div>
 
                 <div class="hint_images">

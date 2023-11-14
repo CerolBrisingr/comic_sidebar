@@ -1,0 +1,42 @@
+
+.dropdown {
+    display: inline-block;
+    position: relative;
+}
+
+.dropdown_option_box {
+    display: none;
+    position: absolute;
+    right: 0;
+    z-index: 20;
+    flex-direction: column;
+    border: groove;
+    border-radius: 0.3em;
+    border-width: 2px;
+    border-color: lightgray;
+}
+
+.dropdown_icon {
+    visibility: hidden;
+}
+
+.dropdown_option {
+    cursor: pointer;
+    display: flex;
+    text-align: left;
+    white-space: nowrap;
+    border: none;
+    align-items: center;
+}
+
+.dropdown_label {
+    margin-top: 0.3vh;
+    margin-bottom: 0.3vh;
+    margin-left: 0.3em;
+}
+
+.dropdown_divider {
+    border-width: 2px;
+    border-top: solid;
+    border-color: lightgray;
+}

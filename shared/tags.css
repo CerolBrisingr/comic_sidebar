@@ -1,0 +1,47 @@
+.tag_container {
+    overflow: hidden;
+    border:solid;
+    border-width: 1px;
+    display: block;
+    border-radius: 0.5ex;
+}
+
+.tag_create_button,
+.tag_add_button {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    float: right;
+}
+
+.tag_add_image {
+    margin: 0;
+    padding: 0;
+}
+
+.tag_create_div,
+.tag_div {
+    padding-left: 2px;
+    padding-right: 2px;
+    margin: 1px;
+    border: solid;
+    border-width: 1px;
+    border-color: lightgrey;
+    border-radius: 1ex;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5ex;
+}
+
+.tag_create_image,
+.tag_remove_image {
+    padding: 0;
+}
+
+.tag_create_edit {
+    outline: none;
+    border: none;
+}

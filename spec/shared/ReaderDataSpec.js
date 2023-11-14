@@ -18,12 +18,43 @@ describe("ReaderData", function() {
 
     it('should be possible to reload the readerObject', function() {
         readerData = ReaderData.buildForEditor(object);
+        readerData.addTag("test");
         readerObject = readerData.returnAsObject();
         let newReaderData = ReaderData.buildForEditor(readerObject);
         expect(newReaderData).toEqual(readerData);
         expect(readerObject).toEqual(newReaderData.returnAsObject());
     });
 
+    it('should be possible to modify a reader Object', function() {
+        readerData = ReaderData.buildForEditor(object);
+        readerData.addTag("test");
+        readerData.setLabel("Updated");
+        readerData.setPrefixMask("http://www.somecomic.com/");
+        readerObject = readerData.returnAsObject();
+        let newReaderData = ReaderData.buildForEditor(object);
+        newReaderData.editReader(readerObject);
+        expect(newReaderData).toEqual(readerData);
+        expect(readerObject).toEqual(newReaderData.returnAsObject());
+    });
+
+});
+
+describe("ReaderData tags", function() {
+    let object = readerObjectStub();
+
+    it('should not accept identical tags', function() {
+        let readerData = ReaderData.buildForEditor(object);
+        readerData.addTag("test");
+        readerData.addTag("test");
+        expect(readerData.getTags()).toEqual(["test"]);
+    });
+
+    it('should accept different tags', function() {
+        let readerData = ReaderData.buildForEditor(object);
+        readerData.addTag("test");
+        readerData.addTag("test2");
+        expect(readerData.getTags()).toEqual(["test", "test2"]);
+    });
 });
 
 function compareReader(readerData, object) {
