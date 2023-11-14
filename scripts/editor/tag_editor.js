@@ -212,7 +212,6 @@ class TagCreator {
     }
 
     _tryCreate(tagString) {
-        // Next: add new tag UI in any case
         if (this.#editorInterface.createTag(tagString))
             this.#editorInterface.removeCreateInterface();
     }
