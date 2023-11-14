@@ -69,14 +69,11 @@ class TagEditor {
 
     #addTagObject(tagString) {
         let nTags = this.#tags.length;
-        console.log(`We adding a tag to ${nTags} others`);
         if (nTags === 0) {
             this.#tags.push(new TagObject(this.#myInterface, tagString));
-            console.log(`Creating a first one!`);
             return;
         } 
         let slot = SlotFinder.findTagSlot(tagString, this.#tags);
-        console.log(`Insert at slot ${slot}`);
         this.#addTagObjectInSlot(tagString, slot);
     }
 
