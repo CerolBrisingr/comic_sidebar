@@ -54,7 +54,7 @@ class TagLibrary {
         let count = this.#tagMap.get(tagString);
         if (count <= 0)
             this.#errorCount();
-        if (count === 1)
+        if (count <= 1)
             this.#tagMap.delete(tagString);
         this.#tagMap.set(tagString, count - 1);
     }
