@@ -7,7 +7,7 @@ import { ReaderFilter } from "../sidebar/reader_filter.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
-import { TagLibrary } from "../sidebar/tag_libraray.js"
+import { TagLibrary } from "../background/tag_libraray.js"
 
 class WebReader {
 
