@@ -94,7 +94,6 @@ class HtmlContainer {
     
     getList() {
         // Returns stored objects as list
-        // Upkeeping a sorted index is probably better once we actually sort
         let objectList = [];
         for (let host of this.#data.values())
             for (let object of host) {
