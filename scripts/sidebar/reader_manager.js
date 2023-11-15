@@ -11,12 +11,15 @@ class ReaderManager {
     #readerSync;
     #schedule;
     #favIcon;
+    #tagLibrary;
     
-    constructor(readerObject, parentInterface, container, showAllInterface) {
+    constructor(readerObject, parentInterface, container, showAllInterface, tagLibrary) {
         this.#container = container;
+        this.#tagLibrary = tagLibrary;
         this.#parentInterface = parentInterface;
         this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
         this.#readerData = this.#createReaderData(readerObject);
+        this.#tagLibrary.registerTags(this.#readerData);
         this.#schedule = new Scheduler(this.#readerData.getSchedule(), showAllInterface);
         this.#createReaderVisuals();
     }
@@ -66,7 +69,9 @@ class ReaderManager {
     }
     
     editReader(readerObjectLike) {
+        this.#tagLibrary.retractTags(this.#readerData);
         this.#readerData.editReader(readerObjectLike);
+        this.#tagLibrary.registerTags(this.#readerData);
         this.#schedule.updateRuleset(this.#readerData.getSchedule());
         this.#updateReaderVisuals();
         this.#parentInterface.relistViewerDisplay();
