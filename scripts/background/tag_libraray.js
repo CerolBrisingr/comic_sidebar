@@ -27,15 +27,17 @@ class TagLibrary {
         console.log(Array.from(this.#tagMap.values()));
     }
 
-    recount(readerList) {
+    clear() {
         this.#tagMap.clear();
-        for (let readerData of readerList) {
-            this.registerTags(readerData);
-        }
+        this.#isFine = true;
     }
 
     getUsedTags() {
         return Array.from(this.#tagMap.keys());
+    }
+
+    getCorrespondingValues() {
+        return Array.from(this.#tagMap.values());
     }
 
     #registerTag(tagString) {
@@ -48,14 +50,18 @@ class TagLibrary {
         this.#tagMap.set(tagString, count + 1);
     }
 
-    #retractTag(tag) {
-        if (!this.#tagMap.has(tagString))
+    #retractTag(tagString) {
+        if (!this.#tagMap.has(tagString)) {
             this.#errorExist();
+            return;
+        }
         let count = this.#tagMap.get(tagString);
         if (count <= 0)
             this.#errorCount();
-        if (count <= 1)
+        if (count <= 1) {
             this.#tagMap.delete(tagString);
+            return;
+        }
         this.#tagMap.set(tagString, count - 1);
     }
 

@@ -55,6 +55,12 @@ describe("ReaderData tags", function() {
         readerData.addTag("test2");
         expect(readerData.getTags()).toEqual(["test", "test2"]);
     });
+
+    it('should not allow tagging with "untagged"', function() {
+        let readerData = ReaderData.buildForEditor(object);
+        readerData.addTag("untagged");
+        expect(readerData.getTags()).toEqual([]);
+    });
 });
 
 function compareReader(readerData, object) {
