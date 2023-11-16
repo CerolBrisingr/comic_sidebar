@@ -4,9 +4,12 @@ import { ReaderSync } from "./reader_sync.js"
 import { Scheduler } from "./scheduler.js"
 
 class BasicReaderManager {
+    _readerSync;
+    _parentInterface;
 
     constructor(readerObject, parentInterface) {
         this.#importReaderData(readerObject);
+        this._parentInterface = parentInterface;
     }
     
     #importReaderData(readerObject) {
@@ -27,20 +30,23 @@ class BasicReaderManager {
     editReader() {
         throw new Error("not implemented");
     }
+    
+    deleteMe() {
+        this._readerSync.disconnect();
+        this._parentInterface.deleteMe(this._readerData.getPrefixMask());
+    }
 }
 
 class SidebarReaderManager {
     #readerData;
     #parentInterface;
-    #container;
     #readerVisuals;
     #readerSync;
     #schedule;
     #favIcon;
     #tagLibrary;
     
-    constructor(readerObject, parentInterface, container, showAllInterface, tagLibrary) {
-        this.#container = container;
+    constructor(readerObject, parentInterface, showAllInterface, tagLibrary) {
         this.#tagLibrary = tagLibrary;
         this.#parentInterface = parentInterface;
         this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
@@ -182,7 +188,6 @@ class SidebarReaderManager {
     
     deleteMe() {
         this.#readerSync.disconnect();
-        this.#container.removeChild(this.getVisuals());
         this.#parentInterface.deleteMe(this.#readerData.getPrefixMask());
     }
 }

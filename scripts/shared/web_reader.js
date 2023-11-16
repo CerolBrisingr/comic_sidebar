@@ -219,7 +219,6 @@ class WebReaderSidebar extends WebReader {
         return new SidebarReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#container, 
             this.#showAllInterface, 
             this.#tagLibrary
         )
