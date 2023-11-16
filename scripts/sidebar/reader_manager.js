@@ -4,6 +4,7 @@ import { ReaderSync } from "../shared/reader_sync.js"
 import { Scheduler } from "../shared/scheduler.js"
 
 class BasicReaderManager {
+    _readerData;
     _readerSync = new ReaderSyncDummy();
     _parentInterface;
 
@@ -74,6 +75,10 @@ class BasicReaderManager {
             return false;
         return this._readerData.isValid();
     }
+    
+    // Interface only
+    expand() {}
+    collapse() {}
 }
 
 class CoreReaderManager extends BasicReaderManager {
@@ -95,8 +100,6 @@ class CoreReaderManager extends BasicReaderManager {
 }
 
 class SidebarReaderManager extends BasicReaderManager{
-    _readerData;
-    _parentInterface;
     #readerVisuals;
     #readerSyncSatellite;
     #schedule;

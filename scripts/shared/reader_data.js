@@ -3,7 +3,7 @@ import { ReaderSchedule } from "./reader_schedule.js";
 
 class ReaderData {
     #label;
-    #intId;
+    #intId; // TODO: maybe we can get that one out, too
     #latestInteraction = 0;
     #prefixMask;
     #automatic;
@@ -275,10 +275,6 @@ class ReaderData {
             }
         return thisAsObject;
     }
-    
-    // Interface only
-    expand() {}
-    collapse() {}
 }
 
 function isArray(list) {
