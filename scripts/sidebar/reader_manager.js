@@ -86,13 +86,12 @@ class BasicReaderManager {
 
 class CoreReaderManager extends BasicReaderManager {
     #tagLibrary;
-    #readerSyncCore;
 
     constructor(readerObject, parentInterface, tagLibrary, intId) {
         super(readerObject, parentInterface, intId);
         this.#tagLibrary = tagLibrary;
         this.#tagLibrary.registerTags(this._readerData);
-        this.#readerSyncCore = ReaderSync.makeCore(intId, this);
+        this._readerSync = ReaderSync.makeCore(intId, this);
     }
 
     editReader(readerObjectLike) {
@@ -108,13 +107,12 @@ class CoreReaderManager extends BasicReaderManager {
 
 class SidebarReaderManager extends BasicReaderManager{
     #readerVisuals;
-    #readerSyncSatellite;
     #schedule;
     #favIcon;
     
     constructor(readerObject, parentInterface, showAllInterface) {
         super(readerObject, parentInterface, readerObject.intId);
-        this.#readerSyncSatellite = ReaderSync.makeSatellite(readerObject.intId, this);
+        this._readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
         this.#schedule = new Scheduler(this._readerData.getSchedule(), showAllInterface);
         this.#createReaderVisuals();
     }
@@ -144,7 +142,7 @@ class SidebarReaderManager extends BasicReaderManager{
     }
     
     prepareReaderEdit() {
-        this.#readerSyncSatellite.sendEditRequest(this.#favIcon);
+        this._readerSync.sendEditRequest(this.#favIcon);
     }
     
     editReader(readerObjectLike) {
@@ -166,7 +164,7 @@ class SidebarReaderManager extends BasicReaderManager{
     }
     
     sendPinRequest(url) {
-        this.#readerSyncSatellite.sendPinRequest(url);
+        this._readerSync.sendPinRequest(url);
     }
     
     addManual(url) {
@@ -181,11 +179,11 @@ class SidebarReaderManager extends BasicReaderManager{
     }
     
     sendUnpinRequest(url) {
-        this.#readerSyncSatellite.sendUnpinRequest(url);
+        this._readerSync.sendUnpinRequest(url);
     }
     
     sendBookmarkLabelUpdateRequest(url, newLabel) {
-        this.#readerSyncSatellite.sendBookmarkLabelUpdateRequest(url, newLabel);
+        this._readerSync.sendBookmarkLabelUpdateRequest(url, newLabel);
     }
 
     removeManual(url) {
