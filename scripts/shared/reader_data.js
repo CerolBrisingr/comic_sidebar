@@ -1,12 +1,10 @@
 import { dissectUrl, urlFitsPrefix } from "./url.js"
-import { ReaderSync } from "./reader_sync.js"
 import { ReaderSchedule } from "./reader_schedule.js";
 
 class ReaderData {
     #label;
     #intId;
     #latestInteraction = 0;
-    #readerSync;
     #prefixMask;
     #automatic;
     #manual;
@@ -27,7 +25,7 @@ class ReaderData {
         return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
     }
     
-    constructor(data, parentInterface, readerSync) {
+    constructor(data, parentInterface, intId) {
         // Import object from storage
         this.#parentInterface = parentInterface;
         this.#registerInteraction(data.time);
@@ -41,11 +39,7 @@ class ReaderData {
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
-        
-        if (typeof readerSync === "number")
-            readerSync = ReaderSync.makeCore(readerSync, this);
-        this.#readerSync = readerSync;
-        this.#intId = this.#readerSync.getId();
+        this.#intId = intId;
     }
     
     #importAutomaticList(list) {
@@ -285,11 +279,6 @@ class ReaderData {
     // Interface only
     expand() {}
     collapse() {}
-    
-    deleteMe() {
-        this.#readerSync.disconnect();
-        this.#parentInterface.deleteMe(this.#prefixMask);
-    }
 }
 
 function isArray(list) {

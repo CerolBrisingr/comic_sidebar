@@ -4,18 +4,19 @@ import { ReaderSync } from "./reader_sync.js"
 import { Scheduler } from "./scheduler.js"
 
 class BasicReaderManager {
-    _readerSync;
+    _readerSync = new ReaderSyncDummy();
     _parentInterface;
 
-    constructor(readerObject, parentInterface) {
-        this.#importReaderData(readerObject);
+    constructor(readerObject, parentInterface, intId) {
+        this.#importReaderData(readerObject, intId);
         this._parentInterface = parentInterface;
     }
     
-    #importReaderData(readerObject) {
+    #importReaderData(readerObject, intId) {
         this._readerData = new ReaderData(
             readerObject,
-            new ReaderManagerInterface(this)
+            new ReaderManagerInterface(this),
+            intId
         );
     }
     
@@ -26,54 +27,90 @@ class BasicReaderManager {
     getPrefixMask() {
         return this._readerData.getPrefixMask();
     }
+
+    getLatestInputTime() {
+        return this._readerData.getLatestInputTime();
+    }
     
-    editReader() {
-        throw new Error("not implemented");
+    urlIsCompatible(url) {
+        return this._readerData.urlIsCompatible(url);
+    }
+    
+    getMostRecentAutomaticUrl() {
+        return this._readerData.getMostRecentAutomaticUrl();
+    }
+
+    addAutomatic(data){
+        return this._readerData.addAutomatic(data);
+    }
+
+    updateBookmarkLabel(url, newLabel) {
+        return this._readerData.updateManualLabel(url, newLabel);
+    }
+
+    addManual(url) {
+        return this._readerData.addManual(url);
+    }
+
+    removeManual(url) {
+        return this._readerData.removeManual(url);
+    }
+    
+    editReader(readerObjectLike) {
+        this._readerData.editReader(readerObjectLike);
+    }
+    
+    returnAsObject() {
+        return this._readerData.returnAsObject();
     }
     
     deleteMe() {
         this._readerSync.disconnect();
         this._parentInterface.deleteMe(this._readerData.getPrefixMask());
     }
+
+    isValid() {
+        if (this._readerData === undefined)
+            return false;
+        return this._readerData.isValid();
+    }
 }
 
-class SidebarReaderManager {
-    #readerData;
-    #parentInterface;
+class CoreReaderManager extends BasicReaderManager {
+    #tagLibrary;
+    #readerSyncCore;
+
+    constructor(readerObject, parentInterface, tagLibrary, intId) {
+        super(readerObject, parentInterface, intId);
+        this.#tagLibrary = tagLibrary;
+        this.#tagLibrary.registerTags(this._readerData);
+        this.#readerSyncCore = ReaderSync.makeCore(intId, this);
+    }
+
+    editReader(readerObjectLike) {
+        this.#tagLibrary.retractTags(this._readerData);
+        super.editReader(readerObjectLike);
+        this.#tagLibrary.registerTags(this._readerData);
+    }
+}
+
+class SidebarReaderManager extends BasicReaderManager{
+    _readerData;
+    _parentInterface;
     #readerVisuals;
-    #readerSync;
+    #readerSyncSatellite;
     #schedule;
     #favIcon;
-    #tagLibrary;
     
-    constructor(readerObject, parentInterface, showAllInterface, tagLibrary) {
-        this.#tagLibrary = tagLibrary;
-        this.#parentInterface = parentInterface;
-        this.#readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
-        this.#readerData = this.#createReaderData(readerObject);
-        this.#tagLibrary.registerTags(this.#readerData);
-        this.#schedule = new Scheduler(this.#readerData.getSchedule(), showAllInterface);
+    constructor(readerObject, parentInterface, showAllInterface) {
+        super(readerObject, parentInterface, readerObject.intId);
+        this.#readerSyncSatellite = ReaderSync.makeSatellite(readerObject.intId, this);
+        this.#schedule = new Scheduler(this._readerData.getSchedule(), showAllInterface);
         this.#createReaderVisuals();
     }
 
     canShow() {
-        return this.#schedule.canShow(this.#readerData.getLatestInputTime());
-    }
-    
-    getLabel() {
-        return this.#readerData.getLabel();
-    }
-    
-    getPrefixMask() {
-        return this.#readerData.getPrefixMask();
-    }
-    
-    #createReaderData(readerObject) {
-        return new ReaderData(
-            readerObject,
-            new ReaderManagerInterface(this),
-            this.#readerSync
-        );
+        return this.#schedule.canShow(super.getLatestInputTime());
     }
 
     updateFavIcon(src) {
@@ -87,78 +124,64 @@ class SidebarReaderManager {
     }
     
     #createReaderVisuals() {
-        if (this.#readerData === undefined) {
+        if (this._readerData === undefined) {
             this.#readerVisuals = undefined;
             console.log("Encountered invalid readerData");
             return;
         }
         let readerManagerInterface = new ReaderManagerInterface(this);
-        this.#readerVisuals = new ReaderVisuals(this.#readerData, readerManagerInterface);
+        this.#readerVisuals = new ReaderVisuals(this._readerData, readerManagerInterface);
     }
     
     prepareReaderEdit() {
-        this.#readerSync.sendEditRequest(this.#favIcon);
+        this.#readerSyncSatellite.sendEditRequest(this.#favIcon);
     }
     
     editReader(readerObjectLike) {
-        this.#tagLibrary.retractTags(this.#readerData);
-        this.#readerData.editReader(readerObjectLike);
-        this.#tagLibrary.registerTags(this.#readerData);
-        this.#schedule.updateRuleset(this.#readerData.getSchedule());
+        super.editReader(readerObjectLike);
+        this.#schedule.updateRuleset(this._readerData.getSchedule());
         this.#updateReaderVisuals();
-        this.#parentInterface.relistViewerDisplay();
+        this._parentInterface.relistViewerDisplay();
     }
     
     #updateReaderVisuals() {
-        this.#readerVisuals.updateListing(this.#readerData, this.#favIcon);
-    }
-    
-    urlIsCompatible(url) {
-        return this.#readerData.urlIsCompatible(url);
-    }
-    
-    getMostRecentAutomaticUrl() {
-        return this.#readerData.getMostRecentAutomaticUrl();
+        this.#readerVisuals.updateListing(this._readerData, this.#favIcon);
     }
     
     addAutomatic(data) {
-        const addedAutomatic = this.#readerData.addAutomatic(data);
+        const addedAutomatic = super.addAutomatic(data);
         if (addedAutomatic)
-            this.#readerVisuals.updateReaderUrls(this.#readerData);
+            this.#readerVisuals.updateReaderUrls(this._readerData);
         return addedAutomatic;
-    }
-
-    getLatestInputTime() {
-        return this.#readerData.getLatestInputTime();
     }
     
     sendPinRequest(url) {
-        this.#readerSync.sendPinRequest(url);
+        this.#readerSyncSatellite.sendPinRequest(url);
     }
     
     addManual(url) {
-        if (this.#readerData.addManual(url))
-            this.#readerVisuals.updateReaderUrls(this.#readerData);
+        if (super.addManual(url))
+            this.#readerVisuals.updateReaderUrls(this._readerData);
     }
     
     updateBookmarkLabel(url, newLabel) {
-        if (this.#readerData.updateManualLabel(url, newLabel)) {
+        if (super.updateManualLabel(url, newLabel)) {
             this.#readerVisuals.updateManualLabel(url, newLabel);
         }
     }
     
     sendUnpinRequest(url) {
-        this.#readerSync.sendUnpinRequest(url);
+        this.#readerSyncSatellite.sendUnpinRequest(url);
     }
     
     sendBookmarkLabelUpdateRequest(url, newLabel) {
-        this.#readerSync.sendBookmarkLabelUpdateRequest(url, newLabel);
+        this.#readerSyncSatellite.sendBookmarkLabelUpdateRequest(url, newLabel);
     }
 
     removeManual(url) {
-        let didRemove = this.#readerData.removeManual(url);
+        let didRemove = super.removeManual(url);
         if (didRemove)
-            this.#readerVisuals.updateReaderUrls(this.#readerData);
+            this.#readerVisuals.updateReaderUrls(this._readerData);
         return didRemove;
     }
     
@@ -167,15 +190,10 @@ class SidebarReaderManager {
     }
     
     isValid() {
-        if (this.#readerData === undefined 
-            || this.#readerVisuals === undefined
+        if (this.#readerVisuals === undefined
             || this.#schedule === undefined)
             return false;
-        return this.#readerData.isValid();
-    }
-    
-    returnAsObject() {
-        return this.#readerData.returnAsObject();
+        return super.isValid();
     }
     
     expand() {
@@ -184,11 +202,6 @@ class SidebarReaderManager {
     
     collapse() {
         this.#readerVisuals.collapse();
-    }
-    
-    deleteMe() {
-        this.#readerSync.disconnect();
-        this.#parentInterface.deleteMe(this.#readerData.getPrefixMask());
     }
 }
 
@@ -249,4 +262,8 @@ class ReaderManagerInterface {
     }
 }
 
-export {SidebarReaderManager, ReaderManagerDummy}
+class ReaderSyncDummy {
+    disconnect(){};
+}
+
+export {CoreReaderManager, SidebarReaderManager, ReaderManagerDummy}
