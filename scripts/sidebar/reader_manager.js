@@ -100,6 +100,10 @@ class CoreReaderManager extends BasicReaderManager {
         super.editReader(readerObjectLike);
         this.#tagLibrary.registerTags(this._readerData);
     }
+
+    getUsedTags() {
+        return this.#tagLibrary.getUsedTags();
+    }
 }
 
 class SidebarReaderManager extends BasicReaderManager{

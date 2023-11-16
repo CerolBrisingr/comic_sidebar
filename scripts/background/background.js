@@ -62,6 +62,7 @@ function handlePageAddition(data) {
     let test = dissectUrl(data.url);
     if (test === undefined) // Invalid or reserved URL, not useful
         return;
+    data.knownTags = webReader.getUsedTags();
     ReaderEditorControl.createReaderEntry(data, handleImport);
 }
 

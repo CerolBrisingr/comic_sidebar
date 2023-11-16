@@ -194,6 +194,10 @@ class WebReaderBackground extends WebReader {
         data.favIcon = info.favIcon;
         return true;
     }
+
+    getUsedTags() {
+        return this.#tagLibrary.getUsedTags();
+    }
     
     saveProgress() {
         if (this._savingSuspended)
