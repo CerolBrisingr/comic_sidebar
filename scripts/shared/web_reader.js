@@ -1,5 +1,5 @@
 import { HtmlContainer } from "./html_container.js"
-import {CoreReaderManager, SidebarReaderManager} from "./reader_manager.js"
+import {CoreReaderManager, SidebarReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
