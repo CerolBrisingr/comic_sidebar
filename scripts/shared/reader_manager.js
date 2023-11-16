@@ -1,9 +1,35 @@
-import { ReaderVisuals } from "./reader_visuals.js"
-import { ReaderData } from "../shared/reader_data.js"
-import { ReaderSync } from "../shared/reader_sync.js"
-import { Scheduler } from "../shared/scheduler.js"
+import { ReaderVisuals } from "../sidebar/reader_visuals.js"
+import { ReaderData } from "./reader_data.js"
+import { ReaderSync } from "./reader_sync.js"
+import { Scheduler } from "./scheduler.js"
 
-class ReaderManager {
+class BasicReaderManager {
+
+    constructor(readerObject, parentInterface) {
+        this.#importReaderData(readerObject);
+    }
+    
+    #importReaderData(readerObject) {
+        this._readerData = new ReaderData(
+            readerObject,
+            new ReaderManagerInterface(this)
+        );
+    }
+    
+    getLabel() {
+        return this._readerData.getLabel();
+    }
+    
+    getPrefixMask() {
+        return this._readerData.getPrefixMask();
+    }
+    
+    editReader() {
+        throw new Error("not implemented");
+    }
+}
+
+class SidebarReaderManager {
     #readerData;
     #parentInterface;
     #container;
@@ -210,12 +236,12 @@ class ReaderManagerInterface {
     }
     
     saveProgress() {
-        // ReaderManager/Sidebar does not autosave
+        // SidebarReaderManager/Sidebar does not autosave
     }
     
     deleteMe(prefixMask) {
-        throw new Error("ReaderData should never be in a position to call delete to ReaderManager!");
+        throw new Error("ReaderData should never be in a position to call delete to SidebarReaderManager!");
     }
 }
 
-export {ReaderManager, ReaderManagerDummy}
+export {SidebarReaderManager, ReaderManagerDummy}

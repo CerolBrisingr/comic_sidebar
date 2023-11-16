@@ -1,6 +1,6 @@
 import { HtmlContainer } from "./html_container.js"
 import {ReaderData} from "./reader_data.js"
-import {ReaderManager} from "../sidebar/reader_manager.js"
+import {SidebarReaderManager} from "./reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
@@ -216,7 +216,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     _createReaderClass(readerObject) {
-        return new ReaderManager(
+        return new SidebarReaderManager(
             readerObject,
             new WebReaderInterface(this),
             this.#container, 
