@@ -7,17 +7,18 @@ class BasicReaderManager {
     _readerData;
     _readerSync = new ReaderSyncDummy();
     _parentInterface;
+    _intId;
 
     constructor(readerObject, parentInterface, intId) {
-        this.#importReaderData(readerObject, intId);
+        this.#importReaderData(readerObject);
         this._parentInterface = parentInterface;
+        this._intId = intId;
     }
     
-    #importReaderData(readerObject, intId) {
+    #importReaderData(readerObject) {
         this._readerData = new ReaderData(
             readerObject,
-            new ReaderManagerInterface(this),
-            intId
+            new ReaderManagerInterface(this)
         );
     }
     
@@ -62,7 +63,9 @@ class BasicReaderManager {
     }
     
     returnAsObject() {
-        return this._readerData.returnAsObject();
+        let object = this._readerData.returnAsObject();
+        object.intId = this._intId;
+        return object;
     }
     
     deleteMe() {

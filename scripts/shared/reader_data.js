@@ -3,7 +3,6 @@ import { ReaderSchedule } from "./reader_schedule.js";
 
 class ReaderData {
     #label;
-    #intId; // TODO: maybe we can get that one out, too
     #latestInteraction = 0;
     #prefixMask;
     #automatic;
@@ -25,7 +24,7 @@ class ReaderData {
         return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
     }
     
-    constructor(data, parentInterface, intId) {
+    constructor(data, parentInterface) {
         // Import object from storage
         this.#parentInterface = parentInterface;
         this.#registerInteraction(data.time);
@@ -39,7 +38,6 @@ class ReaderData {
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
-        this.#intId = intId;
     }
     
     #importAutomaticList(list) {
@@ -258,7 +256,6 @@ class ReaderData {
     
     returnAsObject() {
         let thisAsObject = {
-            intId: this.#intId,
             time: this.#latestInteraction,
             label:this.#label,
             prefix_mask:this.#prefixMask,
