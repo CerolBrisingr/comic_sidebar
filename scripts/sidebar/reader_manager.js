@@ -82,6 +82,7 @@ class BasicReaderManager {
     // Interface only
     expand() {}
     collapse() {}
+    saveProgress() {}
 }
 
 class CoreReaderManager extends BasicReaderManager {
@@ -108,6 +109,10 @@ class CoreReaderManager extends BasicReaderManager {
 
     getKnownTags() {
         return this.#tagLibrary.getKnownTags();
+    }
+
+    saveProgress() {
+        this._parentInterface.saveProgress();
     }
 }
 
@@ -268,7 +273,7 @@ class ReaderManagerInterface {
     }
     
     saveProgress() {
-        // SidebarReaderManager/Sidebar does not autosave
+        this.#readerManager.saveProgress();
     }
     
     deleteMe(prefixMask) {
