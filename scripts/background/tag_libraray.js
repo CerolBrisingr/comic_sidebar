@@ -15,16 +15,12 @@ class TagLibrary {
         for (let tag of readerData.getTags()) {
             this.#registerTag(tag);
         }
-        console.log(this.getUsedTags());
-        console.log(Array.from(this.#tagMap.values()));
     }
 
     retractTags(readerData) {
         for (let tag of readerData.getTags()) {
             this.#retractTag(tag);
         }
-        console.log(this.getUsedTags());
-        console.log(Array.from(this.#tagMap.values()));
     }
 
     clear() {

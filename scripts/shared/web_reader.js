@@ -1,6 +1,5 @@
 import { HtmlContainer } from "./html_container.js"
-import {ReaderData} from "./reader_data.js"
-import {ReaderManager} from "../sidebar/reader_manager.js"
+import {CoreReaderManager, SidebarReaderManager} from "../sidebar/reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
@@ -129,14 +128,17 @@ class WebReader {
 
 class WebReaderBackground extends WebReader {
     #favIconController = new FavIconController();
+    #tagLibrary = new TagLibrary();
+    
     constructor() {
         super();
     }
 
     _createReaderClass(readerObject, intId) {
-        return new ReaderData(
+        return new CoreReaderManager(
             readerObject,
             new WebReaderInterface(this),
+            this.#tagLibrary,
             intId
         )
     }
@@ -192,6 +194,10 @@ class WebReaderBackground extends WebReader {
         data.favIcon = info.favIcon;
         return true;
     }
+
+    getUsedTags() {
+        return this.#tagLibrary.getUsedTags();
+    }
     
     saveProgress() {
         if (this._savingSuspended)
@@ -205,7 +211,6 @@ class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
     #favIconSubscriber = new FavIconSubscriber();
-    #tagLibrary = new TagLibrary();
 
     constructor(container, showAllInterface) {
         if (container == undefined)
@@ -216,12 +221,10 @@ class WebReaderSidebar extends WebReader {
     }
 
     _createReaderClass(readerObject) {
-        return new ReaderManager(
+        return new SidebarReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#container, 
-            this.#showAllInterface, 
-            this.#tagLibrary
+            this.#showAllInterface
         )
     }
 
