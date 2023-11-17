@@ -3,6 +3,7 @@ class TagDropdown {
     #knownTags;
     #fktOpenTagCreator;
     #fktCreateTag;
+    #openDropdown;
     #createNew;
     #divider;
     #optionsBox;
@@ -27,8 +28,8 @@ class TagDropdown {
     }
 
     #setUpDropdownButton() {
-        let button = document.getElementById("tag_add_button");
-        button.onclick = () => {
+        this.#openDropdown = document.getElementById("tag_add_button");
+        this.#openDropdown.onclick = () => {
             if (this.#isOpen) {
                 this.#close();
             } else {
@@ -36,7 +37,7 @@ class TagDropdown {
                 this.#open();
             }
         };
-        button.onblur = (evt) => {this.#onblur(evt)};
+        this.#openDropdown.onblur = (evt) => {this.#onblur(evt)};
     }
 
     #setUpOptionsBox() {
@@ -52,6 +53,7 @@ class TagDropdown {
     }
 
     #updateDropdown() {
+        // Adjust content
         let list = [this.#createNew];
         let suggestions = this.#gatherSuggestions();
         if (suggestions.length > 0)
@@ -60,6 +62,10 @@ class TagDropdown {
             list.push(this.#buildSuggestion(suggestion));
         }
         this.#optionsBox.replaceChildren(...list);
+
+        // Adjust position
+        let rectButton = this.#openDropdown.getBoundingClientRect();
+        this.#optionsBox.style.top = (rectButton.top + rectButton.height) + "px";
     }
 
     #gatherSuggestions() {
