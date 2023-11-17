@@ -1,4 +1,4 @@
-import { TagDropdown } from "./editor_dropdown.js";
+import { TagDropdown } from "./tag_dropdown.js";
 
 class TagEditor {
     #readerData;
@@ -243,7 +243,7 @@ class TagCreator {
         //   tag create button class: tag_create_button
         //      create button image class: tag_create_image, plus.svg
         let button = document.createElement("button");
-        button.classList.add("tag_create_button");
+        button.classList.add("tag_creator_button");
 
         let image = document.createElement("img");
         image.classList.add("tag_create_image");

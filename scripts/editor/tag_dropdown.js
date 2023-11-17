@@ -7,6 +7,7 @@ class TagDropdown {
     #divider;
     #optionsBox;
     #ui;
+    #isOpen = false;
 
     constructor(editorInterface, knownTags, fktOpenTagCreator, fktCreateTag) {
         this.#editorInterface = editorInterface;
@@ -28,8 +29,12 @@ class TagDropdown {
     #setUpDropdownButton() {
         let button = document.getElementById("tag_add_button");
         button.onclick = () => {
-            this.#updateDropdown();
-            this.#open();
+            if (this.#isOpen) {
+                this.#close();
+            } else {
+                this.#updateDropdown();
+                this.#open();
+            }
         };
         button.onblur = (evt) => {this.#onblur(evt)};
     }
@@ -89,10 +94,12 @@ class TagDropdown {
     }
 
     #open() {
+        this.#isOpen = true;
         this.#optionsBox.style.display = "flex";
     }
 
     #close() {
+        this.#isOpen = false;
         this.#optionsBox.style.display = "none";
     }
 
