@@ -28,7 +28,7 @@ class TagLibrary {
         this.#isFine = true;
     }
 
-    getUsedTags() {
+    getKnownTags() {
         return Array.from(this.#tagMap.keys());
     }
 

@@ -123,6 +123,7 @@ class WebReader {
     relistViewers() {}
     saveProgress() {}
     _updateFavIcon() {}
+    recountTags() {}
     async _registerFavIcon() {}
 }
 
@@ -195,8 +196,16 @@ class WebReaderBackground extends WebReader {
         return true;
     }
 
-    getUsedTags() {
-        return this.#tagLibrary.getUsedTags();
+    getKnownTags() {
+        return this.#tagLibrary.getKnownTags();
+    }
+
+    recountTags() {
+        this.#tagLibrary.clear();
+        let readerManagerList = this._readerStorage.getList();
+        for (let readerManager of readerManagerList) {
+            this.#tagLibrary.registerTags(readerManager);
+        }
     }
     
     saveProgress() {
@@ -336,6 +345,10 @@ class WebReaderInterface {
     
     relistViewerDisplay() {
         this.#webReader.relistViewers();
+    }
+
+    recountTags() {
+        this.#webReader.recountTags();
     }
 }
 

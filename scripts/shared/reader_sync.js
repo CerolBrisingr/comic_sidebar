@@ -84,7 +84,7 @@ class ReaderSyncCore extends ReaderSync {
     
     #editRequestHandler(readerManager, favIcon) {
         let readerObject = readerManager.returnAsObject();
-        readerObject.knownTags = readerManager.getUsedTags();
+        readerObject.knownTags = readerManager.getKnownTags();
         readerObject.favIcon = favIcon;
         readerObject.mostRecentAutomaticUrl = readerManager.getMostRecentAutomaticUrl();
         ReaderEditorControl.updateReaderEntry(readerObject, (readerObjectLike) => {

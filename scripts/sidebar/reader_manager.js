@@ -98,10 +98,16 @@ class CoreReaderManager extends BasicReaderManager {
         this.#tagLibrary.retractTags(this._readerData);
         super.editReader(readerObjectLike);
         this.#tagLibrary.registerTags(this._readerData);
+        if (!this.#tagLibrary.isFine())
+            this._parentInterface.recountTags();
     }
 
-    getUsedTags() {
-        return this.#tagLibrary.getUsedTags();
+    getTags() {
+        return this._readerData.getTags();
+    }
+
+    getKnownTags() {
+        return this.#tagLibrary.getKnownTags();
     }
 }
 

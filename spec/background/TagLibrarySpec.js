@@ -17,7 +17,7 @@ describe("TagLibrary", function() {
     it("should read tags from ReaderData", function() {
         tagLibrary.registerTags(readerData);
         expect(tagLibrary.isFine()).toBeTrue();
-        expect(tagLibrary.getUsedTags()).toEqual(["test1", "test2"]);
+        expect(tagLibrary.getKnownTags()).toEqual(["test1", "test2"]);
         expect(tagLibrary.getCorrespondingValues()).toEqual([1, 1]);
     });
 
@@ -25,7 +25,7 @@ describe("TagLibrary", function() {
         tagLibrary.registerTags(readerData);
         tagLibrary.clear();
         expect(tagLibrary.isFine()).toBeTrue();
-        expect(tagLibrary.getUsedTags()).toEqual([]);
+        expect(tagLibrary.getKnownTags()).toEqual([]);
 
         tagLibrary.retractTags(readerData);
         expect(tagLibrary.isFine()).toBeFalse();
@@ -36,22 +36,22 @@ describe("TagLibrary", function() {
     it("should have issues removing tags from an empty library", function() {
         tagLibrary.retractTags(readerData);
         expect(tagLibrary.isFine()).toBeFalse();
-        expect(tagLibrary.getUsedTags()).toEqual([]);
+        expect(tagLibrary.getKnownTags()).toEqual([]);
     });
 
     it("should have no issues removing no tags from an empty library", function() {
         readerData = ReaderData.buildForEditor(object);
         tagLibrary.retractTags(readerData);
         expect(tagLibrary.isFine()).toBeTrue();
-        expect(tagLibrary.getUsedTags()).toEqual([]);
+        expect(tagLibrary.getKnownTags()).toEqual([]);
     });
 
     it("should be able to add and remove tags", function() {
         tagLibrary.registerTags(readerData);
-        expect(tagLibrary.getUsedTags()).toEqual(["test1", "test2"]);
+        expect(tagLibrary.getKnownTags()).toEqual(["test1", "test2"]);
         tagLibrary.retractTags(readerData);
         expect(tagLibrary.isFine()).toBeTrue();
-        expect(tagLibrary.getUsedTags()).toEqual([]);
+        expect(tagLibrary.getKnownTags()).toEqual([]);
     });
 
     it("should be able to combine tags", function() {
@@ -61,12 +61,12 @@ describe("TagLibrary", function() {
         tagLibrary.registerTags(readerData);
         tagLibrary.registerTags(readerData2);
         expect(tagLibrary.isFine()).toBeTrue();
-        expect(tagLibrary.getUsedTags()).toEqual(["test1", "test2", "test3"]);
+        expect(tagLibrary.getKnownTags()).toEqual(["test1", "test2", "test3"]);
         expect(tagLibrary.getCorrespondingValues()).toEqual([1, 2, 1]);
 
         tagLibrary.retractTags(readerData2);
         expect(tagLibrary.isFine()).toBeTrue();
-        expect(tagLibrary.getUsedTags()).toEqual(["test1", "test2"]);
+        expect(tagLibrary.getKnownTags()).toEqual(["test1", "test2"]);
         expect(tagLibrary.getCorrespondingValues()).toEqual([1, 1]);
     });
 });
