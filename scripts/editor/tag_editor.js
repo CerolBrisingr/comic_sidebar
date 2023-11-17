@@ -1,4 +1,4 @@
-import { EditorDropdown } from "./editor_dropdown.js";
+import { TagDropdown } from "./editor_dropdown.js";
 
 class TagEditor {
     #readerData;
@@ -11,9 +11,8 @@ class TagEditor {
 
     constructor(readerData, knownTags) {
         this.#readerData = readerData;
-        let tagData = this.getTags();
         this.#myInterface = new EditorInterface(this);
-        this.#setUpTags(tagData);
+        this.#setUpTags(this.getTags());
         this.#setUpTagAdder(knownTags);
         this.updateTagContainer();
     }
@@ -27,11 +26,14 @@ class TagEditor {
     }
 
     #setUpTagAdder(knownTags) {
-        this.#addTagUi = new EditorDropdown(
+        this.#addTagUi = new TagDropdown(
             this.#myInterface, 
             knownTags, 
-            () => {this.#startTagCreator()}, 
-            () => {this.addTag}
+            () => {this.#startTagCreator();}, 
+            (tag) => {
+                this.addTag(tag);
+                this.updateTagContainer();
+                }
             );
     }
 
@@ -147,7 +149,7 @@ class EditorInterface {
     }
 
     listTags() {
-        return this.getTags();
+        return this.#tagEditor.getTags();
     }
 
     createTag(tagString) {
