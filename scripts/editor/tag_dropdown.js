@@ -127,6 +127,7 @@ function relatedTargetOnDropdown(relTarget) {
         return true;
     if (relTarget.classList.contains("dropdown_divider"))
         return true;
+    return false;
 }
 
 export {TagDropdown}
