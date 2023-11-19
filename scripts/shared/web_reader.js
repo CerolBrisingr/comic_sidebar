@@ -1,5 +1,5 @@
 import { HtmlContainer } from "./html_container.js"
-import {CoreReaderManager, SidebarReaderManager} from "../sidebar/reader_manager.js"
+import {CoreReaderManager, SidebarReaderManager} from "./reader_manager.js"
 import {importBackup, unpackReaderObjectList} from "./backup_import.js"
 import {saveBackup, buildWebReaderObject} from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
@@ -9,6 +9,7 @@ import { dissectUrl } from "./url.js"
 import { TagLibrary } from "../background/tag_libraray.js"
 
 class WebReader {
+    _tagLibrary = new TagLibrary();
 
     constructor() {
         this._currentReader = new ReaderClassDummy();
@@ -92,6 +93,18 @@ class WebReader {
     _createReaderClass(readerObject, intId) {
         throw new Error("not implemented");
     }
+
+    getKnownTags() {
+        return this._tagLibrary.getKnownTags();
+    }
+
+    recountTags() {
+        this._tagLibrary.clear();
+        let readerManagerList = this._readerStorage.getList();
+        for (let readerManager of readerManagerList) {
+            this._tagLibrary.registerTags(readerManager);
+        }
+    }
     
     async registerPage(readerObjectLike) {
         let storageObject 
@@ -129,7 +142,6 @@ class WebReader {
 
 class WebReaderBackground extends WebReader {
     #favIconController = new FavIconController();
-    #tagLibrary = new TagLibrary();
     
     constructor() {
         super();
@@ -139,7 +151,7 @@ class WebReaderBackground extends WebReader {
         return new CoreReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#tagLibrary,
+            this._tagLibrary,
             intId
         )
     }
@@ -195,18 +207,6 @@ class WebReaderBackground extends WebReader {
         data.favIcon = info.favIcon;
         return true;
     }
-
-    getKnownTags() {
-        return this.#tagLibrary.getKnownTags();
-    }
-
-    recountTags() {
-        this.#tagLibrary.clear();
-        let readerManagerList = this._readerStorage.getList();
-        for (let readerManager of readerManagerList) {
-            this.#tagLibrary.registerTags(readerManager);
-        }
-    }
     
     saveProgress() {
         if (this._savingSuspended)
@@ -233,7 +233,8 @@ class WebReaderSidebar extends WebReader {
         return new SidebarReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#showAllInterface
+            this.#showAllInterface,
+            this._tagLibrary
         )
     }
 
