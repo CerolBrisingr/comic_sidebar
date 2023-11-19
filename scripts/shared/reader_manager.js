@@ -1,17 +1,20 @@
-import { ReaderVisuals } from "./reader_visuals.js"
-import { ReaderData } from "../shared/reader_data.js"
-import { ReaderSync } from "../shared/reader_sync.js"
-import { Scheduler } from "../shared/scheduler.js"
+import { ReaderVisuals } from "../sidebar/reader_visuals.js"
+import { ReaderData } from "./reader_data.js"
+import { ReaderSync } from "./reader_sync.js"
+import { Scheduler } from "./scheduler.js"
 
 class BasicReaderManager {
     _readerData;
     _readerSync = new ReaderSyncDummy();
     _parentInterface;
+    _tagLibrary;
     _intId;
 
-    constructor(readerObject, parentInterface, intId) {
+    constructor(readerObject, parentInterface, tagLibrary, intId) {
         this.#importReaderData(readerObject);
         this._parentInterface = parentInterface;
+        this._tagLibrary = tagLibrary;
+        this._tagLibrary.registerTags(this._readerData);
         this._intId = intId;
     }
     
@@ -59,7 +62,19 @@ class BasicReaderManager {
     }
     
     editReader(readerObjectLike) {
+        this._tagLibrary.retractTags(this._readerData);
         this._readerData.editReader(readerObjectLike);
+        this._tagLibrary.registerTags(this._readerData);
+        if (!this._tagLibrary.isFine())
+            this._parentInterface.recountTags();
+    }
+
+    getTags() {
+        return this._readerData.getTags();
+    }
+
+    getKnownTags() {
+        return this._tagLibrary.getKnownTags();
     }
     
     returnAsObject() {
@@ -86,29 +101,10 @@ class BasicReaderManager {
 }
 
 class CoreReaderManager extends BasicReaderManager {
-    #tagLibrary;
 
     constructor(readerObject, parentInterface, tagLibrary, intId) {
-        super(readerObject, parentInterface, intId);
-        this.#tagLibrary = tagLibrary;
-        this.#tagLibrary.registerTags(this._readerData);
+        super(readerObject, parentInterface, tagLibrary, intId);
         this._readerSync = ReaderSync.makeCore(intId, this);
-    }
-
-    editReader(readerObjectLike) {
-        this.#tagLibrary.retractTags(this._readerData);
-        super.editReader(readerObjectLike);
-        this.#tagLibrary.registerTags(this._readerData);
-        if (!this.#tagLibrary.isFine())
-            this._parentInterface.recountTags();
-    }
-
-    getTags() {
-        return this._readerData.getTags();
-    }
-
-    getKnownTags() {
-        return this.#tagLibrary.getKnownTags();
     }
 
     saveProgress() {
@@ -121,8 +117,8 @@ class SidebarReaderManager extends BasicReaderManager{
     #schedule;
     #favIcon;
     
-    constructor(readerObject, parentInterface, showAllInterface) {
-        super(readerObject, parentInterface, readerObject.intId);
+    constructor(readerObject, parentInterface, showAllInterface, tagLibrary) {
+        super(readerObject, parentInterface, tagLibrary, readerObject.intId);
         this._readerSync = ReaderSync.makeSatellite(readerObject.intId, this);
         this.#schedule = new Scheduler(this._readerData.getSchedule(), showAllInterface);
         this.#createReaderVisuals();
