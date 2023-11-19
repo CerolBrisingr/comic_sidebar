@@ -37,7 +37,7 @@ class Editor {
         this.#setUpPreview(favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
-        this.#setUpTagEditor();
+        this.#setUpTagEditor(data.knownTags);
         this.#setUpCreationExit();
     }
 
@@ -50,7 +50,7 @@ class Editor {
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
-        this.#setUpTagEditor();
+        this.#setUpTagEditor(readerObjectLike.knownTags);
         this.#setUpUpdateExit();
     }
 
@@ -76,8 +76,8 @@ class Editor {
         this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
     }
 
-    #setUpTagEditor() {
-        this.#tagEditor = new TagEditor(this.#reader);
+    #setUpTagEditor(knownTags) {
+        this.#tagEditor = new TagEditor(this.#reader, knownTags);
     }
 
     #collectExitButtons() {

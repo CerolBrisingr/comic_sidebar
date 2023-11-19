@@ -6,7 +6,18 @@
     border-radius: 0.5ex;
 }
 
-.tag_create_button,
+.tag_create_button {
+    position:absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+}
+
+.tag_creator_button,
 .tag_add_button {
     display: flex;
     margin: 0;

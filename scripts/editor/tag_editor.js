@@ -1,17 +1,19 @@
+import { TagDropdown } from "./tag_dropdown.js";
+
 class TagEditor {
     #readerData;
     #container;
     #tagBuilder = new TagCreatorDummy();
     #tags;
-    #addTagButton;
+    #addTagUi;
+
     #myInterface;
 
-    constructor(readerData) {
+    constructor(readerData, knownTags) {
         this.#readerData = readerData;
-        let tagData = this.#readerData.getTags();
         this.#myInterface = new EditorInterface(this);
-        this.#setUpTags(tagData);
-        this.#setUpTagAdder(tagData);
+        this.#setUpTags(this.getTags());
+        this.#setUpTagAdder(knownTags);
         this.updateTagContainer();
     }
 
@@ -23,15 +25,26 @@ class TagEditor {
         }
     }
 
-    #setUpTagAdder(tagData) {
-        // For now: just button to add a new tag (id: tag_add_button)
-        // later: dropdown menu with "add tag" and all existing tags that are not listed yet
-        this.#addTagButton = document.getElementById("tag_add_button");
-        this.#addTagButton.addEventListener("click", () => {
-            this.#tagBuilder = new TagCreator(this.#myInterface);
-            this.updateTagContainer();
-            this.#tagBuilder.select();
-        });
+    #setUpTagAdder(knownTags) {
+        this.#addTagUi = new TagDropdown(
+            this.#myInterface, 
+            knownTags, 
+            () => {this.#startTagCreator();}, 
+            (tag) => {
+                this.addTag(tag);
+                this.updateTagContainer();
+                }
+            );
+    }
+
+    #startTagCreator() {
+        this.#tagBuilder = new TagCreator(this.#myInterface);
+        this.updateTagContainer();
+        this.#tagBuilder.select();
+    }
+
+    getTags() {
+        return this.#readerData.getTags();
     }
 
     removeCreateInterface() {
@@ -39,7 +52,7 @@ class TagEditor {
     }
 
     updateTagContainer() {
-        let list = [this.#addTagButton];
+        let list = [this.#addTagUi.getUi()];
         if (this.#tagBuilder.isValid())
             list.push(this.#tagBuilder.getUi());
         for (let tag of this.#tags) {
@@ -135,6 +148,10 @@ class EditorInterface {
         this.#tagEditor.updateTagContainer();
     }
 
+    listTags() {
+        return this.#tagEditor.getTags();
+    }
+
     createTag(tagString) {
         let canCreate = this.#tagEditor.addTag(tagString);
         if (canCreate)
@@ -226,7 +243,7 @@ class TagCreator {
         //   tag create button class: tag_create_button
         //      create button image class: tag_create_image, plus.svg
         let button = document.createElement("button");
-        button.classList.add("tag_create_button");
+        button.classList.add("tag_creator_button");
 
         let image = document.createElement("img");
         image.classList.add("tag_create_image");

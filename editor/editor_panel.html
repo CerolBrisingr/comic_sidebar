@@ -69,9 +69,17 @@
         </div>
         <label for="reader_tags"><b>Add tags so you can filter for them:</b></label>        
         <div class="tag_container" id="reader_tags">
-            <button class="tag_add_button" id="tag_add_button">
-                <img class="tag_add_image" src="../icons/plus.svg" />
-            </button>
+            <div id="tag_add_ui" class="tag_add_ui">
+                <button class="tag_add_button" id="tag_add_button">
+                    <img class="tag_add_image" src="../icons/plus.svg" />
+                </button>
+                <div id="dropdown_option_box" class="dropdown_option_box">
+                    <button class="dropdown_option" id="start_dropdown_creator">
+                        <div class="dropdown_label">Create new Tag</div>
+                    </button>
+                    <div class="dropdown_divider" id="divider_to_suggestions"></div>
+                </div>
+            </div>
         </div>
     </div>
     <label class="div_label" for="preview_container">

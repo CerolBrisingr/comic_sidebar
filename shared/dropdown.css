@@ -1,9 +1,4 @@
 
-.dropdown {
-    display: inline-block;
-    position: relative;
-}
-
 .dropdown_option_box {
     display: none;
     position: absolute;
