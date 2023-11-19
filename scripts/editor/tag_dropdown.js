@@ -15,11 +15,15 @@ class TagDropdown {
         this.#knownTags = knownTags;
         this.#fktOpenTagCreator = fktOpenTagCreator;
         this.#fktCreateTag = fktCreateTag;
-        this.#ui = document.getElementById("tag_add_ui");
+        this.#setUpUi();
         this.#setUpDivider();
         this.#setUpCreateNew();
         this.#setUpOptionsBox();
         this.#setUpDropdownButton();
+    }
+
+    #setUpUi() {
+        this.#ui = document.getElementById("tag_add_ui");
     }
 
     #setUpDivider() {
