@@ -63,17 +63,18 @@ class SortControls {
     #optionBox;
     #fcnUpdate;
     #ruleButtons = {};
+    #doFilter = false;
     #isOpen = false;
 
-    constructor(fcnUpdate, btnToggle, optionBox, name, url, latest, oldest) {
-        this.#btnToggle = btnToggle;
-        this.#optionBox = optionBox;
+    constructor(fcnUpdate, sortUi) {
+        this.#btnToggle = sortUi.btnToggle;
+        this.#optionBox = sortUi.optionBox;
         this.#fcnUpdate = fcnUpdate;
-        this.#configureButtons(name, url, latest, oldest);
-        this.#setCheckmarks("Name");
+        this.#configureButtons(sortUi);
+        this.#setSortingCheckmarks("Name");
     }
 
-    #configureButtons(name, url, latest, oldest) {
+    #configureButtons(sortUi) {
         this.#btnToggle.onclick = (evt) => {
             if (this.#isOpen) {
                 this.#close();
@@ -82,10 +83,11 @@ class SortControls {
             }
         };
         this.#btnToggle.onblur = (evt) => {this.#onblur(evt);};
-        this.#setUpRuleBtn(name, "Name");
-        this.#setUpRuleBtn(url, "URL");
-        this.#setUpRuleBtn(latest, "Latest");
-        this.#setUpRuleBtn(oldest, "Oldest");
+        this.#setUpRuleBtn(sortUi.name, "Name");
+        this.#setUpRuleBtn(sortUi.url, "URL");
+        this.#setUpRuleBtn(sortUi.latest, "Latest");
+        this.#setUpRuleBtn(sortUi.oldest, "Oldest");
+        this.#setUpFilterBtn(sortUi.filter);
     }
 
     #open() {
@@ -104,19 +106,41 @@ class SortControls {
         this.#ruleButtons[strRule] = element;
     }
 
+    #setUpFilterBtn(filter) {
+        filter.button.onclick = () => {
+            this.#doFilter = !this.#doFilter;
+            this.#updateFilteringState(filter);
+            this.#close();
+        };
+        filter.button.onblur = (evt) => {
+            this.#onblur(evt);
+        };
+        this.#updateFilteringState(filter);
+    }
+
+    #updateFilteringState(filter) {
+        if (this.#doFilter) {
+            filter.icon.style.visibility = "visible";
+            filter.filterDiv.style.display = "block";
+        } else {
+            filter.icon.style.visibility = "hidden";
+            filter.filterDiv.style.display = "none";
+        }
+    }
+
     #onblur(evt) {
         if (!relatedTargetOnDropdown(evt.relatedTarget)) 
             this.#close();
     }
 
     #setRule(strRule) {
-        this.#setCheckmarks(strRule);
+        this.#setSortingCheckmarks(strRule);
         ReaderSort.setRule(strRule);
         this.#fcnUpdate();
         this.#close();
     }
 
-    #setCheckmarks(strRule) {
+    #setSortingCheckmarks(strRule) {
         for (const [key, entry] of Object.entries(this.#ruleButtons)) {
             if (key === strRule) {
                 entry.icon.style.visibility = "visible";
