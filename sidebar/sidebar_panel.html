@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="sidebar_panel.css">
         <link rel="stylesheet" href="../shared/hints.css">
         <link rel="stylesheet" href="../shared/dropdown.css">
+        <link rel="stylesheet" href="../shared/tags.css">
+        <link rel="stylesheet" href="sidebar_panel.css">
         <meta charset="utf-8">
         <script type="module" src="../scripts/sidebar/sidebar.js"></script>
     </head>
@@ -100,6 +101,11 @@
                     <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_oldest_tick">
                     <div class="dropdown_label">sort by oldest Access</div>
                 </button>
+                <div class="dropdown_divider" id="divider_to_suggestions"></div>
+                <button class="dropdown_option" id="filter_tags_button">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="filter_tags_tick">
+                    <div class="dropdown_label">filter by Tags</div>
+                </button>
             </div>
         </div>
         <div>
@@ -111,6 +117,19 @@
             <button id="sidebar_tracking_state" class="searchbar_icon" title="Deactivate URL tracking">
                 <canvas id="sidebar_tracking_state_icon" width="16" height="16"></canvas>
             </button>
+        </div>
+    </div>
+    <div class="tag_container" id="reader_tags">
+        <div id="tag_add_ui" class="tag_add_ui">
+            <button class="tag_add_button" id="tag_add_button">
+                <img class="tag_add_image" src="../icons/plus.svg" />
+            </button>
+            <div id="dropdown_option_box" class="dropdown_option_box">
+                <button class="dropdown_option" id="start_dropdown_creator">
+                    <div class="dropdown_label">Create new Tag</div>
+                </button>
+                <div class="dropdown_divider" id="divider_to_suggestions"></div>
+            </div>
         </div>
     </div>
     <div id="container">

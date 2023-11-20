@@ -56,26 +56,31 @@ function setUpDropdownMenu() {
     const fcnUpdate = () => {
         webReader.relistViewers();
     };
-    const btnToggle = document.getElementById("dropdown_toggle");
-    const optionBox = document.getElementById("dropdown_option_box");
-    const name = {
+    let sortUi = {};
+    sortUi.btnToggle = document.getElementById("dropdown_toggle");
+    sortUi.optionBox = document.getElementById("dropdown_option_box");
+    sortUi.name = {
         button: document.getElementById("sort_name"), 
         icon: document.getElementById("sort_name_tick")
     };
-    const url = {
+    sortUi.url = {
         button: document.getElementById("sort_url"),
         icon: document.getElementById("sort_url_tick")
     };
-    const latest = {
+    sortUi.latest = {
         button: document.getElementById("sort_latest"),
         icon: document.getElementById("sort_latest_tick")
     };
-    const oldest = {
+    sortUi.oldest = {
         button: document.getElementById("sort_oldest"),
         icon: document.getElementById("sort_oldest_tick")
     };
-    sortControls = new SortControls(fcnUpdate, btnToggle, optionBox, 
-        name, url, latest, oldest);
+    sortUi.filter = {
+        button: document.getElementById("filter_tags_button"),
+        icon: document.getElementById("filter_tags_tick"),
+        filterDiv: document.getElementById("reader_tags")
+    }
+    sortControls = new SortControls(fcnUpdate, sortUi);
 }
 
 function setUpWebReader(readerObjectList) {
