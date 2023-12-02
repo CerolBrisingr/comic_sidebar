@@ -64,36 +64,19 @@ class ReaderData {
     }
 
     _importTags(tagData) {
-        this.#tags = new Set();
-        if (tagData === undefined)
-            return;
-        if (!isArray(tagData))
-            return;
-        for (let tag of tagData) {
-            this.addTag(tag);
-        }
+        this.#tags = new Tags(tagData);
     }
 
     removeTag(tag) {
-        return this.#tags.delete(tag);
+        return this.#tags.removeTag(tag);
     }
 
     addTag(tag) {
-        if (typeof tag !== "string")
-            return "";
-        tag = tag.trim();
-        if (tag === "untagged")
-            return "";
-        if (tag === "")
-            return "";
-        if (this.#tags.has(tag))
-            return "";
-        this.#tags.add(tag);
-        return tag;
+        return this.#tags.addTag(tag);
     }
 
     getTags() {
-        return Array.from(this.#tags);
+        return this.#tags.getTags();
     }
     
     getLabel() {
@@ -325,6 +308,43 @@ class Bookmark {
     }
 }
 
+class Tags {
+    #tags;
+
+    constructor(tagData) {
+        this.#tags = new Set();
+        if (tagData === undefined)
+            return;
+        if (!isArray(tagData))
+            return;
+        for (let tag of tagData) {
+            this.addTag(tag);
+        }
+    }
+
+    removeTag(tag) {
+        return this.#tags.delete(tag);
+    }
+
+    addTag(tag) {
+        if (typeof tag !== "string")
+            return "";
+        tag = tag.trim();
+        if (tag === "untagged")
+            return "";
+        if (tag === "")
+            return "";
+        if (this.#tags.has(tag))
+            return "";
+        this.#tags.add(tag);
+        return tag;
+    }
+
+    getTags() {
+        return Array.from(this.#tags);
+    }
+}
+
 class ReaderSyncDummy {
     getId() {
         return 1;
@@ -338,4 +358,4 @@ class InterfaceDummy {
     deleteMe() {}
 }
 
-export {ReaderData}
+export {ReaderData, Tags}
