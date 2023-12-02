@@ -1,8 +1,9 @@
 import { HtmlContainer } from "./html_container.js"
-import {CoreReaderManager, SidebarReaderManager} from "./reader_manager.js"
-import {importBackup, unpackReaderObjectList} from "./backup_import.js"
-import {saveBackup, buildWebReaderObject} from "./backup_export.js"
+import { CoreReaderManager, SidebarReaderManager } from "./reader_manager.js"
+import { importBackup, unpackReaderObjectList } from "./backup_import.js"
+import { saveBackup, buildWebReaderObject } from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
+import { SortControls } from "../sidebar/reader_sort.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
@@ -219,14 +220,23 @@ class WebReaderBackground extends WebReader {
 class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
+    #sortControl;
     #favIconSubscriber = new FavIconSubscriber();
 
-    constructor(container, showAllInterface) {
+    constructor(container, showAllInterface, sortUi) {
         if (container == undefined)
             throw new Error("Containing element for reader listings must be provided");
         super();
+        this.#createSortControl(sortUi);
         this.#container = container;
         this.#showAllInterface = showAllInterface;
+    }
+
+    #createSortControl(sortUi) {
+        const fcnUpdate = () => {
+            this.relistViewers();
+        };
+        this.#sortControl = new SortControls(fcnUpdate, sortUi);
     }
 
     _createReaderClass(readerObject) {

@@ -1,96 +1,74 @@
 class TagDropdown {
-    #editorInterface;
-    #knownTags;
-    #fktOpenTagCreator;
-    #fktCreateTag;
-    #openDropdown;
-    #createNew;
-    #divider;
-    #optionsBox;
-    #ui;
-    #isOpen = false;
+    _usedTagsManager;
+    _knownTags = [];
+    _fktCreateTag;
+    _openDropdown;
+    _optionsBox;
+    _ui;
+    _isOpen = false;
 
-    constructor(editorInterface, knownTags, fktOpenTagCreator, fktCreateTag) {
-        this.#editorInterface = editorInterface;
-        this.#knownTags = knownTags;
-        this.#fktOpenTagCreator = fktOpenTagCreator;
-        this.#fktCreateTag = fktCreateTag;
-        this.#setUpUi();
-        this.#setUpDivider();
-        this.#setUpCreateNew();
-        this.#setUpOptionsBox();
-        this.#setUpDropdownButton();
+    constructor(usedTagsManager, fktCreateTag) {
+        this._usedTagsManager = usedTagsManager;
+        this._fktCreateTag = fktCreateTag;
+        this._setUpUi();
+        this._setUpOptionsBox();
+        this._setUpDropdownButton();
     }
 
-    #setUpUi() {
-        this.#ui = document.getElementById("tag_add_ui");
+    _setUpUi() {
+        this._ui = document.getElementById("tag_add_ui");
     }
 
-    #setUpDivider() {
-        this.#divider = document.getElementById("divider_to_suggestions");
-        this.#divider.onblur = (evt) => {this.#onblur(evt)};
-    }
-
-    #setUpDropdownButton() {
-        this.#openDropdown = document.getElementById("tag_add_button");
-        this.#openDropdown.onclick = () => {
-            if (this.#isOpen) {
-                this.#close();
+    _setUpDropdownButton() {
+        this._openDropdown = document.getElementById("tag_add_button");
+        this._openDropdown.onclick = () => {
+            if (this._isOpen) {
+                this._close();
             } else {
-                this.#updateDropdown();
-                this.#open();
+                this._updateDropdown();
+                this._open();
             }
         };
-        this.#openDropdown.onblur = (evt) => {this.#onblur(evt)};
+        this._openDropdown.onblur = (evt) => {this._onblur(evt)};
     }
 
-    #setUpOptionsBox() {
-        this.#optionsBox = document.getElementById("dropdown_option_box");
+    _setUpOptionsBox() {
+        this._optionsBox = document.getElementById("dropdown_option_box");
     }
 
-    #setUpCreateNew() {
-        this.#createNew = document.getElementById("start_dropdown_creator");
-        this.#createNew.onclick = () => {
-            this.#fktOpenTagCreator();
-            this.#close();
-        };
+    _updateDropdown() {
+        this._adjustDropdownContent();
+        this._adjustDropdownPosition();
     }
 
-    #updateDropdown() {
-        // Adjust content
-        let list = [this.#createNew];
-        let suggestions = this.#gatherSuggestions();
-        if (suggestions.length > 0)
-            list.push(this.#divider);
-        for (let suggestion of suggestions) {
-            list.push(this.#buildSuggestion(suggestion));
-        }
-        this.#optionsBox.replaceChildren(...list);
-
-        // Adjust position
-        let rectButton = this.#openDropdown.getBoundingClientRect();
-        let rectUi = this.#ui.getBoundingClientRect();
-        this.#optionsBox.style.top = (rectButton.top + rectButton.height) + "px";
-        this.#optionsBox.style.right = (window.innerWidth - rectUi.right - rectButton.width) + "px";
+    _adjustDropdownContent() {
+        throw new Error("Missing implementation");
     }
 
-    #gatherSuggestions() {
+    _adjustDropdownPosition() {
+        let rectButton = this._openDropdown.getBoundingClientRect();
+        let rectUi = this._ui.getBoundingClientRect();
+        this._optionsBox.style.top = (rectButton.top + rectButton.height) + "px";
+        this._optionsBox.style.right = (window.innerWidth - rectUi.right - rectButton.width) + "px";
+    }
+
+    _gatherSuggestions() {
         let list = [];
-        let usedTags = this.#editorInterface.listTags();
-        for (let tag of this.#knownTags) {
+        let usedTags = this._usedTagsManager.listTags();
+        for (let tag of this._knownTags) {
             if (!usedTags.includes(tag))
                 list.push(tag);
         }
         return list;
     }
 
-    #buildSuggestion(suggestionText) {
+    _buildSuggestion(suggestionText) {
         let suggestion = document.createElement("button");
         suggestion.classList.add("dropdown_option");
 
         suggestion.onclick = () => {
-            this.#fktCreateTag(suggestionText);
-            this.#close();
+            this._fktCreateTag(suggestionText);
+            this._close();
         };
 
         let label = document.createElement("div");
@@ -100,24 +78,97 @@ class TagDropdown {
         return suggestion;
     }
 
-    #onblur(evt) {
+    _onblur(evt) {
         if (!relatedTargetOnDropdown(evt.relatedTarget)) 
-            this.#close();
+            this._close();
     }
 
-    #open() {
-        this.#isOpen = true;
-        this.#optionsBox.style.display = "flex";
+    _open() {
+        this._isOpen = true;
+        this._optionsBox.style.display = "flex";
     }
 
-    #close() {
-        this.#isOpen = false;
-        this.#optionsBox.style.display = "none";
+    _close() {
+        this._isOpen = false;
+        this._optionsBox.style.display = "none";
     }
 
     getUi() {
-        return this.#ui;
+        return this._ui;
     }
+}
+
+class TagDropdownEditor extends TagDropdown {
+    _divider;
+    _createNew;
+    _fktOpenTagCreator;
+
+    constructor(editorInterface, knownTags, fktOpenTagCreator, fktCreateTag) {
+        super(editorInterface, fktCreateTag);
+        this._fktOpenTagCreator = fktOpenTagCreator;
+        this._setUpDivider();
+        this._setUpCreateNew();
+        this._knownTags = knownTags;
+    }
+
+    _setUpDivider() {
+        this._divider = document.getElementById("divider_to_suggestions");
+        this._divider.onblur = (evt) => {this._onblur(evt);};
+    }
+
+    _setUpCreateNew() {
+        this._createNew = document.getElementById("start_dropdown_creator");
+        this._createNew.onclick = () => {
+            this._fktOpenTagCreator();
+            this._close();
+        };
+    }
+
+    _adjustDropdownContent() {
+        let list = [this._createNew];
+        let suggestions = this._gatherSuggestions();
+        if (suggestions.length > 0)
+            list.push(this._divider);
+        for (let suggestion of suggestions) {
+            list.push(this._buildSuggestion(suggestion));
+        }
+        this._optionsBox.replaceChildren(...list);
+    }
+
+}
+
+class TagDropdownFilter extends TagDropdown {
+    _placeholder;
+
+    constructor(usedTagsManager, fktCreateTag) {
+        super(usedTagsManager, fktCreateTag);
+        this._setUpPlaceholder();
+    }
+
+    _updateDropdown() {
+        this._knownTags = this._usedTagsManager.getKnownTags();
+        super._updateDropdown();
+    }
+    
+    _setUpPlaceholder() {
+        this._placeholder = document.getElementById("placeholder_for_suggestions");
+        this._placeholder.onblur = (evt) => {this._onblur(evt);};
+        this._placeholder.onclick = () => {this._close();};
+    }
+
+    _adjustDropdownContent() {
+        let suggestions = this._gatherSuggestions();
+        if (suggestions.length == 0) {
+            this._optionsBox.replaceChildren(this._placeholder);
+            return;
+        }
+        let list = [];
+        for (let suggestion of suggestions) {
+            list.push(this._buildSuggestion(suggestion));
+        }
+        this._optionsBox.replaceChildren(...list);
+    }
+
 }
 
 function relatedTargetOnDropdown(relTarget) {
@@ -130,4 +181,4 @@ function relatedTargetOnDropdown(relTarget) {
     return false;
 }
 
-export {TagDropdown}
+export {TagDropdownEditor, TagDropdownFilter}

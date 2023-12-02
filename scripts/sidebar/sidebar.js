@@ -2,7 +2,6 @@ import {WebReaderSidebar} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
 import { ReaderFilter } from "./reader_filter.js"
-import { SortControls } from "./reader_sort.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
 import { TrackingState } from "../shared/tracking_state.js"
@@ -31,7 +30,6 @@ function setUpUserInterface() {
     addComicBtn.onclick = function () {addCurrentPage()};
 
     setUpSearchBar();
-    setUpDropdownMenu();
 }
 
 function setUpSearchBar() {
@@ -52,10 +50,7 @@ function setUpTrackingState() {
     });
 }
 
-function setUpDropdownMenu() {
-    const fcnUpdate = () => {
-        webReader.relistViewers();
-    };
+function gatherSortUi() {
     let sortUi = {};
     sortUi.btnToggle = document.getElementById("dropdown_toggle");
     sortUi.optionBox = document.getElementById("dropdown_option_box");
@@ -80,10 +75,10 @@ function setUpDropdownMenu() {
         icon: document.getElementById("filter_tags_tick"),
         filterDiv: document.getElementById("reader_tags")
     }
-    sortControls = new SortControls(fcnUpdate, sortUi);
+    return sortUi;
 }
 
-function setUpWebReader(readerObjectList) {
+function setUpWebReader(readerObjectList, sortUi) {
     if (readerObjectList === undefined)
         return;
     const container = document.getElementById('container');
@@ -92,7 +87,7 @@ function setUpWebReader(readerObjectList) {
         icon: document.getElementById("sidebar_show_all_icon")
     }
     let showAllInterface = new ShowAllInterface(showAll);
-    webReader = new WebReaderSidebar(container, showAllInterface);
+    webReader = new WebReaderSidebar(container, showAllInterface, sortUi);
     showAllInterface.setUpdateFcn(() => {webReader.relistViewers();});
 }
 
@@ -117,7 +112,8 @@ function receiveReaderObjectList(readerObjectList) {
         return;
     isSetUp = true;
     setUpUserInterface();
-    setUpWebReader(readerObjectList);
+    let sortUi = gatherSortUi();
+    setUpWebReader(readerObjectList, sortUi);
     executeWebReaderLoading(readerObjectList);
 }
 

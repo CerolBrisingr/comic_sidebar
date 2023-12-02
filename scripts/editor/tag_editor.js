@@ -1,4 +1,4 @@
-import { TagDropdown } from "./tag_dropdown.js";
+import { TagDropdownEditor } from "./tag_dropdown.js";
 
 class TagEditor {
     #readerData;
@@ -26,7 +26,7 @@ class TagEditor {
     }
 
     #setUpTagAdder(knownTags) {
-        this.#addTagUi = new TagDropdown(
+        this.#addTagUi = new TagDropdownEditor(
             this.#myInterface, 
             knownTags, 
             () => {this.#startTagCreator();}, 
