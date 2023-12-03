@@ -34,7 +34,7 @@ class ReaderData {
             this.#prefixMask = String(data.prefix_mask);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
-        this._importTags(data.tags);
+        this.#tags = new Tags(data.tags);
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
@@ -61,10 +61,6 @@ class ReaderData {
             if ((bookmark !== undefined) && entry.hasOwnProperty("label"))
                 bookmark.setLabel(String(entry.label));
         }
-    }
-
-    _importTags(tagData) {
-        this.#tags = new Tags(tagData);
     }
 
     removeTag(tag) {
@@ -173,7 +169,7 @@ class ReaderData {
     editReader(readerObjectLike) {
         this.#label = readerObjectLike.label;
         this.#prefixMask = readerObjectLike.prefix_mask;
-        this._importTags(readerObjectLike.tags);
+        this.#tags.update(readerObjectLike.tags);
         this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();
     }
@@ -313,6 +309,11 @@ class Tags {
 
     constructor(tagData) {
         this.#tags = new Set();
+        this.update(tagData);
+    }
+
+    update(tagData) {
+        this.#tags.clear();
         if (tagData === undefined)
             return;
         if (!isArray(tagData))
