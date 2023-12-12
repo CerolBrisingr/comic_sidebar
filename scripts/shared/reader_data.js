@@ -1,5 +1,6 @@
 import { dissectUrl, urlFitsPrefix } from "./url.js"
 import { ReaderSchedule } from "./reader_schedule.js";
+import { TagData } from "./tag_data.js";
 
 class ReaderData {
     #label;
@@ -34,7 +35,7 @@ class ReaderData {
             this.#prefixMask = String(data.prefix_mask);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
-        this.#tags = new Tags(data.tags);
+        this.#tags = new TagData(data.tags);
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
@@ -304,48 +305,6 @@ class Bookmark {
     }
 }
 
-class Tags {
-    #tags;
-
-    constructor(tagData) {
-        this.#tags = new Set();
-        this.update(tagData);
-    }
-
-    update(tagData) {
-        this.#tags.clear();
-        if (tagData === undefined)
-            return;
-        if (!isArray(tagData))
-            return;
-        for (let tag of tagData) {
-            this.addTag(tag);
-        }
-    }
-
-    removeTag(tag) {
-        return this.#tags.delete(tag);
-    }
-
-    addTag(tag) {
-        if (typeof tag !== "string")
-            return "";
-        tag = tag.trim();
-        if (tag === "untagged")
-            return "";
-        if (tag === "")
-            return "";
-        if (this.#tags.has(tag))
-            return "";
-        this.#tags.add(tag);
-        return tag;
-    }
-
-    getTags() {
-        return Array.from(this.#tags);
-    }
-}
-
 class ReaderSyncDummy {
     getId() {
         return 1;
@@ -359,4 +318,4 @@ class InterfaceDummy {
     deleteMe() {}
 }
 
-export {ReaderData, Tags}
+export {ReaderData}
