@@ -221,6 +221,7 @@ class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
     #sortControl;
+    #tagDropdown;
     #favIconSubscriber = new FavIconSubscriber();
 
     constructor(container, showAllInterface, sortUi) {
@@ -228,6 +229,7 @@ class WebReaderSidebar extends WebReader {
             throw new Error("Containing element for reader listings must be provided");
         super();
         this.#createSortControl(sortUi);
+        this.#createTagDropdown(sortUi.filter);
         this.#container = container;
         this.#showAllInterface = showAllInterface;
     }
@@ -236,7 +238,16 @@ class WebReaderSidebar extends WebReader {
         const fcnUpdate = () => {
             this.relistViewers();
         };
-        this.#sortControl = new SortControls(fcnUpdate, sortUi);
+        this.#sortControl = new SortControls(sortUi);
+        this.#sortControl.setOnUpdate(fcnUpdate);
+    }
+
+    #createTagDropdown(filterUi) {
+
+        this.#sortControl.setOnClickFilter((filterState) => {
+            this.#tagDropdown.setActiveState(filterState);
+        });
+        this.#sortControl.triggerOnClickFilter();
     }
 
     _createReaderClass(readerObject) {

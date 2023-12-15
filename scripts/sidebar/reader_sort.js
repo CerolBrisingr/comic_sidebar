@@ -61,17 +61,40 @@ function compare(a, b) {
 class SortControls {
     #btnToggle;
     #optionBox;
-    #fcnUpdate;
     #ruleButtons = {};
     #doFilter = false;
     #isOpen = false;
+    #clickFilterFcn;
+    #updateFcn;
 
-    constructor(fcnUpdate, sortUi) {
+    constructor(sortUi) {
         this.#btnToggle = sortUi.btnToggle;
         this.#optionBox = sortUi.optionBox;
-        this.#fcnUpdate = fcnUpdate;
         this.#configureButtons(sortUi);
         this.#setSortingCheckmarks("Name");
+        this.setOnClickFilter();
+    }
+
+    setOnClickFilter(fcnOnClick) {
+        if (typeof fcnOnClick !== "function") {
+            fcnOnClick = () => {};
+        }
+        this.#clickFilterFcn = fcnOnClick;
+    }
+
+    triggerOnClickFilter() {
+        this.#clickFilterFcn(this.#doFilter);
+    }
+
+    setOnUpdate(fcnOnUpdate) {
+        if (typeof fcnOnUpdate !== "function") {
+            fcnOnClick = () => {};
+        }
+        this.#updateFcn = fcnOnUpdate;
+    }
+
+    #triggerUpdateFcn() {
+        this.#updateFcn();
     }
 
     #configureButtons(sortUi) {
@@ -109,13 +132,12 @@ class SortControls {
     #setUpFilterBtn(filter) {
         filter.button.onclick = () => {
             this.#doFilter = !this.#doFilter;
-            this.#updateFilteringState(filter);
+            this.triggerOnClickFilter();
             this.#close();
         };
         filter.button.onblur = (evt) => {
             this.#onblur(evt);
         };
-        this.#updateFilteringState(filter);
     }
 
     #updateFilteringState(filter) {
@@ -136,7 +158,7 @@ class SortControls {
     #setRule(strRule) {
         this.#setSortingCheckmarks(strRule);
         ReaderSort.setRule(strRule);
-        this.#fcnUpdate();
+        this.#triggerUpdateFcn();
         this.#close();
     }
 
