@@ -49,7 +49,11 @@ class TagDropdown {
         let rectButton = this._openDropdown.getBoundingClientRect();
         let rectUi = this._ui.getBoundingClientRect();
         this._optionsBox.style.top = (window.scrollY + rectButton.top + rectButton.height) + "px";
-        this._optionsBox.style.right = (window.innerWidth - rectUi.right - rectButton.width) + "px";
+        this._optionsBox.style.right = this._getOffsetRight(rectUi, rectButton);
+    }
+
+    _getOffsetRight(rectUi, rectButton) {
+        return (window.innerWidth - rectUi.right - rectButton.width) + "px";
     }
 
     _gatherSuggestions() {
@@ -154,6 +158,10 @@ class TagDropdownFilter extends TagDropdown {
         this._placeholder = document.getElementById("placeholder_for_suggestions");
         this._placeholder.onblur = (evt) => {this._onblur(evt);};
         this._placeholder.onclick = () => {this._close();};
+    }
+
+    _getOffsetRight(rectUi, rectButton) {
+        return "0px";
     }
 
     _adjustDropdownContent() {
