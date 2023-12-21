@@ -48,7 +48,7 @@ class TagDropdown {
     _adjustDropdownPosition() {
         let rectButton = this._openDropdown.getBoundingClientRect();
         let rectUi = this._ui.getBoundingClientRect();
-        this._optionsBox.style.top = (rectButton.top + rectButton.height) + "px";
+        this._optionsBox.style.top = (window.scrollY + rectButton.top + rectButton.height) + "px";
         this._optionsBox.style.right = (window.innerWidth - rectUi.right - rectButton.width) + "px";
     }
 
