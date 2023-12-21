@@ -10,7 +10,7 @@ class TagData {
         this.#tags.clear();
         if (tagData === undefined)
             return;
-        if (!isArray(tagData))
+        if (!Array.isArray(tagData))
             return;
         for (let tag of tagData) {
             this.addTag(tag);
