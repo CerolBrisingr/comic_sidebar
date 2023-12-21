@@ -52,8 +52,8 @@ function setUpTrackingState() {
 
 function gatherSortUi() {
     let sortUi = {};
-    sortUi.btnToggle = document.getElementById("dropdown_toggle");
-    sortUi.optionBox = document.getElementById("dropdown_option_box");
+    sortUi.btnToggle = document.getElementById("sort_dropdown_toggle");
+    sortUi.optionBox = document.getElementById("sort_dropdown_option_box");
     sortUi.name = {
         button: document.getElementById("sort_name"), 
         icon: document.getElementById("sort_name_tick")
