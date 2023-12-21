@@ -4,7 +4,7 @@ import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
 import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 import { ScheduleEditor } from "./schedule_editor.js";
-import { TagEditor } from "./tag_editor.js";
+import { TagEditorEditor } from "./tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
 
 class Editor {
@@ -77,7 +77,7 @@ class Editor {
     }
 
     #setUpTagEditor(knownTags) {
-        this.#tagEditor = new TagEditor(this.#reader, knownTags);
+        this.#tagEditor = new TagEditorEditor(this.#reader, knownTags);
     }
 
     #collectExitButtons() {

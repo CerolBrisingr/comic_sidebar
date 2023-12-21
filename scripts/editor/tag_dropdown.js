@@ -145,6 +145,8 @@ class TagDropdownFilter extends TagDropdown {
     _placeholder;
 
     constructor(usedTagsManager, fktCreateTag) {
+        // usedTagsManager.getKnownTags();  All tags of all readers
+        // usedTagsManager.listTags();      Tags that are already listed
         super(usedTagsManager, fktCreateTag);
         this._setUpPlaceholder();
     }

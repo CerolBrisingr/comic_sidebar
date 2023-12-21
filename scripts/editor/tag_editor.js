@@ -1,7 +1,8 @@
-import { TagDropdownEditor } from "./tag_dropdown.js";
+import { TagDropdownEditor, TagDropdownFilter } from "./tag_dropdown.js";
+import { TagData } from "../shared/tag_data.js";
 
 class TagEditor {
-    #readerData;
+    #tagData;
     #container;
     #tagBuilder = new TagCreatorDummy();
     #tags;
@@ -9,8 +10,8 @@ class TagEditor {
 
     #myInterface;
 
-    constructor(readerData, knownTags) {
-        this.#readerData = readerData;
+    constructor(tagData, knownTags) {
+        this.#tagData = tagData;
         this.#myInterface = new EditorInterface(this);
         this.#setUpTags(this.getTags());
         this.#setUpTagAdder(knownTags);
@@ -44,7 +45,7 @@ class TagEditor {
     }
 
     getTags() {
-        return this.#readerData.getTags();
+        return this.#tagData.getTags();
     }
 
     removeCreateInterface() {
@@ -62,7 +63,7 @@ class TagEditor {
     }
 
     removeTag(tagObject) {
-        let wasRemoved = this.#readerData.removeTag(tagObject.getString());
+        let wasRemoved = this.#tagData.removeTag(tagObject.getString());
         let iFound = this.#tags.indexOf(tagObject);
         if (iFound === -1)
             return false;
@@ -71,7 +72,7 @@ class TagEditor {
     }
 
     addTag(tagString) {
-        let addedTag = this.#readerData.addTag(tagString);
+        let addedTag = this.#tagData.addTag(tagString);
         if (addedTag !== "") {
             // addTag() will return emtpy string if rejected
             this.#addTagObject(addedTag);
@@ -93,6 +94,22 @@ class TagEditor {
     #addTagObjectInSlot(tagString, slot) {
         let newTag = new TagObject(this.#myInterface, tagString);
         this.#tags.splice(slot, 0, newTag);
+    }
+
+}
+
+class TagEditorEditor extends TagEditor {
+
+    constructor(readerData, knownTags) {
+        super(readerData, knownTags);
+    }
+
+}
+
+class TagEditorFilter extends TagEditor {
+
+    constructor(knownTags) {
+        super(new TagData, knownTags);
     }
 
 }
@@ -317,4 +334,4 @@ class TagObject {
     }
 }
 
-export {TagEditor, SlotFinder}
+export {TagEditorEditor, TagEditorFilter, SlotFinder}
