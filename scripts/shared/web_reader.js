@@ -8,6 +8,7 @@ import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
 import { TagLibrary } from "../background/tag_libraray.js"
+import { TagDropdownFilter } from "../editor/tag_dropdown.js"
 
 class WebReader {
     _tagLibrary = new TagLibrary();
@@ -242,10 +243,20 @@ class WebReaderSidebar extends WebReader {
         this.#sortControl.setOnUpdate(fcnUpdate);
     }
 
-    #createTagDropdown(filterUi) {
-
-        this.#sortControl.setOnClickFilter((filterState) => {
-            this.#tagDropdown.setActiveState(filterState);
+    #createTagDropdown(filter) {
+        const tagSourceInterface = new TagSourceInterface();
+        const fcnCreateTag = (tagString) => {
+            console.log(tagString);
+        }
+        this.#tagDropdown = new TagDropdownFilter(tagSourceInterface, fcnCreateTag); // Hardcoded ids as of now
+        this.#sortControl.setOnClickFilter((newState) => {
+            if (newState) {
+                filter.icon.style.visibility = "visible";
+                filter.filterDiv.style.display = "block";
+            } else {
+                filter.icon.style.visibility = "hidden";
+                filter.filterDiv.style.display = "none";
+            }
         });
         this.#sortControl.triggerOnClickFilter();
     }
@@ -371,6 +382,16 @@ class WebReaderInterface {
 
     recountTags() {
         this.#webReader.recountTags();
+    }
+}
+
+class TagSourceInterface {
+    getKnownTags() {
+        return ["test1", "test2", "test_used"];
+    }
+
+    listTags() {
+        return ["test_used"];
     }
 }
 

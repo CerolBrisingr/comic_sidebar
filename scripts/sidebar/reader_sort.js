@@ -140,16 +140,6 @@ class SortControls {
         };
     }
 
-    #updateFilteringState(filter) {
-        if (this.#doFilter) {
-            filter.icon.style.visibility = "visible";
-            filter.filterDiv.style.display = "block";
-        } else {
-            filter.icon.style.visibility = "hidden";
-            filter.filterDiv.style.display = "none";
-        }
-    }
-
     #onblur(evt) {
         if (!relatedTargetOnDropdown(evt.relatedTarget)) 
             this.#close();
