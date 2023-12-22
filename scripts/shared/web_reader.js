@@ -8,7 +8,7 @@ import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
 import { TagLibrary } from "../background/tag_libraray.js"
-import { TagDropdownFilter } from "../editor/tag_dropdown.js"
+import { TagEditorFilter } from "../editor/tag_editor.js"
 
 class WebReader {
     _tagLibrary = new TagLibrary();
@@ -222,7 +222,7 @@ class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
     #sortControl;
-    #tagDropdown;
+    #tagFilter;
     #favIconSubscriber = new FavIconSubscriber();
 
     constructor(container, showAllInterface, sortUi) {
@@ -244,11 +244,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     #createTagDropdown(filter) {
-        const tagSourceInterface = new TagSourceInterface();
-        const fcnCreateTag = (tagString) => {
-            console.log(tagString);
-        }
-        this.#tagDropdown = new TagDropdownFilter(tagSourceInterface, fcnCreateTag); // Hardcoded ids as of now
+        this.#tagFilter = new TagEditorFilter(this._tagLibrary); // Hardcoded ids as of now
         this.#sortControl.setOnClickFilter((newState) => {
             if (newState) {
                 filter.icon.style.visibility = "visible";
@@ -382,16 +378,6 @@ class WebReaderInterface {
 
     recountTags() {
         this.#webReader.recountTags();
-    }
-}
-
-class TagSourceInterface {
-    getKnownTags() {
-        return ["test1", "test2", "test_used"];
-    }
-
-    listTags() {
-        return ["test_used"];
     }
 }
 
