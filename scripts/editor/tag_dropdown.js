@@ -1,3 +1,5 @@
+import { SlotFinder } from "./tag_editor.js";
+
 class TagDropdown {
     _usedTagsManager;
     _knownTags = [];
@@ -61,9 +63,14 @@ class TagDropdown {
         let usedTags = this._usedTagsManager.listTags();
         for (let tag of this._knownTags) {
             if (!usedTags.includes(tag))
-                list.push(tag);
+                this.#addInCorrectSlot(list, tag);
         }
         return list;
+    }
+
+    #addInCorrectSlot(list, tagString) {
+        let slot = SlotFinder.findTagSlot(tagString, list);
+        list.splice(slot, 0, tagString);
     }
 
     _buildSuggestion(suggestionText) {
