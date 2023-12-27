@@ -166,6 +166,8 @@ class SlotFinder {
     }
 
     static _isAfter(tagString, tag) {
+        if (typeof tag === "string")
+            return tagString > tag.toLowerCase();
         return tagString > tag.getString().toLowerCase();
     }
 }
