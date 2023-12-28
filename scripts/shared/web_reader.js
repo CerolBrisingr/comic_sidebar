@@ -3,7 +3,7 @@ import { CoreReaderManager, SidebarReaderManager } from "./reader_manager.js"
 import { importBackup, unpackReaderObjectList } from "./backup_import.js"
 import { saveBackup, buildWebReaderObject } from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
-import { SortControls } from "../sidebar/reader_sort.js"
+import { SortSelector } from "../sidebar/reader_sort.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
@@ -12,6 +12,7 @@ import { TagEditorFilter } from "../editor/tag_editor.js"
 
 class WebReader {
     _tagLibrary = new TagLibrary();
+    _readerSort = new ReaderSort("Name");
 
     constructor() {
         this._currentReader = new ReaderClassDummy();
@@ -52,7 +53,7 @@ class WebReader {
     }
 
     _getSortedStorage() {
-        return ReaderSort.apply(this._readerStorage.getList());
+        return this._readerSort.apply(this._readerStorage.getList());
     }
     
     getObjectList() {
@@ -236,10 +237,11 @@ class WebReaderSidebar extends WebReader {
     }
 
     #createSortControl(sortUi) {
-        const fcnUpdate = () => {
+        const fcnUpdate = (strRule) => {
+            this._readerSort.setRule(strRule);
             this.relistViewers();
         };
-        this.#sortControl = new SortControls(sortUi);
+        this.#sortControl = new SortSelector(sortUi);
         this.#sortControl.setOnUpdate(fcnUpdate);
     }
 
@@ -404,4 +406,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReaderSidebar, WebReaderBackground, ReaderSort}
+export {WebReaderSidebar, WebReaderBackground}

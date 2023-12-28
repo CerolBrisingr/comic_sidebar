@@ -77,7 +77,6 @@ class TagEditor {
         let newTag = new TagObject(this._myInterface, tagString);
         this._tags.splice(slot, 0, newTag);
     }
-
 }
 
 class TagEditorEditor extends TagEditor {
