@@ -1,20 +1,25 @@
 class ReaderSort {
-    static #possible_rules = {
-        Name: compareLabels,
-        URL: compareUrls,
-        Oldest: compareAgeUp,
-        Latest: compareAgeDown
-    };
-    static #rule = ReaderSort.#possible_rules.Name;
+    #possibleRules;
+    #rule;
 
-    static setRule(strRule) {
-        if (!ReaderSort.#possible_rules.hasOwnProperty(strRule))
-            throw new Error(`Invalid sorting rule "${strRule}"`);
-            ReaderSort.#rule = ReaderSort.#possible_rules[strRule];
+    constructor(strRule) {
+        this.#possibleRules = {
+            Name: compareLabels,
+            URL: compareUrls,
+            Oldest: compareAgeUp,
+            Latest: compareAgeDown
+        };
+        this.setRule(strRule);
     }
 
-    static apply(readerStorageList) {
-        return readerStorageList.sort(ReaderSort.#rule);
+    setRule(strRule) {
+        if (!this.#possibleRules.hasOwnProperty(strRule))
+            throw new Error(`Invalid sorting rule "${strRule}"`);
+            this.#rule = this.#possibleRules[strRule];
+    }
+
+    apply(readerStorageList) {
+        return readerStorageList.sort(this.#rule);
     }
 }
 
@@ -58,7 +63,7 @@ function compare(a, b) {
     return -1;
 }
 
-class SortControls {
+class SortSelector {
     #btnToggle;
     #optionBox;
     #ruleButtons = {};
@@ -93,8 +98,8 @@ class SortControls {
         this.#updateFcn = fcnOnUpdate;
     }
 
-    #triggerUpdateFcn() {
-        this.#updateFcn();
+    #triggerUpdateFcn(strRule) {
+        this.#updateFcn(strRule);
     }
 
     #configureButtons(sortUi) {
@@ -147,8 +152,7 @@ class SortControls {
 
     #setRule(strRule) {
         this.#setSortingCheckmarks(strRule);
-        ReaderSort.setRule(strRule);
-        this.#triggerUpdateFcn();
+        this.#triggerUpdateFcn(strRule);
         this.#close();
     }
 
@@ -174,4 +178,4 @@ function relatedTargetOnDropdown(relTarget) {
     return false;
 }
 
-export {ReaderSort, SortControls}
+export {ReaderSort, SortSelector}
