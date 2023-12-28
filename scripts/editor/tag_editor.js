@@ -7,11 +7,13 @@ class TagEditor {
     _tagBuilder = new TagCreatorDummy();
     _tags;
     _addTagUi;
+    #fcnTagsChanged;
 
     _myInterface;
 
     constructor(tagData) {
         this._tagData = tagData;
+        this.setTagsChangedFcn();
     }
 
     _setUpTags(tagData) {
@@ -50,6 +52,7 @@ class TagEditor {
         if (iFound === -1)
             return false;
         this._tags.splice(iFound, 1);
+        this.#triggerTagsChanged();
         return wasRemoved;
     }
 
@@ -58,9 +61,20 @@ class TagEditor {
         if (addedTag !== "") {
             // addTag() will return emtpy string if rejected
             this._addTagObject(addedTag);
+            this.#triggerTagsChanged();
             return true;
         }
         return false;
+    }
+
+    #triggerTagsChanged() {
+        this.#fcnTagsChanged();
+    }
+
+    setTagsChangedFcn(fcnTagsChanged) {
+        if (typeof fcnTagsChanged !== "function")
+            fcnTagsChanged = () => {};
+        this.#fcnTagsChanged = fcnTagsChanged;
     }
 
     _addTagObject(tagString) {

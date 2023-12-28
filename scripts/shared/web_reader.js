@@ -2,7 +2,7 @@ import { HtmlContainer } from "./html_container.js"
 import { CoreReaderManager, SidebarReaderManager } from "./reader_manager.js"
 import { importBackup, unpackReaderObjectList } from "./backup_import.js"
 import { saveBackup, buildWebReaderObject } from "./backup_export.js"
-import { ReaderFilter } from "../sidebar/reader_filter.js"
+import { ReaderFilter, TagFilter } from "../sidebar/reader_filter.js"
 import { SortSelector } from "../sidebar/reader_sort.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
@@ -223,6 +223,7 @@ class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
     #sortControl;
+    #tagEditor;
     #tagFilter;
     #favIconSubscriber = new FavIconSubscriber();
 
@@ -232,6 +233,7 @@ class WebReaderSidebar extends WebReader {
         super();
         this.#createSortControl(sortUi);
         this.#createTagDropdown(sortUi.filter);
+        this.#createTagFilter();
         this.#container = container;
         this.#showAllInterface = showAllInterface;
     }
@@ -246,7 +248,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     #createTagDropdown(filter) {
-        this.#tagFilter = new TagEditorFilter(this._tagLibrary); // Hardcoded ids as of now
+        this.#tagEditor = new TagEditorFilter(this._tagLibrary); // Hardcoded ids as of now
         this.#sortControl.setOnClickFilter((newState) => {
             if (newState) {
                 filter.icon.style.visibility = "visible";
@@ -257,6 +259,13 @@ class WebReaderSidebar extends WebReader {
             }
         });
         this.#sortControl.triggerOnClickFilter();
+    }
+    
+    #createTagFilter() {
+        this.#tagFilter = new TagFilter(this.#tagEditor);
+        this.#tagEditor.setTagsChangedFcn(() => {
+            this.relistViewers();
+        });
     }
 
     _createReaderClass(readerObject) {
@@ -339,6 +348,8 @@ class WebReaderSidebar extends WebReader {
             if (!manager.isValid())
                 continue;
             if (!ReaderFilter.fits(manager))
+                continue;
+            if (!this.#tagFilter.fits(manager))
                 continue;
             if (!this.#canShow(manager))
                 continue;
