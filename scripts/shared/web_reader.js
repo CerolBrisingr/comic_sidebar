@@ -226,6 +226,7 @@ class WebReaderSidebar extends WebReader {
     #tagEditor;
     #tagFilter;
     #favIconSubscriber = new FavIconSubscriber();
+    #readerFilter = new ReaderFilter("");
 
     constructor(container, showAllInterface, sortUi) {
         if (container == undefined)
@@ -233,6 +234,7 @@ class WebReaderSidebar extends WebReader {
         super();
         this.#createSortControl(sortUi);
         this.#createTagDropdown(sortUi.filter);
+        this.#setUpSearchBar(sortUi.filter.titleFilterInput);
         this.#createTagFilter();
         this.#container = container;
         this.#showAllInterface = showAllInterface;
@@ -247,15 +249,22 @@ class WebReaderSidebar extends WebReader {
         this.#sortControl.setOnUpdate(fcnUpdate);
     }
 
+    #setUpSearchBar(searchBox) {
+        searchBox.addEventListener("input", (event) => {
+            this.#readerFilter.setFilter(event.target.value);
+            this.relistViewers();
+        });
+    }
+
     #createTagDropdown(filter) {
         this.#tagEditor = new TagEditorFilter(this._tagLibrary); // Hardcoded ids as of now
         this.#sortControl.setOnClickFilter((newState) => {
             if (newState) {
                 filter.icon.style.visibility = "visible";
-                filter.filterDiv.style.display = "block";
+                filter.tagFilterDiv.style.display = "block";
             } else {
                 filter.icon.style.visibility = "hidden";
-                filter.filterDiv.style.display = "none";
+                filter.tagFilterDiv.style.display = "none";
             }
         });
         this.#sortControl.triggerOnClickFilter();
@@ -347,7 +356,7 @@ class WebReaderSidebar extends WebReader {
         for (let manager of this._getSortedStorage()) {
             if (!manager.isValid())
                 continue;
-            if (!ReaderFilter.fits(manager))
+            if (!this.#readerFilter.fits(manager))
                 continue;
             if (!this.#tagFilter.fits(manager))
                 continue;
