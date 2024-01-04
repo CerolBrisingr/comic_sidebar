@@ -1,7 +1,6 @@
 import {WebReaderSidebar} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
-import { ReaderFilter } from "./reader_filter.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
 import { TrackingState } from "../shared/tracking_state.js"
@@ -11,7 +10,6 @@ import { HideableHint } from "../shared/hideable_hint.js"
 // Tab management
 let webReader;
 let addComicBtn
-let sortControls;
 let isSetUp = false;
 let trackingStateImage;
 let trackingStateBtn;
@@ -28,16 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
 function setUpUserInterface() {
     addComicBtn = document.getElementById('add_reader');
     addComicBtn.onclick = function () {addCurrentPage()};
-
-    setUpSearchBar();
-}
-
-function setUpSearchBar() {
-    const searchBox = document.getElementById('search_box');
-    searchBox.addEventListener("input", (event) => {
-        ReaderFilter.setFilter(event.target.value);
-        webReader.relistViewers();
-    });
 }
 
 function setUpTrackingState() {
@@ -71,9 +59,10 @@ function gatherSortUi() {
         icon: document.getElementById("sort_oldest_tick")
     };
     sortUi.filter = {
+        titleFilterInput: document.getElementById("search_box"),
         button: document.getElementById("filter_tags_button"),
         icon: document.getElementById("filter_tags_tick"),
-        filterDiv: document.getElementById("reader_tags")
+        tagFilterDiv: document.getElementById("reader_tags")
     }
     return sortUi;
 }
