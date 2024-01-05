@@ -11,9 +11,10 @@ class TagFilter {
         if (tags.length === 0)
             return true;
         for (const tag of tags) {
-            if (readerTags.includes(tag))
-                return true;
+            if (!readerTags.includes(tag))
+                return false;
         }
+        return true;
     }
 }
 
