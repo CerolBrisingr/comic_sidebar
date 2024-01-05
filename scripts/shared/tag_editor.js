@@ -1,5 +1,5 @@
 import { TagDropdownEditor, TagDropdownFilter } from "./tag_dropdown.js";
-import { TagData } from "../shared/tag_data.js";
+import { TagData } from "./tag_data.js";
 
 class TagEditor {
     _tagData;
