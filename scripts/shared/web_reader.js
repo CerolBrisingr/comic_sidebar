@@ -2,13 +2,14 @@ import { HtmlContainer } from "./html_container.js"
 import { CoreReaderManager, SidebarReaderManager } from "./reader_manager.js"
 import { importBackup, unpackReaderObjectList } from "./backup_import.js"
 import { saveBackup, buildWebReaderObject } from "./backup_export.js"
-import { ReaderFilter, TagFilter } from "../sidebar/reader_filter.js"
+import { ReaderFilter } from "../sidebar/reader_filter.js"
+import { TagFilter } from "../sidebar/tag_filter.js"
 import { SortSelector } from "../sidebar/reader_sort.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
 import { TagLibrary } from "../background/tag_libraray.js"
-import { TagEditorFilter } from "../editor/tag_editor.js"
+import { TagEditorFilter } from "./tag_editor.js"
 
 class WebReader {
     _tagLibrary = new TagLibrary();

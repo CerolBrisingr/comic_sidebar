@@ -20,23 +20,4 @@ class ReaderFilter {
     }
 }
 
-class TagFilter {
-    _tagEditor;
-
-    constructor(tagEditor) {
-        this._tagEditor = tagEditor;
-    }
-
-    fits(readerManager) {
-        const readerTags = readerManager.getTags();
-        const tags = this._tagEditor.getTags();
-        if (tags.length === 0)
-            return true;
-        for (const tag of tags) {
-            if (readerTags.includes(tag))
-                return true;
-        }
-    }
-}
-
-export {ReaderFilter, TagFilter}
+export {ReaderFilter}

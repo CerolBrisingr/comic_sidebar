@@ -4,7 +4,7 @@ import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
 import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 import { ScheduleEditor } from "./schedule_editor.js";
-import { TagEditorEditor } from "./tag_editor.js";
+import { TagEditorEditor } from "../shared/tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
 
 class Editor {
