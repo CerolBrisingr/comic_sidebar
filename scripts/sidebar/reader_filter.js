@@ -1,18 +1,22 @@
 class ReaderFilter {
-    static #filter;
+    #filter;
 
-    static setFilter(strFilter) {
-        strFilter.trim();
-        if (strFilter === "")
-            ReaderFilter.#filter = undefined;
-        ReaderFilter.#filter = strFilter.toLowerCase();
+    constructor(strFilter) {
+        this.setFilter(strFilter);
     }
 
-    static fits(item) {
-        if (ReaderFilter.#filter === undefined)
+    setFilter(strFilter) {
+        strFilter.trim();
+        if (strFilter === "")
+            this.#filter = undefined;
+        this.#filter = strFilter.toLowerCase();
+    }
+
+    fits(item) {
+        if (this.#filter === undefined)
             return true;
         let label = item.getLabel().toLowerCase();
-        return label.includes(ReaderFilter.#filter);
+        return label.includes(this.#filter);
     }
 }
 

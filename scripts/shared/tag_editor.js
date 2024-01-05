@@ -1,35 +1,113 @@
-import { TagDropdown } from "./tag_dropdown.js";
+import { TagDropdownEditor, TagDropdownFilter } from "./tag_dropdown.js";
+import { TagData } from "./tag_data.js";
 
 class TagEditor {
-    #readerData;
-    #container;
-    #tagBuilder = new TagCreatorDummy();
-    #tags;
-    #addTagUi;
+    _tagData;
+    _container;
+    _tagBuilder = new TagCreatorDummy();
+    _tags;
+    _addTagUi;
+    #fcnTagsChanged;
 
-    #myInterface;
+    _myInterface;
 
-    constructor(readerData, knownTags) {
-        this.#readerData = readerData;
-        this.#myInterface = new EditorInterface(this);
-        this.#setUpTags(this.getTags());
-        this.#setUpTagAdder(knownTags);
-        this.updateTagContainer();
+    constructor(tagData) {
+        this._tagData = tagData;
+        this.setTagsChangedFcn();
     }
 
-    #setUpTags(tagData) {
-        this.#container = document.getElementById("reader_tags");
-        this.#tags = [];
+    _setUpTags(tagData) {
+        this._container = document.getElementById("reader_tags");
+        this._tags = [];
         for (let tag of tagData) {
-            this.#addTagObject(tag);
+            this._addTagObject(tag);
         }
     }
 
-    #setUpTagAdder(knownTags) {
-        this.#addTagUi = new TagDropdown(
-            this.#myInterface, 
+    _setUpTagAdder() {
+        throw new Error("not implemented!");
+    }
+
+    getTags() {
+        return this._tagData.getTags();
+    }
+
+    removeCreateInterface() {
+        this._tagBuilder = new TagCreatorDummy();
+    }
+
+    updateTagContainer() {
+        let list = [this._addTagUi.getUi()];
+        if (this._tagBuilder.isValid())
+            list.push(this._tagBuilder.getUi());
+        for (let tag of this._tags) {
+            list.push(tag.getUi());
+        }
+        this._container.replaceChildren(...list);
+    }
+
+    removeTag(tagObject) {
+        let wasRemoved = this._tagData.removeTag(tagObject.getString());
+        let iFound = this._tags.indexOf(tagObject);
+        if (iFound === -1)
+            return false;
+        this._tags.splice(iFound, 1);
+        this.#triggerTagsChanged();
+        return wasRemoved;
+    }
+
+    addTag(tagString) {
+        let addedTag = this._tagData.addTag(tagString);
+        if (addedTag !== "") {
+            // addTag() will return emtpy string if rejected
+            this._addTagObject(addedTag);
+            this.#triggerTagsChanged();
+            return true;
+        }
+        return false;
+    }
+
+    #triggerTagsChanged() {
+        this.#fcnTagsChanged();
+    }
+
+    setTagsChangedFcn(fcnTagsChanged) {
+        if (typeof fcnTagsChanged !== "function")
+            fcnTagsChanged = () => {};
+        this.#fcnTagsChanged = fcnTagsChanged;
+    }
+
+    _addTagObject(tagString) {
+        let nTags = this._tags.length;
+        if (nTags === 0) {
+            this._tags.push(new TagObject(this._myInterface, tagString));
+            return;
+        } 
+        let slot = SlotFinder.findTagSlot(tagString, this._tags);
+        this._addTagObjectInSlot(tagString, slot);
+    }
+
+    _addTagObjectInSlot(tagString, slot) {
+        let newTag = new TagObject(this._myInterface, tagString);
+        this._tags.splice(slot, 0, newTag);
+    }
+}
+
+class TagEditorEditor extends TagEditor {
+
+    constructor(readerData, knownTags) {
+        super(readerData);
+        this._myInterface = new EditorInterface(this);
+        this._setUpTags(this.getTags());
+        this._setUpTagAdder(knownTags);
+        this.updateTagContainer();
+    }
+
+    _setUpTagAdder(knownTags) {
+        this._addTagUi = new TagDropdownEditor(
+            this._myInterface, 
             knownTags, 
-            () => {this.#startTagCreator();}, 
+            () => {this._startTagCreator();}, 
             (tag) => {
                 this.addTag(tag);
                 this.updateTagContainer();
@@ -37,62 +115,31 @@ class TagEditor {
             );
     }
 
-    #startTagCreator() {
-        this.#tagBuilder = new TagCreator(this.#myInterface);
+    _startTagCreator() {
+        this._tagBuilder = new TagCreator(this._myInterface);
         this.updateTagContainer();
-        this.#tagBuilder.select();
+        this._tagBuilder.select();
+    }
+}
+
+class TagEditorFilter extends TagEditor {
+
+    constructor(tagLibrary) {
+        super(new TagData);
+        this._myInterface = new EditorInterface(this, tagLibrary);
+        this._setUpTags(this.getTags());
+        this._setUpTagAdder();
+        this.updateTagContainer();
     }
 
-    getTags() {
-        return this.#readerData.getTags();
-    }
-
-    removeCreateInterface() {
-        this.#tagBuilder = new TagCreatorDummy();
-    }
-
-    updateTagContainer() {
-        let list = [this.#addTagUi.getUi()];
-        if (this.#tagBuilder.isValid())
-            list.push(this.#tagBuilder.getUi());
-        for (let tag of this.#tags) {
-            list.push(tag.getUi());
-        }
-        this.#container.replaceChildren(...list);
-    }
-
-    removeTag(tagObject) {
-        let wasRemoved = this.#readerData.removeTag(tagObject.getString());
-        let iFound = this.#tags.indexOf(tagObject);
-        if (iFound === -1)
-            return false;
-        this.#tags.splice(iFound, 1);
-        return wasRemoved;
-    }
-
-    addTag(tagString) {
-        let addedTag = this.#readerData.addTag(tagString);
-        if (addedTag !== "") {
-            // addTag() will return emtpy string if rejected
-            this.#addTagObject(addedTag);
-            return true;
-        }
-        return false;
-    }
-
-    #addTagObject(tagString) {
-        let nTags = this.#tags.length;
-        if (nTags === 0) {
-            this.#tags.push(new TagObject(this.#myInterface, tagString));
-            return;
-        } 
-        let slot = SlotFinder.findTagSlot(tagString, this.#tags);
-        this.#addTagObjectInSlot(tagString, slot);
-    }
-
-    #addTagObjectInSlot(tagString, slot) {
-        let newTag = new TagObject(this.#myInterface, tagString);
-        this.#tags.splice(slot, 0, newTag);
+    _setUpTagAdder() {
+        this._addTagUi = new TagDropdownFilter(
+            this._myInterface, 
+            (tag) => {
+                this.addTag(tag);
+                this.updateTagContainer();
+                }
+            );
     }
 
 }
@@ -132,15 +179,19 @@ class SlotFinder {
     }
 
     static _isAfter(tagString, tag) {
+        if (typeof tag === "string")
+            return tagString > tag.toLowerCase();
         return tagString > tag.getString().toLowerCase();
     }
 }
 
 class EditorInterface {
     #tagEditor;
+    #tagLibrary;
 
-    constructor(tagEditor) {
+    constructor(tagEditor, tagLibrary) {
         this.#tagEditor = tagEditor;
+        this.#tagLibrary = tagLibrary;
     }
 
     removeCreateInterface() {
@@ -150,6 +201,14 @@ class EditorInterface {
 
     listTags() {
         return this.#tagEditor.getTags();
+    }
+
+    listAllKnownTags() {
+        if (this.#tagLibrary !== undefined) {
+            return this.#tagLibrary.getKnownTags();
+        } else {
+            return [];
+        }
     }
 
     createTag(tagString) {
@@ -317,4 +376,4 @@ class TagObject {
     }
 }
 
-export {TagEditor, SlotFinder}
+export {TagEditorEditor, TagEditorFilter, SlotFinder}

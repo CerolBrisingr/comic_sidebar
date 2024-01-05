@@ -1,8 +1,6 @@
 import {WebReaderSidebar} from "../shared/web_reader.js"
 import {SubscriberPort} from "./subscriber_port.js"
 import {UrlListener} from "../shared/url_listener.js"
-import { ReaderFilter } from "./reader_filter.js"
-import { SortControls } from "./reader_sort.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
 import { TrackingState } from "../shared/tracking_state.js"
@@ -12,7 +10,6 @@ import { HideableHint } from "../shared/hideable_hint.js"
 // Tab management
 let webReader;
 let addComicBtn
-let sortControls;
 let isSetUp = false;
 let trackingStateImage;
 let trackingStateBtn;
@@ -29,17 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
 function setUpUserInterface() {
     addComicBtn = document.getElementById('add_reader');
     addComicBtn.onclick = function () {addCurrentPage()};
-
-    setUpSearchBar();
-    setUpDropdownMenu();
-}
-
-function setUpSearchBar() {
-    const searchBox = document.getElementById('search_box');
-    searchBox.addEventListener("input", (event) => {
-        ReaderFilter.setFilter(event.target.value);
-        webReader.relistViewers();
-    });
 }
 
 function setUpTrackingState() {
@@ -52,33 +38,36 @@ function setUpTrackingState() {
     });
 }
 
-function setUpDropdownMenu() {
-    const fcnUpdate = () => {
-        webReader.relistViewers();
-    };
-    const btnToggle = document.getElementById("dropdown_toggle");
-    const optionBox = document.getElementById("dropdown_option_box");
-    const name = {
+function gatherSortUi() {
+    let sortUi = {};
+    sortUi.btnToggle = document.getElementById("sort_dropdown_toggle");
+    sortUi.optionBox = document.getElementById("sort_dropdown_option_box");
+    sortUi.name = {
         button: document.getElementById("sort_name"), 
         icon: document.getElementById("sort_name_tick")
     };
-    const url = {
+    sortUi.url = {
         button: document.getElementById("sort_url"),
         icon: document.getElementById("sort_url_tick")
     };
-    const latest = {
+    sortUi.latest = {
         button: document.getElementById("sort_latest"),
         icon: document.getElementById("sort_latest_tick")
     };
-    const oldest = {
+    sortUi.oldest = {
         button: document.getElementById("sort_oldest"),
         icon: document.getElementById("sort_oldest_tick")
     };
-    sortControls = new SortControls(fcnUpdate, btnToggle, optionBox, 
-        name, url, latest, oldest);
+    sortUi.filter = {
+        titleFilterInput: document.getElementById("search_box"),
+        button: document.getElementById("filter_tags_button"),
+        icon: document.getElementById("filter_tags_tick"),
+        tagFilterDiv: document.getElementById("reader_tags")
+    }
+    return sortUi;
 }
 
-function setUpWebReader(readerObjectList) {
+function setUpWebReader(readerObjectList, sortUi) {
     if (readerObjectList === undefined)
         return;
     const container = document.getElementById('container');
@@ -87,7 +76,7 @@ function setUpWebReader(readerObjectList) {
         icon: document.getElementById("sidebar_show_all_icon")
     }
     let showAllInterface = new ShowAllInterface(showAll);
-    webReader = new WebReaderSidebar(container, showAllInterface);
+    webReader = new WebReaderSidebar(container, showAllInterface, sortUi);
     showAllInterface.setUpdateFcn(() => {webReader.relistViewers();});
 }
 
@@ -112,7 +101,8 @@ function receiveReaderObjectList(readerObjectList) {
         return;
     isSetUp = true;
     setUpUserInterface();
-    setUpWebReader(readerObjectList);
+    let sortUi = gatherSortUi();
+    setUpWebReader(readerObjectList, sortUi);
     executeWebReaderLoading(readerObjectList);
 }
 

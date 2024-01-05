@@ -1,20 +1,25 @@
 class ReaderSort {
-    static #possible_rules = {
-        Name: compareLabels,
-        URL: compareUrls,
-        Oldest: compareAgeUp,
-        Latest: compareAgeDown
-    };
-    static #rule = ReaderSort.#possible_rules.Name;
+    #possibleRules;
+    #rule;
 
-    static setRule(strRule) {
-        if (!ReaderSort.#possible_rules.hasOwnProperty(strRule))
-            throw new Error(`Invalid sorting rule "${strRule}"`);
-            ReaderSort.#rule = ReaderSort.#possible_rules[strRule];
+    constructor(strRule) {
+        this.#possibleRules = {
+            Name: compareLabels,
+            URL: compareUrls,
+            Oldest: compareAgeUp,
+            Latest: compareAgeDown
+        };
+        this.setRule(strRule);
     }
 
-    static apply(readerStorageList) {
-        return readerStorageList.sort(ReaderSort.#rule);
+    setRule(strRule) {
+        if (!this.#possibleRules.hasOwnProperty(strRule))
+            throw new Error(`Invalid sorting rule "${strRule}"`);
+            this.#rule = this.#possibleRules[strRule];
+    }
+
+    apply(readerStorageList) {
+        return readerStorageList.sort(this.#rule);
     }
 }
 
@@ -58,22 +63,46 @@ function compare(a, b) {
     return -1;
 }
 
-class SortControls {
+class SortSelector {
     #btnToggle;
     #optionBox;
-    #fcnUpdate;
     #ruleButtons = {};
+    #doFilter = false;
     #isOpen = false;
+    #clickFilterFcn;
+    #updateFcn;
 
-    constructor(fcnUpdate, btnToggle, optionBox, name, url, latest, oldest) {
-        this.#btnToggle = btnToggle;
-        this.#optionBox = optionBox;
-        this.#fcnUpdate = fcnUpdate;
-        this.#configureButtons(name, url, latest, oldest);
-        this.#setCheckmarks("Name");
+    constructor(sortUi) {
+        this.#btnToggle = sortUi.btnToggle;
+        this.#optionBox = sortUi.optionBox;
+        this.#configureButtons(sortUi);
+        this.#setSortingCheckmarks("Name");
+        this.setOnClickFilter();
     }
 
-    #configureButtons(name, url, latest, oldest) {
+    setOnClickFilter(fcnOnClick) {
+        if (typeof fcnOnClick !== "function") {
+            fcnOnClick = () => {};
+        }
+        this.#clickFilterFcn = fcnOnClick;
+    }
+
+    triggerOnClickFilter() {
+        this.#clickFilterFcn(this.#doFilter);
+    }
+
+    setOnUpdate(fcnOnUpdate) {
+        if (typeof fcnOnUpdate !== "function") {
+            fcnOnClick = () => {};
+        }
+        this.#updateFcn = fcnOnUpdate;
+    }
+
+    #triggerUpdateFcn(strRule) {
+        this.#updateFcn(strRule);
+    }
+
+    #configureButtons(sortUi) {
         this.#btnToggle.onclick = (evt) => {
             if (this.#isOpen) {
                 this.#close();
@@ -82,10 +111,11 @@ class SortControls {
             }
         };
         this.#btnToggle.onblur = (evt) => {this.#onblur(evt);};
-        this.#setUpRuleBtn(name, "Name");
-        this.#setUpRuleBtn(url, "URL");
-        this.#setUpRuleBtn(latest, "Latest");
-        this.#setUpRuleBtn(oldest, "Oldest");
+        this.#setUpRuleBtn(sortUi.name, "Name");
+        this.#setUpRuleBtn(sortUi.url, "URL");
+        this.#setUpRuleBtn(sortUi.latest, "Latest");
+        this.#setUpRuleBtn(sortUi.oldest, "Oldest");
+        this.#setUpFilterBtn(sortUi.filter);
     }
 
     #open() {
@@ -104,19 +134,29 @@ class SortControls {
         this.#ruleButtons[strRule] = element;
     }
 
+    #setUpFilterBtn(filter) {
+        filter.button.onclick = () => {
+            this.#doFilter = !this.#doFilter;
+            this.triggerOnClickFilter();
+            this.#close();
+        };
+        filter.button.onblur = (evt) => {
+            this.#onblur(evt);
+        };
+    }
+
     #onblur(evt) {
         if (!relatedTargetOnDropdown(evt.relatedTarget)) 
             this.#close();
     }
 
     #setRule(strRule) {
-        this.#setCheckmarks(strRule);
-        ReaderSort.setRule(strRule);
-        this.#fcnUpdate();
+        this.#setSortingCheckmarks(strRule);
+        this.#triggerUpdateFcn(strRule);
         this.#close();
     }
 
-    #setCheckmarks(strRule) {
+    #setSortingCheckmarks(strRule) {
         for (const [key, entry] of Object.entries(this.#ruleButtons)) {
             if (key === strRule) {
                 entry.icon.style.visibility = "visible";
@@ -138,4 +178,4 @@ function relatedTargetOnDropdown(relTarget) {
     return false;
 }
 
-export {ReaderSort, SortControls}
+export {ReaderSort, SortSelector}

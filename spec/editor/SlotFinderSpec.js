@@ -63,6 +63,25 @@ describe("SlotFinder", function() {
         slot = SlotFinder.findTagSlot("iiij", filledList);
         expect(slot).toBe(5);
     });
+
+    it("should also work with strings only", function() {
+        let stringList = ["aaaa", "cccc", "eeee", "gggg", "iiii"];
+        
+        slot = SlotFinder.findTagSlot("aaaa", stringList);
+        expect(slot).toBe(0);
+        
+        slot = SlotFinder.findTagSlot("AAAA", stringList);
+        expect(slot).toBe(0);
+        
+        slot = SlotFinder.findTagSlot("aaab", stringList);
+        expect(slot).toBe(1);
+        
+        slot = SlotFinder.findTagSlot("dddd", stringList);
+        expect(slot).toBe(2);
+
+        slot = SlotFinder.findTagSlot("iiij", stringList);
+        expect(slot).toBe(5);
+    });
 });
 
 class TagDummy {
