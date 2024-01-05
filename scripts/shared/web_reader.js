@@ -1,14 +1,19 @@
 import { HtmlContainer } from "./html_container.js"
-import {ReaderData} from "./reader_data.js"
-import {ReaderManager} from "../sidebar/reader_manager.js"
-import {importBackup, unpackReaderObjectList} from "./backup_import.js"
-import {saveBackup, buildWebReaderObject} from "./backup_export.js"
+import { CoreReaderManager, SidebarReaderManager } from "./reader_manager.js"
+import { importBackup, unpackReaderObjectList } from "./backup_import.js"
+import { saveBackup, buildWebReaderObject } from "./backup_export.js"
 import { ReaderFilter } from "../sidebar/reader_filter.js"
+import { TagFilter } from "../sidebar/tag_filter.js"
+import { SortSelector } from "../sidebar/reader_sort.js"
 import { ReaderSort } from "../sidebar/reader_sort.js"
 import { FavIconController, FavIconSubscriber } from "./fav_icon_manager.js"
 import { dissectUrl } from "./url.js"
+import { TagLibrary } from "../background/tag_libraray.js"
+import { TagEditorFilter } from "./tag_editor.js"
 
 class WebReader {
+    _tagLibrary = new TagLibrary();
+    _readerSort = new ReaderSort("Name");
 
     constructor() {
         this._currentReader = new ReaderClassDummy();
@@ -49,7 +54,7 @@ class WebReader {
     }
 
     _getSortedStorage() {
-        return ReaderSort.apply(this._readerStorage.getList());
+        return this._readerSort.apply(this._readerStorage.getList());
     }
     
     getObjectList() {
@@ -92,6 +97,18 @@ class WebReader {
     _createReaderClass(readerObject, intId) {
         throw new Error("not implemented");
     }
+
+    getKnownTags() {
+        return this._tagLibrary.getKnownTags();
+    }
+
+    recountTags() {
+        this._tagLibrary.clear();
+        let readerManagerList = this._readerStorage.getList();
+        for (let readerManager of readerManagerList) {
+            this._tagLibrary.registerTags(readerManager);
+        }
+    }
     
     async registerPage(readerObjectLike) {
         let storageObject 
@@ -123,19 +140,22 @@ class WebReader {
     relistViewers() {}
     saveProgress() {}
     _updateFavIcon() {}
+    recountTags() {}
     async _registerFavIcon() {}
 }
 
 class WebReaderBackground extends WebReader {
     #favIconController = new FavIconController();
+    
     constructor() {
         super();
     }
 
     _createReaderClass(readerObject, intId) {
-        return new ReaderData(
+        return new CoreReaderManager(
             readerObject,
             new WebReaderInterface(this),
+            this._tagLibrary,
             intId
         )
     }
@@ -203,21 +223,67 @@ class WebReaderBackground extends WebReader {
 class WebReaderSidebar extends WebReader {
     #container;
     #showAllInterface;
+    #sortControl;
+    #tagEditor;
+    #tagFilter;
     #favIconSubscriber = new FavIconSubscriber();
-    constructor(container, showAllInterface) {
+    #readerFilter = new ReaderFilter("");
+
+    constructor(container, showAllInterface, sortUi) {
         if (container == undefined)
             throw new Error("Containing element for reader listings must be provided");
         super();
+        this.#createSortControl(sortUi);
+        this.#createTagDropdown(sortUi.filter);
+        this.#setUpSearchBar(sortUi.filter.titleFilterInput);
+        this.#createTagFilter();
         this.#container = container;
         this.#showAllInterface = showAllInterface;
     }
 
+    #createSortControl(sortUi) {
+        const fcnUpdate = (strRule) => {
+            this._readerSort.setRule(strRule);
+            this.relistViewers();
+        };
+        this.#sortControl = new SortSelector(sortUi);
+        this.#sortControl.setOnUpdate(fcnUpdate);
+    }
+
+    #setUpSearchBar(searchBox) {
+        searchBox.addEventListener("input", (event) => {
+            this.#readerFilter.setFilter(event.target.value);
+            this.relistViewers();
+        });
+    }
+
+    #createTagDropdown(filter) {
+        this.#tagEditor = new TagEditorFilter(this._tagLibrary); // Hardcoded ids as of now
+        this.#sortControl.setOnClickFilter((newState) => {
+            if (newState) {
+                filter.icon.style.visibility = "visible";
+                filter.tagFilterDiv.style.display = "block";
+            } else {
+                filter.icon.style.visibility = "hidden";
+                filter.tagFilterDiv.style.display = "none";
+            }
+        });
+        this.#sortControl.triggerOnClickFilter();
+    }
+    
+    #createTagFilter() {
+        this.#tagFilter = new TagFilter(this.#tagEditor);
+        this.#tagEditor.setTagsChangedFcn(() => {
+            this.relistViewers();
+        });
+    }
+
     _createReaderClass(readerObject) {
-        return new ReaderManager(
+        return new SidebarReaderManager(
             readerObject,
             new WebReaderInterface(this),
-            this.#container, 
-            this.#showAllInterface
+            this.#showAllInterface,
+            this._tagLibrary
         )
     }
 
@@ -291,7 +357,9 @@ class WebReaderSidebar extends WebReader {
         for (let manager of this._getSortedStorage()) {
             if (!manager.isValid())
                 continue;
-            if (!ReaderFilter.fits(manager))
+            if (!this.#readerFilter.fits(manager))
+                continue;
+            if (!this.#tagFilter.fits(manager))
                 continue;
             if (!this.#canShow(manager))
                 continue;
@@ -330,6 +398,10 @@ class WebReaderInterface {
     relistViewerDisplay() {
         this.#webReader.relistViewers();
     }
+
+    recountTags() {
+        this.#webReader.recountTags();
+    }
 }
 
 class ReaderClassDummy {
@@ -355,4 +427,4 @@ class ReaderClassDummy {
     collapse() {}
 }
 
-export {WebReaderSidebar, WebReaderBackground, ReaderSort}
+export {WebReaderSidebar, WebReaderBackground}

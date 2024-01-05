@@ -1,8 +1,10 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="sidebar_panel.css">
         <link rel="stylesheet" href="../shared/hints.css">
+        <link rel="stylesheet" href="../shared/dropdown.css">
+        <link rel="stylesheet" href="../shared/tags.css">
+        <link rel="stylesheet" href="sidebar_panel.css">
         <meta charset="utf-8">
         <script type="module" src="../scripts/sidebar/sidebar.js"></script>
     </head>
@@ -22,7 +24,7 @@
                 <b>Use</b>
             </div>
             <div class="hint_explain">
-                Use a direct link. The first page of a online comic or novel will usually do fine. The second-to-last page is a good candidate as well! <br />
+                Use a direct link. The first page of an online comic or novel will usually do fine. The second-to-last page is a good candidate as well! <br />
                 http://some.page/comic/page_1.html <br />
                 http://some.page/comic/page_132.html
             </div>
@@ -79,10 +81,10 @@
             id="search_box" 
             placeholder="Search for title..">
         <div class="dropdown">
-            <button class="dropdown_toggle" id="dropdown_toggle" title="Sort reader list ..">
+            <button class="searchbar_icon" id="sort_dropdown_toggle" title="Sort reader list ..">
                 <img src="../icons/sort.svg">
             </button>
-            <div id="dropdown_option_box" class="dropdown_option_box">
+            <div id="sort_dropdown_option_box" class="dropdown_option_box">
                 <button class="dropdown_option" id="sort_name">
                     <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_name_tick">
                     <div class="dropdown_label">sort by Name</div>
@@ -99,6 +101,11 @@
                     <img src="../icons/checkmark.svg" class="dropdown_icon" id="sort_oldest_tick">
                     <div class="dropdown_label">sort by oldest Access</div>
                 </button>
+                <div class="dropdown_divider" id="divider_to_suggestions"></div>
+                <button class="dropdown_option" id="filter_tags_button">
+                    <img src="../icons/checkmark.svg" class="dropdown_icon" id="filter_tags_tick">
+                    <div class="dropdown_label">filter by Tags</div>
+                </button>
             </div>
         </div>
         <div>
@@ -110,6 +117,18 @@
             <button id="sidebar_tracking_state" class="searchbar_icon" title="Deactivate URL tracking">
                 <canvas id="sidebar_tracking_state_icon" width="16" height="16"></canvas>
             </button>
+        </div>
+    </div>
+    <div class="tag_container" id="reader_tags">
+        <div id="tag_add_ui" class="tag_add_ui">
+            <button class="tag_add_button" id="tag_add_button">
+                <img class="tag_add_image" src="../icons/plus.svg" />
+            </button>
+            <div id="dropdown_option_box" class="dropdown_option_box">
+                <button class="dropdown_option" id="placeholder_for_suggestions">
+                    <div class="dropdown_label"><i>No options available</i></div>
+                </button>
+            </div>
         </div>
     </div>
     <div id="container">

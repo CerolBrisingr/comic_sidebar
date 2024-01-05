@@ -33,16 +33,16 @@ class ReaderSync {
 }
 
 class ReaderSyncCore extends ReaderSync {
-    #readerData;
-    constructor(intId, readerData) {
+    #readerManager;
+    constructor(intId, readerManager) {
         super(intId);
-        this.#setReaderData(readerData);
+        this.#setReaderData(readerManager);
     }
     
-    #setReaderData(readerData) {
-        if (this.#readerData)
+    #setReaderData(readerManager) {
+        if (this.#readerManager)
             return;
-        this.#readerData = readerData;
+        this.#readerManager = readerManager;
         this.#setUp();
     }
     
@@ -61,7 +61,7 @@ class ReaderSyncCore extends ReaderSync {
             return;
         }
         if (message.hasOwnProperty("editRequest")) {
-            this.#editRequestHandler(this.#readerData, message.editRequest);
+            this.#editRequestHandler(this.#readerManager, message.editRequest);
             return;
         }
         if (message.hasOwnProperty("updateBookmarkLabelRequest")) {
@@ -71,21 +71,22 @@ class ReaderSyncCore extends ReaderSync {
     }
     
     #pinRequestHandler(url) {
-        if (this.#readerData.addManual(url)) {
+        if (this.#readerManager.addManual(url)) {
             this.port.sendMessage({pinCommand: url});
         }
     }
     
     #unpinRequestHandler(url) {
-        if (this.#readerData.removeManual(url)) {
+        if (this.#readerManager.removeManual(url)) {
             this.port.sendMessage({unpinCommand: url});
         }
     }
     
-    #editRequestHandler(readerData, favIcon) {
-        let readerObject = readerData.returnAsObject();
+    #editRequestHandler(readerManager, favIcon) {
+        let readerObject = readerManager.returnAsObject();
+        readerObject.knownTags = readerManager.getKnownTags();
         readerObject.favIcon = favIcon;
-        readerObject.mostRecentAutomaticUrl = readerData.getMostRecentAutomaticUrl();
+        readerObject.mostRecentAutomaticUrl = readerManager.getMostRecentAutomaticUrl();
         ReaderEditorControl.updateReaderEntry(readerObject, (readerObjectLike) => {
             this.#handleReaderEdit(readerObjectLike);
         });
@@ -96,7 +97,7 @@ class ReaderSyncCore extends ReaderSync {
             this.#deleteRequestHandler(readerObjectLike.deleteMe);
             return;
         }
-        this.#readerData.editReader(readerObjectLike);
+        this.#readerManager.editReader(readerObjectLike);
         this.port.sendMessage({editCommand: readerObjectLike});
     }
     
@@ -104,11 +105,11 @@ class ReaderSyncCore extends ReaderSync {
         if (!deleteMe)
             return;
         this.port.sendMessage("deleteCommand");
-        this.#readerData.deleteMe();
+        this.#readerManager.deleteMe();
     }
     
     #updateBookmarkLabelRequestHandler(payload) {
-        this.#readerData.updateManualLabel(payload.url, payload.newLabel);
+        this.#readerManager.updateManualLabel(payload.url, payload.newLabel);
         this.port.sendMessage({updateBookmarkLabel: payload});
     }
 }

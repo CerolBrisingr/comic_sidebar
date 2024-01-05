@@ -4,6 +4,7 @@ import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
 import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 import { ScheduleEditor } from "./schedule_editor.js";
+import { TagEditorEditor } from "../shared/tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
 
 class Editor {
@@ -13,6 +14,7 @@ class Editor {
     #reader;
     #preview;
     #scheduler;
+    #tagEditor;
     #fcnFinalize;
 
     #cancel;
@@ -35,6 +37,7 @@ class Editor {
         this.#setUpPreview(favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
+        this.#setUpTagEditor(data.knownTags);
         this.#setUpCreationExit();
     }
 
@@ -47,6 +50,7 @@ class Editor {
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
+        this.#setUpTagEditor(readerObjectLike.knownTags);
         this.#setUpUpdateExit();
     }
 
@@ -70,6 +74,10 @@ class Editor {
 
     #setUpScheduleEditor() {
         this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
+    }
+
+    #setUpTagEditor(knownTags) {
+        this.#tagEditor = new TagEditorEditor(this.#reader, knownTags);
     }
 
     #collectExitButtons() {

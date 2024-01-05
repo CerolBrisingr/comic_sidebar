@@ -1,17 +1,16 @@
-import { dissectUrl } from "./url.js"
-import { ReaderSync } from "./reader_sync.js"
+import { dissectUrl, urlFitsPrefix } from "./url.js"
 import { ReaderSchedule } from "./reader_schedule.js";
+import { TagData } from "./tag_data.js";
 
 class ReaderData {
     #label;
-    #intId;
     #latestInteraction = 0;
-    #readerSync;
     #prefixMask;
     #automatic;
     #manual;
     #parentInterface;
     #schedule;
+    #tags;
 
     static buildForEditor(readerObject) {
         // Build readerData without the connected behavior
@@ -26,7 +25,7 @@ class ReaderData {
         return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
     }
     
-    constructor(data, parentInterface, readerSync) {
+    constructor(data, parentInterface) {
         // Import object from storage
         this.#parentInterface = parentInterface;
         this.#registerInteraction(data.time);
@@ -36,14 +35,10 @@ class ReaderData {
             this.#prefixMask = String(data.prefix_mask);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
+        this.#tags = new TagData(data.tags);
         this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
         this.#schedule = new ReaderSchedule(data.schedule);
-        
-        if (typeof readerSync === "number")
-            readerSync = ReaderSync.makeCore(readerSync, this);
-        this.#readerSync = readerSync;
-        this.#intId = this.#readerSync.getId();
     }
     
     #importAutomaticList(list) {
@@ -67,6 +62,18 @@ class ReaderData {
             if ((bookmark !== undefined) && entry.hasOwnProperty("label"))
                 bookmark.setLabel(String(entry.label));
         }
+    }
+
+    removeTag(tag) {
+        return this.#tags.removeTag(tag);
+    }
+
+    addTag(tag) {
+        return this.#tags.addTag(tag);
+    }
+
+    getTags() {
+        return this.#tags.getTags();
     }
     
     getLabel() {
@@ -104,7 +111,7 @@ class ReaderData {
     urlIsCompatible(url_string) {
         if (!(typeof url_string === "string"))
             return false;
-        return url_string.startsWith(this.#prefixMask);
+        return urlFitsPrefix(url_string, this.#prefixMask);
     }
 
     addAutomatic(data) {
@@ -163,6 +170,7 @@ class ReaderData {
     editReader(readerObjectLike) {
         this.#label = readerObjectLike.label;
         this.#prefixMask = readerObjectLike.prefix_mask;
+        this.#tags.update(readerObjectLike.tags);
         this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();
     }
@@ -228,11 +236,11 @@ class ReaderData {
     
     returnAsObject() {
         let thisAsObject = {
-            intId: this.#intId,
             time: this.#latestInteraction,
             label:this.#label,
             prefix_mask:this.#prefixMask,
             schedule:this.#schedule.returnAsObject(),
+            tags:this.getTags(),
             automatic: [],
             manual: []
         }
@@ -243,15 +251,6 @@ class ReaderData {
             thisAsObject.automatic.push(bookmark.returnAsObject());
             }
         return thisAsObject;
-    }
-    
-    // Interface only
-    expand() {}
-    collapse() {}
-    
-    deleteMe() {
-        this.#readerSync.disconnect();
-        this.#parentInterface.deleteMe(this.#prefixMask);
     }
 }
 
