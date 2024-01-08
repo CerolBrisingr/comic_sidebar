@@ -38,7 +38,7 @@
   "permissions": [
     "storage",
     "tabs",
-    "unlimited_storage"
+    "unlimitedStorage"
   ],
 
   "commands": {
