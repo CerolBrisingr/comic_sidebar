@@ -58,7 +58,7 @@ class ReaderData {
         for (let entry of list) {
             if (!entry.hasOwnProperty("href"))
                 continue;
-            let bookmark = this.addManual(String(entry.href));
+            let bookmark = this.#registerManual(String(entry.href));
             if ((bookmark !== undefined) && entry.hasOwnProperty("label"))
                 bookmark.setLabel(String(entry.label));
         }
@@ -183,6 +183,14 @@ class ReaderData {
     }
     
     addManual(url) {
+        let newBookmark = this.#registerManual(url);
+        if (newBookmark === undefined)
+            return;
+        this.#parentInterface.saveProgress();
+        return newBookmark;
+    }
+
+    #registerManual(url) {
         if (!this.#isValidNewUrl(url))
             return undefined;
         let newBookmark = new Bookmark(url);
@@ -195,7 +203,6 @@ class ReaderData {
             }
         }
         this.#manual.push(newBookmark);
-        this.#parentInterface.saveProgress();
         return newBookmark;
     }
     

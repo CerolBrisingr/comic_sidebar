@@ -1,4 +1,4 @@
-import { SlotFinder } from "../../scripts/editor/tag_editor.js";
+import { SlotFinder } from "../../scripts/shared/tag_editor.js";
 
 describe("SlotFinder", function() {
     let filledList;
