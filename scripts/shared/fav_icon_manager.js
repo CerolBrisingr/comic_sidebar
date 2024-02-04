@@ -3,7 +3,7 @@ class FavIcons {
     _defaultEntry;
 
     constructor() {
-        this._defaultEntry = "../../icons/globe.svg";
+        this._defaultEntry = "../../icons/reader.svg";
     }
 
     async initialize(originUrlList) {

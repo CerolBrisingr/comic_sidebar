@@ -322,7 +322,7 @@ class IconLink {
 
     static getReader(label, favIcon) {
         if (favIcon === undefined)
-            favIcon = "../../icons/globe.svg";
+            favIcon = "../../icons/reader.svg";
         let href = "#";
         let iconLink = new IconLink(href, label, favIcon);
         iconLink.addImgClass("thumbnail_icon");
