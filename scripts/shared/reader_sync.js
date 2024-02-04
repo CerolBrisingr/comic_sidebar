@@ -109,7 +109,7 @@ class ReaderSyncCore extends ReaderSync {
     }
     
     #updateBookmarkLabelRequestHandler(payload) {
-        this.#readerManager.updateManualLabel(payload.url, payload.newLabel);
+        this.#readerManager.updateBookmarkLabel(payload.url, payload.newLabel);
         this.port.sendMessage({updateBookmarkLabel: payload});
     }
 }
