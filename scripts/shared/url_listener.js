@@ -90,6 +90,8 @@ class UrlListener {
     }
     
     async retransmit() {
+        if (!this.#isActive)
+            return;
         const bundle = await UrlListener.findLatestTabUrl();
         this.#fktReactToUrl(bundle);
     }
