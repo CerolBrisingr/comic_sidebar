@@ -137,6 +137,7 @@ function updateSidebar(data) {
 function updateUrlListener() {
     if (isActive) {
         urlListener.activate();
+        urlListener.retransmit();
     } else {
         urlListener.deactivate();
     }
