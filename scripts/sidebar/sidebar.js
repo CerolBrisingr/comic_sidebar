@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function setUpUserInterface() {
     addComicBtn = document.getElementById('add_reader');
-    addComicBtn.onclick = function () {addCurrentPage()};
+    addComicBtn.onclick = function () {addCurrentPageAsReader()};
 }
 
 function setUpTrackingState() {
@@ -84,9 +84,9 @@ function requestUrlRetransmission() {
     bsConnection.sendMessage("urlRetransmissionRequest");
 }
 
-function requestPageAddition(data) {
+function requestReaderAddition(data) {
     // data: latest browser tab information
-    bsConnection.sendMessage({requestPageAddition: data});
+    bsConnection.sendMessage({requestReaderAddition: data});
 }
 
 function requestWebReader() {
@@ -116,14 +116,14 @@ async function executeWebReaderLoading(readerObjectList) {
 }
 
 // Add current page to list
-function addCurrentPage() {
+function addCurrentPageAsReader() {
     // Request information about current tab and then
     // message background script to start configuration dialog
     if (webReader === undefined)
         return;
     UrlListener.findLatestTabUrl()
         .then((data) => {
-            requestPageAddition(data);
+            requestReaderAddition(data);
             }, onError);
 }
 

@@ -42,13 +42,8 @@ async function receiveMessage(message) {
         urlListener.retransmit();
         return;
     }
-    if (message.hasOwnProperty("requestPageAddition")) {
-        if (!isActive) {
-            // More reliable to block here than in sidebar context
-            // This way, isActive is always up to date
-            return;
-        }
-        handlePageAddition(message.requestPageAddition);
+    if (message.hasOwnProperty("requestReaderAddition")) {
+        handlePageAddition(message.requestReaderAddition);
         return;
     }
     if (message === "requestReaderTransmission") {
