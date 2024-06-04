@@ -3,6 +3,11 @@
     --button-hover-color: #abcc7a;
 }
 
+.sized {
+    width: 18px;
+    height: 18px;
+}
+
 .hard_space {
     margin-top: 0;
     margin-bottom: 0;
@@ -51,6 +56,7 @@
     object-fit: contain;
     padding-left: 2.5em;
     opacity: 0.9;
+    height: 18px;
 }
 
 .thumbnail_icon {
@@ -99,6 +105,7 @@
 .label_input {
     border: none;
     outline: none;
+    min-width: 30px;
 }
 
 /* Does help with overflow */
@@ -121,6 +128,7 @@
     background-image: url("../icons/search.svg");
     background-repeat: no-repeat;
     background-position-y: center;
+    background-size: 18px 18px;
     padding-left: 20px;
 }
 

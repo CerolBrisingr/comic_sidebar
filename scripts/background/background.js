@@ -42,8 +42,8 @@ async function receiveMessage(message) {
         urlListener.retransmit();
         return;
     }
-    if (message.hasOwnProperty("requestPageAddition")) {
-        handlePageAddition(message.requestPageAddition);
+    if (message.hasOwnProperty("requestReaderAddition")) {
+        handlePageAddition(message.requestReaderAddition);
         return;
     }
     if (message === "requestReaderTransmission") {

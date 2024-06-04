@@ -180,7 +180,7 @@ class SidebarReaderManager extends BasicReaderManager{
     }
     
     updateBookmarkLabel(url, newLabel) {
-        if (super.updateManualLabel(url, newLabel)) {
+        if (super.updateBookmarkLabel(url, newLabel)) {
             this.#readerVisuals.updateManualLabel(url, newLabel);
         }
     }
