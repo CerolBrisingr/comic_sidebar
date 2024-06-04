@@ -417,6 +417,7 @@ class IconButton {
     constructor(iconPath, buttonClass = "icon_button") {
         this.#button = document.createElement("button");
         this.#icon = document.createElement("img");
+        this.#icon.classList.add("sized");
         this.#button.appendChild(this.#icon);
 
         this.#button.classList.add(buttonClass);
