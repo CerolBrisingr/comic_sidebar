@@ -165,32 +165,35 @@ function minWeekDaySpan(now, numDays) {
 
 function nearestMonthlyReset(now, schedule) {
     // Get number of days since last monthly update date
-    let year = now.getFullYear();
-    let month = now.getMonth();
-    let date = now.getDate();
-    let daysInLastMonth = daysInPreviousMonth(year, month);
-    let target = new Date(1, 0, 1); // Unused backup
+    let year = now.getFullYear(); // dd.mm.(yyyy)
+    let month = now.getMonth();   // dd.(mm).yyyy
+    let date = now.getDate();     // (dd).mm.yyyy
+    let latestReset = new Date(1, 0, 1); // Unused backup
 
-    let days = schedule.getDays();
-    if(days.length === 0) {
+    let resetDays = schedule.getDays();
+    if(resetDays.length === 0) {
         // Full month back if unset
-        date = Math.min(daysInLastMonth, date);
+        date = Math.min(daysInPreviousMonth(year, month), date);
         return new Date(year, month-1, date + 1).getTime();
     }
 
-    for (let day of days) {
-        let thisTarget;
-        if (date >= day) {
-            thisTarget = new Date(year, month, day);
-        } else if (day > daysInLastMonth) {
-            thisTarget = new Date(year, month, 1);
+    // Find the latest reset, which will be compared against the latest interaction
+    for (let resetDay of resetDays) {
+        let thisReset;
+        if (date >= resetDay) {
+            // Latest occurence is during this month
+            thisReset = new Date(year, month, resetDay);
+        } else if (resetDay > daysInPreviousMonth(year, month)) {
+            // Last month did not have this day? 1st of this month!
+            thisReset = new Date(year, month, 1);
         } else {
-            thisTarget = new Date(year, month - 1, day + 1);
+            // This day last month is out. Start of the next day.
+            thisReset = new Date(year, month - 1, resetDay + 1);
         }
-        if (thisTarget > target)
-            target = thisTarget;
+        if (thisReset > latestReset)
+            latestReset = thisReset;
     }
-    return target.getTime();
+    return latestReset.getTime();
 }
 
 function daysInPreviousMonth(year, month) {

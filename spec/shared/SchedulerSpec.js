@@ -32,7 +32,6 @@ describe('Show All', function() {
     let scheduler;
     let showAll;
     let lastInteraction;
-    let now;
 
     beforeEach(function() {
         readerSchedule = new ReaderSchedule();
