@@ -7,7 +7,7 @@ class ReaderData {
     #latestInteraction = 0;
     #prefixMask;
     #automatic;
-    #manual;
+    #manual = [];
     #parentInterface;
     #schedule;
     #tags;
