@@ -85,6 +85,7 @@ class ReaderData {
     }
     
     getPrefixMask() {
+        // TODO: maybe implement as list for now?
         return this.#prefixMask;
     }
 

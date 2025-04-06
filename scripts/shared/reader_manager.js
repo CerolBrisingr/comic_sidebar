@@ -30,6 +30,7 @@ class BasicReaderManager {
     }
     
     getPrefixMask() {
+        // TODO: probably just rename both
         return this._readerData.getPrefixMask();
     }
 
@@ -85,6 +86,8 @@ class BasicReaderManager {
     
     deleteMe() {
         this._readerSync.disconnect();
+        // TODO: deleteMe must handle all aliases (probably hand over readerData)
+        //       prefix list would work as well
         this._parentInterface.deleteMe(this._readerData.getPrefixMask());
     }
 

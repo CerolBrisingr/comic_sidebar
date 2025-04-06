@@ -7,6 +7,7 @@ class HtmlContainer {
     
     saveObject(object, url = undefined) {
         if (url === undefined)
+            // TODO: store all prefixes
             url = object.getPrefixMask();
         
         let host = this.#getHost(url);

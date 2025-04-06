@@ -53,6 +53,7 @@ class ReaderVisuals {
     updateReaderUrls(readerData) {
         this.#bookmarkContainer.replaceChildren();
         this.#manualBookmarkLines.length = 0;
+        // TODO: work with multiple alias URLs, prefix list would still work
         let prefix = readerData.getPrefixMask();
         this.#addBookmarks(prefix, readerData.getAutomaticBookmarks(), "auto");
         this.#addBookmarks(prefix, readerData.getPinnedBookmarks(), "manual");

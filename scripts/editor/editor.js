@@ -117,6 +117,7 @@ class Editor {
 
     #setUpPrefixHandling(url) {
         this.#prefixInfo = document.getElementById("prefix_output");
+        // TODO: One selector for each alias URL
         this.#prefixEdit = new PrefixSelector(url, this.#reader.getPrefixMask(), (prefix) => {
             this.#prefixUpdate(prefix);
         });

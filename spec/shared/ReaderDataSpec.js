@@ -66,6 +66,7 @@ describe("ReaderData tags", function() {
 function compareReader(readerData, object) {
     expect(readerData).not.toBeUndefined();
     expect(readerData.getLabel()).toBe(object.label);
+    // TODO: update tests
     expect(readerData.getPrefixMask()).toBe(object.prefix_mask);
     expect(readerData.getMostRecentAutomaticUrl()).toBe(object.automatic[0].href);
 }
