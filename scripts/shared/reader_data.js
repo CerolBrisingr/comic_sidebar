@@ -7,7 +7,7 @@ class ReaderData {
     #latestInteraction = 0;
     #prefixMask;
     #automatic;
-    #manual;
+    #manual = [];
     #parentInterface;
     #schedule;
     #tags;
@@ -36,8 +36,8 @@ class ReaderData {
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
         this.#tags = new TagData(data.tags);
-        this.#importManualList(data.manual);
         this.#importAutomaticList(data.automatic);
+        this.#importManualList(data.manual);
         this.#schedule = new ReaderSchedule(data.schedule);
     }
     
