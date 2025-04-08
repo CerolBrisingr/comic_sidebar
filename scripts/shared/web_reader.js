@@ -391,7 +391,7 @@ class WebReaderInterface {
         this.#webReader.saveProgress();
     }
     
-    deleteMe(prefixMask) {
+    removeReader(prefixMask) {
         this.#webReader.removeReader(prefixMask);
     }
     

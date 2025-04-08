@@ -86,9 +86,9 @@ class BasicReaderManager {
     
     deleteMe() {
         this._readerSync.disconnect();
-        // TODO: deleteMe must handle all aliases (probably hand over readerData)
+        // TODO: removeReader must handle all aliases (probably hand over readerData)
         //       prefix list would work as well
-        this._parentInterface.deleteMe(this._readerData.getPrefixMask());
+        this._parentInterface.removeReader(this._readerData.getPrefixMask());
     }
 
     isValid() {
@@ -275,7 +275,7 @@ class ReaderManagerInterface {
         this.#readerManager.saveProgress();
     }
     
-    deleteMe(prefixMask) {
+    removeReader(prefixMask) {
         throw new Error("ReaderData should never be in a position to call delete to SidebarReaderManager!");
     }
 }
