@@ -4,12 +4,16 @@ class HtmlContainer {
     #data = new Map();
     
     constructor() {}
-    
-    saveObject(object, url = undefined) {
-        if (url === undefined)
-            // TODO: store all prefixes
-            url = object.getPrefixMask();
-        
+
+    saveObject(object) {
+        // TODO: remove [] once prefixMask is actually a list
+        let urlList = [object.getPrefixMask()];
+        for (let url of urlList) {
+            this.#storeObjectUsingUrl(object, url);
+        }
+    }
+
+    #storeObjectUsingUrl(object, url) {
         let host = this.#getHost(url);
         if (host === undefined) {
             return false;
@@ -32,8 +36,15 @@ class HtmlContainer {
     clearData() {
         this.#data.clear();
     }
+
+    removeObject(urlList) {
+        // TODO: remove [] once it's actually a list
+        for (let url of [urlList]) {
+            this.#removeObjectUsing(url);
+        }
+    }
     
-    removeObject(url) {
+    #removeObjectUsing(url) {
         let host = this.#getHost(url);
         if (host === undefined) {
             console.log('Could not find valid host for given input');
