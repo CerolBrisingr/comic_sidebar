@@ -1,4 +1,5 @@
-import { dissectUrl, urlFitsPrefix } from "./url.js"
+import { dissectUrl, urlFitsPrefix } from "./url.js"    // TODO: remove from here
+import { SiteDetection } from "./site_detection.js";
 import { ReaderSchedule } from "./reader_schedule.js";
 import { TagData } from "./tag_data.js";
 
