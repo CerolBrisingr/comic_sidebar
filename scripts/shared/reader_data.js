@@ -83,9 +83,14 @@ class ReaderData {
     setLabel(label) {
         this.#label = label;
     }
+
+    getPrefixMasks() {
+        // TODO: update prefix handling to use aliases
+        return [this.#prefixMask];
+    }
     
     getPrefixMask() {
-        // TODO: maybe implement as list for now?
+        // TODO: remove when done
         return this.#prefixMask;
     }
 

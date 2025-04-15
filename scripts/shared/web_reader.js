@@ -110,7 +110,7 @@ class WebReader {
         }
     }
     
-    async registerPage(readerObjectLike) {
+    async registerReader(readerObjectLike) {
         let storageObject 
             = this._selectCorrespondingStorage(readerObjectLike.url);
         if (storageObject.isValid()) {

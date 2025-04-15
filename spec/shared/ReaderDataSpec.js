@@ -90,3 +90,5 @@ function readerObjectStub() {
         ]
     }
 }
+
+export {readerObjectStub}

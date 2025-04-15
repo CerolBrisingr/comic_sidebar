@@ -6,15 +6,14 @@ class HtmlContainer {
     constructor() {}
 
     saveObject(object) {
-        // TODO: remove [] once prefixMask is actually a list
-        let urlList = [object.getPrefixMask()];
+        let urlList = object.getPrefixMasks();
         for (let url of urlList) {
             this.#storeObjectUsingUrl(object, url);
         }
     }
 
     #storeObjectUsingUrl(object, url) {
-        let host = this.#getHost(url);
+        let host = getHost(url);
         if (host === undefined) {
             return false;
         }
@@ -45,7 +44,7 @@ class HtmlContainer {
     }
     
     #removeObjectUsing(url) {
-        let host = this.#getHost(url);
+        let host = getHost(url);
         if (host === undefined) {
             console.log('Could not find valid host for given input');
             return;
@@ -67,7 +66,7 @@ class HtmlContainer {
     }
     
     getObject(url) {
-        let host = this.#getHost(url);
+        let host = getHost(url);
         if (host === undefined) {
             return undefined;
         }
@@ -75,7 +74,7 @@ class HtmlContainer {
     }
 
     getHostListFromUrl(url) {
-        let host = this.#getHost(url);
+        let host = getHost(url);
         if (host === undefined) {
             return [];
         }
@@ -97,23 +96,23 @@ class HtmlContainer {
         return undefined;
     }
     
-    #getHost(url) {
-        let urlPieces = dissectUrl(url);
-        if (urlPieces === undefined)
-            return
-        return urlPieces.host;
-    }
-    
     getList() {
         // Returns stored objects as list
-        let objectList = [];
-        for (let host of this.#data.values())
-            for (let object of host) {
-                objectList.push(object);
+        let objectSet = new Set();
+        for (let listedObjects of this.#data.values())
+            for (let object of listedObjects) {
+                objectSet.add(object);
             }
-        return objectList;
+        return Array.from(objectSet);
     }
     
+}
+
+function getHost(url) {
+    let urlPieces = dissectUrl(url);
+    if (urlPieces === undefined)
+        return
+    return urlPieces.host;
 }
 
 export {HtmlContainer}

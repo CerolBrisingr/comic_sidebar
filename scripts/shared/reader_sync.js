@@ -2,6 +2,9 @@ import {SubscriberPort} from "../sidebar/subscriber_port.js"
 import {ListeningPort} from "../background/listening_port.js"
 import { ReaderEditorControl } from "../editor/reader_editor_control.js";
 
+// Direct communication between the instance of a reader in 
+// the background script and it's representations within each sidebar
+
 class ReaderSync {
     intId;
     port;
@@ -97,6 +100,8 @@ class ReaderSyncCore extends ReaderSync {
             this.#deleteRequestHandler(readerObjectLike.deleteMe);
             return;
         }
+        // TODO: verify edit with WebReader interface in Core
+        //       This is solely important for the webpage recognition mechanism
         this.#readerManager.editReader(readerObjectLike);
         this.port.sendMessage({editCommand: readerObjectLike});
     }

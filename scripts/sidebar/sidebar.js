@@ -167,7 +167,7 @@ function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("addPage")) {
-        webReader.registerPage(message.addPage);
+        webReader.registerReader(message.addPage);
         return;
     }
     console.log("Don't know how to act on this message:");

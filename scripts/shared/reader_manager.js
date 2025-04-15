@@ -28,9 +28,13 @@ class BasicReaderManager {
     getLabel() {
         return this._readerData.getLabel();
     }
+
+    getPrefixMasks() {
+        return this._readerData.getPrefixMasks();
+    }
     
     getPrefixMask() {
-        // TODO: probably just rename both
+        // TODO: remove when done
         return this._readerData.getPrefixMask();
     }
 
@@ -156,6 +160,7 @@ class SidebarReaderManager extends BasicReaderManager{
     }
     
     editReader(readerObjectLike) {
+        // TODO: verify continued compatibility with exising readers first
         super.editReader(readerObjectLike);
         this.#schedule.updateRuleset(this._readerData.getSchedule());
         this.#updateReaderVisuals();
