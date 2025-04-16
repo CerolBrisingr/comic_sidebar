@@ -6,6 +6,10 @@ describe('Single Site', function() {
         expect(siteDetection.isValid()).toBe(true);
         expect(siteDetection.siteIsCompatible("http://www.some.site/123")).toBe(true);
         expect(siteDetection.siteIsCompatible("nope")).toBe(false);
+
+        let extractedObject = siteDetection.returnAsObject();
+        expect(extractedObject.sites.length).toBe(1);
+        expect(extractedObject.sites[0].lastUrl).toEqual("http://www.some.site/123");
     });
 
     it('can be built via prefix', function() {
@@ -33,6 +37,11 @@ describe('Single Site', function() {
         expect(siteDetection.siteIsCompatible("http://www.some.site/123", "blabla")).toBe(false);
         expect(siteDetection.siteIsCompatible("http://www.some.site/123", "..test..")).toBe(true);
         expect(siteDetection.siteIsCompatible("http://www.some.site/1234", "..test..")).toBe(true);
+
+        let extractedObject = siteDetection.returnAsObject();
+        expect(extractedObject.sites[0].titleToken).toEqual("test");
+        expect(extractedObject.sites[0].lastUrl).toEqual("http://www.some.site/1234");
+        expect(extractedObject.sites[0].lastTitle).toEqual("..test..");
     });
 });
 
