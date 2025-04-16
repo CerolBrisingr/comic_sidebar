@@ -63,7 +63,7 @@ class Site {
     #isValid = false;
 
     constructor(data) {
-        // Not setting valid flag if prefix is within expectations
+        // Not setting valid flag if prefix is not within expectations
         if (!data.hasOwnProperty('prefix')) return;
         if (data.prefix === undefined || data.prefix.len == 0) return;
         this.#prefix = data.prefix;
