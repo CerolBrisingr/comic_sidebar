@@ -40,7 +40,7 @@ class SiteDetection {
         let otherSites = other.#sites;
         for (let mySite of this.#sites) {
             for (let otherSite of otherSites) {
-                if (mySite.conflictsWith(otherSite)) return true;
+                if (mySite.overlapsWith(otherSite)) return true;
             }
         }
 
