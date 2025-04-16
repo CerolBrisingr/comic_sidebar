@@ -29,7 +29,27 @@ class SiteDetection {
         }
     }
 
+    overlapsWith(other) {
+        // Don't accept it if it's not even the correct class!
+        if (!(other instanceof SiteDetection)) return true;
+        // Can't collide with yourself
+        if (other == this) return false;
+
+        // As of now, we expect unilateral tests to be enough
+        // One reason why URLs and titles are stored
+        let otherSites = other.#sites;
+        for (let mySite of this.#sites) {
+            for (let otherSite of otherSites) {
+                if (mySite.conflictsWith(otherSite)) return true;
+            }
+        }
+
+        // No conflict detected
+        return false;
+    }
+
     siteIsCompatible(url, title = "") {
+        if (title === undefined) title = "";
         for (let site of this.#sites) {
             if (site.isCompatible(url, title)) {
                 return true;
@@ -59,7 +79,7 @@ class Site {
     #prefix;            // start of URL needs to match this string
     #titleToken = "";   // if set the website title needs to contain this string
     #lastUrl;
-    #lastTitle;
+    #lastTitle = "";
     #isValid = false;
 
     constructor(data) {
@@ -71,9 +91,13 @@ class Site {
         if (data.hasOwnProperty('titleToken')) {
             this.#titleToken = data.titleToken;
         }
+
         if (data.hasOwnProperty('lastUrl')) {
             this.#lastUrl = data.lastUrl;
+        } else {
+            this.#lastUrl = this.#prefix;
         }
+
         if (data.hasOwnProperty('lastTitle')) {
             this.#lastTitle = data.lastTitle;
         }
@@ -94,6 +118,13 @@ class Site {
             this.#lastTitle = title;  // Title is allowed to stay empty
         }
         return doesMatch;
+    }
+
+    overlapsWith(otherSite) {
+        // If you manage to sneak another object type in here, that's on you
+        // If you manage to have the same class identifier in two different
+        //    SiteDetectors, that's still an issue and will show anyway.
+        return otherSite.isCompatible(this.#lastUrl, this.#lastTitle);
     }
 
     returnAsObject() {

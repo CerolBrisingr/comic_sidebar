@@ -10,6 +10,12 @@ describe('Single Site', function() {
         let extractedObject = siteDetection.returnAsObject();
         expect(extractedObject.sites.length).toBe(1);
         expect(extractedObject.sites[0].lastUrl).toEqual("http://www.some.site/123");
+
+        expect(siteDetection.overlapsWith(siteDetection)).toBe(false);
+        expect(siteDetection.overlapsWith(2)).toBe(true);
+
+        let siteDetection2 = SiteDetection.buildFromUrl("http://www.some.site/1234");
+        expect(siteDetection.overlapsWith(siteDetection2)).toBe(true);
     });
 
     it('can be built via prefix', function() {
@@ -42,6 +48,28 @@ describe('Single Site', function() {
         expect(extractedObject.sites[0].titleToken).toEqual("test");
         expect(extractedObject.sites[0].lastUrl).toEqual("http://www.some.site/1234");
         expect(extractedObject.sites[0].lastTitle).toEqual("..test..");
+    });
+
+    it('can check for overlaps', function() {
+        let site = {prefix: "http://www.some.site/123", titleToken: "test"};
+        let data = {sites: [site]};
+        let siteDetection = new SiteDetection(data);
+        siteDetection.siteIsCompatible("http://www.some.site/1234", "..test..");
+
+        site.titleToken = "tes";
+        let siteDetection2 = new SiteDetection(data);
+        let extractedObject2 = siteDetection2.returnAsObject();
+        expect(extractedObject2.sites[0].titleToken).toEqual("tes");
+        expect(siteDetection.overlapsWith(siteDetection2)).toBe(true);
+        expect(siteDetection2.overlapsWith(siteDetection)).toBe(true);
+
+        site.titleToken = "nope";
+        let siteDetection3 = new SiteDetection(data);
+        expect(siteDetection.overlapsWith(siteDetection3)).toBe(false);
+        expect(siteDetection3.overlapsWith(siteDetection)).toBe(false);
+        expect(siteDetection2.overlapsWith(siteDetection3)).toBe(false);
+        expect(siteDetection3.overlapsWith(siteDetection2)).toBe(false);
+
     });
 });
 
