@@ -3,12 +3,12 @@ import { dissectUrl, urlFitsPrefix } from "./url.js"
 class SiteDetection {
     #sites = [];
 
-    static buildForEditorFromUrl(url) {
+    static buildFromUrl(url) {
         let urlPieces = dissectUrl(url);
-        return SiteDetection.buildForEditorFromPrefix(urlPieces.base_url, url);
+        return SiteDetection.buildFromPrefix(urlPieces.base_url, url);
     }
 
-    static buildForEditorFromPrefix(prefix, url = "") {
+    static buildFromPrefix(prefix, url = "") {
         let siteData = [{prefix: prefix, lastUrl: url}];
         return new SiteDetection({sites: siteData});
     }

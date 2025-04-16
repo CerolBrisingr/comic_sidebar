@@ -2,7 +2,7 @@ import { SiteDetection } from "../../scripts/shared/site_detection.js";
 
 describe('Single Site', function() {
     it('can be built from url', function() {
-        let siteDetection = SiteDetection.buildForEditorFromUrl("http://www.some.site");
+        let siteDetection = SiteDetection.buildFromUrl("http://www.some.site");
         expect(siteDetection.isValid()).toBe(true);
         expect(siteDetection.siteIsCompatible("http://www.some.site/123")).toBe(true);
         expect(siteDetection.siteIsCompatible("nope")).toBe(false);
@@ -13,7 +13,7 @@ describe('Single Site', function() {
     });
 
     it('can be built via prefix', function() {
-        let siteDetection = SiteDetection.buildForEditorFromPrefix("http://www.some.site/123");
+        let siteDetection = SiteDetection.buildFromPrefix("http://www.some.site/123");
         expect(siteDetection.isValid()).toBe(true);
         expect(siteDetection.siteIsCompatible("http://www.some.site/123")).toBe(true);
         expect(siteDetection.siteIsCompatible("http://www.some.site")).toBe(false);
