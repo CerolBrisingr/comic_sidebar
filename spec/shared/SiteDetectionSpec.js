@@ -2,7 +2,7 @@ import { SiteDetection } from "../../scripts/shared/site_detection.js";
 
 describe('Single Site', function() {
     it('can be built from url', function() {
-        let siteDetection = SiteDetection.buildFromUrl("http://www.some.site");
+        let siteDetection = SiteDetection.buildFromUrl("http://www.some.site/1234");
         expect(siteDetection.isValid()).toBe(true);
         expect(siteDetection.siteIsCompatible("http://www.some.site/123")).toBe(true);
         expect(siteDetection.siteIsCompatible("nope")).toBe(false);
