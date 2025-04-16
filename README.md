@@ -1,10 +1,12 @@
 # sb_webcomic_sidebar
 
 ## Why would I want this?
-You're reading something online and it's taking quite a lot of sessions? Maybe new pages come out over time and you need a reminder for when to look?
-Maybe you want to wait for a few episodes to be released and come back later where you left things?
+You're reading something online and it's taking quite a lot of sessions? Maybe new pages come out over time and you need a reminder for when to look again?
+Maybe you want to wait for a few episodes to be released and come back later where you left things with no need to backtrack?
 
-Well, you're in luck because that's what this sidebar is for.
+Maybe you just want a few bookmarks to show up in your sidebar when you visit the matching webpage?
+
+Well, you're in luck because that's what this sidebar can do for you!
 
 ## How does it track a page?
 Visit your page and then click on "Add reader" in the sidebar.  
@@ -32,18 +34,23 @@ Separate from those options you can choose to send the entry on a one-time hiatu
 Maybe you need a break, maybe the author needs one. This way you can make one :)
 
 ## Anything on the horizon?
-### Improved recognition
+### Improved recognition (WIP)
 Some pages don't have a parser-friendly URL scheme. Tracking the page name looks like a viable path to improve.  
 Regular expressions might have a place as well at that point.
 
-### Page aliases
+### Page aliases (WIP)
 Pages move from time to time, sometimes they even jump between URLs. Adding tracking-URLs and removing others sounds like a good idea.
 
 ### Improved tags
 You can alredy define tags and search for them. But it would be good to be able to hide specific tags. E.g. set up a "complete" tag and hide those entries.
 
+### Reorder fixed bookmarks
+Currently they are listed in the order in which they were created.
+
 ### Notes
 Add some information to a ressource you're reading
 
 ### Ratings?
-Ok, not so sure about this. This sidebar will stay private so there will never be any form of gathered ranking. But maybe you want one for yourself?
+Ok, not so sure about this. This sidebar will stay private so there will never be any form of gathered ranking. 
+Specifically, I don't need to know which webpages you use this sidebar for and noone else does.
+But maybe you want one for yourself? You could still export your json-backup and upload it somewhere?
