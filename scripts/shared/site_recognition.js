@@ -1,16 +1,16 @@
 import { dissectUrl, urlFitsPrefix } from "./url.js"
 
-class SiteDetection {
+class SiteRecognition {
     #sites = [];
 
     static buildFromUrl(url) {
         let urlPieces = dissectUrl(url);
-        return SiteDetection.buildFromPrefix(urlPieces.base_url, url);
+        return SiteRecognition.buildFromPrefix(urlPieces.base_url, url);
     }
 
     static buildFromPrefix(prefix, url = "") {
         let siteData = [{prefix: prefix, lastUrl: url}];
-        return new SiteDetection({sites: siteData});
+        return new SiteRecognition({sites: siteData});
     }
 
     constructor(data) {
@@ -31,7 +31,7 @@ class SiteDetection {
 
     overlapsWith(other) {
         // Don't accept it if it's not even the correct class!
-        if (!(other instanceof SiteDetection)) return true;
+        if (!(other instanceof SiteRecognition)) return true;
         // Can't collide with yourself
         if (other == this) return false;
 
@@ -137,4 +137,4 @@ class Site {
     }
 }
 
-export {SiteDetection}
+export {SiteRecognition}
