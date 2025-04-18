@@ -7,6 +7,7 @@ class ReaderData {
     #label;
     #latestInteraction = 0;
     #prefixMask;
+    #siteRecognition;
     #automatic;
     #manual = [];
     #parentInterface;
@@ -32,8 +33,12 @@ class ReaderData {
         this.#registerInteraction(data.time);
         if (data.hasOwnProperty("base_url"))
             data.prefix_mask = String(data.base_url);
-        if (data.hasOwnProperty("prefix_mask"))
-            this.#prefixMask = String(data.prefix_mask);
+        if (data.hasOwnProperty("prefix_mask")) { // Deprecated notion
+            let prefix = String(data.prefix_mask);
+            this.#siteRecognition = SiteRecognition.buildFromPrefix(prefix);
+        }
+        if (data.hasOwnProperty("site_recognition"))
+            this.#siteRecognition = new SiteRecognition(data.site_recognition);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
         this.#tags = new TagData(data.tags);
@@ -86,13 +91,19 @@ class ReaderData {
     }
 
     getPrefixMasks() {
-        // TODO: update prefix handling to use aliases
-        return [this.#prefixMask];
+        // TODO: better implementation
+        let masks = [];
+        let siteRecog = this.#siteRecognition.returnAsObject();
+        for (let site of siteRecog.sites) {
+            masks.push(site.prefix);
+        }
+        return masks;
     }
     
     getPrefixMask() {
         // TODO: remove when done
-        return this.#prefixMask;
+        let masks = this.getPrefixMasks();
+        return masks[0];
     }
 
     setPrefixMask(prefixMask) {
@@ -112,7 +123,8 @@ class ReaderData {
     }
     
     isValid() {
-        return ((this.#prefixMask !== undefined) && (this.#label !== undefined));
+        return ((this.#siteRecognition.isValid() !== undefined) 
+                 && (this.#label !== undefined));
     }
     
     urlIsCompatible(url_string) {
@@ -252,7 +264,7 @@ class ReaderData {
         let thisAsObject = {
             time: this.#latestInteraction,
             label:this.#label,
-            prefix_mask:this.#prefixMask,
+            site_recognition:this.#siteRecognition.returnAsObject(),
             schedule:this.#schedule.returnAsObject(),
             tags:this.getTags(),
             automatic: [],

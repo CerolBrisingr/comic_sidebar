@@ -86,20 +86,20 @@ class Site {
         // Not setting valid flag if prefix is not within expectations
         if (!data.hasOwnProperty('prefix')) return;
         if (data.prefix === undefined || data.prefix.len == 0) return;
-        this.#prefix = data.prefix;
+        this.#prefix = String(data.prefix);
 
         if (data.hasOwnProperty('titleToken')) {
-            this.#titleToken = data.titleToken;
+            this.#titleToken = String(data.titleToken);
         }
 
         if (data.hasOwnProperty('lastUrl')) {
-            this.#lastUrl = data.lastUrl;
+            this.#lastUrl = String(data.lastUrl);
         } else {
-            this.#lastUrl = this.#prefix;
+            this.#lastUrl = String(this.#prefix);
         }
 
         if (data.hasOwnProperty('lastTitle')) {
-            this.#lastTitle = data.lastTitle;
+            this.#lastTitle = String(data.lastTitle);
         }
         this.#isValid = true;
     }
