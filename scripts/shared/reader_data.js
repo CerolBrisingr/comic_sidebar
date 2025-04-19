@@ -1,4 +1,4 @@
-import { dissectUrl, urlFitsPrefix } from "./url.js"    // TODO: remove from here
+import { dissectUrl } from "./url.js"    // TODO: remove from here
 import { SiteRecognition } from "./site_recognition.js";
 import { ReaderSchedule } from "./reader_schedule.js";
 import { TagData } from "./tag_data.js";
@@ -6,7 +6,6 @@ import { TagData } from "./tag_data.js";
 class ReaderData {
     #label;
     #latestInteraction = 0;
-    #prefixMask;
     #siteRecognition;
     #automatic;
     #manual = [];
@@ -21,17 +20,18 @@ class ReaderData {
 
     static buildForEditorFromData(data) {
         // Build readerData without connected behavior and from basic assumptions
+        let siteRecognition = SiteRecognition.buildFromUrl(data.url);
         let urlPieces = dissectUrl(data.url);
-        let readerObject = {time: data.time, prefix_mask: urlPieces.base_url, label: urlPieces.host, manual: [], automatic: []};
+        let readerObject = {time: data.time, site_recognition: siteRecognition.returnAsObject(), label: urlPieces.host, manual: [], automatic: []};
         readerObject.automatic.push({href: data.url});
-        return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
+        return ReaderData.buildForEditor(readerObject);
     }
     
     constructor(data, parentInterface) {
         // Import object from storage
         this.#parentInterface = parentInterface;
         this.#registerInteraction(data.time);
-        if (data.hasOwnProperty("base_url"))
+        if (data.hasOwnProperty("base_url"))        // Deprecated notion
             data.prefix_mask = String(data.base_url);
         if (data.hasOwnProperty("prefix_mask")) { // Deprecated notion
             let prefix = String(data.prefix_mask);
@@ -107,7 +107,7 @@ class ReaderData {
     }
 
     setPrefixMask(prefixMask) {
-        this.#prefixMask = prefixMask;
+        this.#siteRecognition.setPrefixMask(prefixMask);
     }
     
     getPinnedBookmarks() {
@@ -130,7 +130,7 @@ class ReaderData {
     urlIsCompatible(url_string) {
         if (!(typeof url_string === "string"))
             return false;
-        return urlFitsPrefix(url_string, this.#prefixMask);
+        return this.#siteRecognition.siteIsCompatible(url_string);
     }
 
     addAutomatic(data) {
@@ -152,7 +152,7 @@ class ReaderData {
     }
     
     #registerAutomatic(url) {
-        if (!this.#isValidNewUrl(url))
+        if (!this.urlIsCompatible(url))
             return false;
         let newBoockmark = new Bookmark(url);
         if (newBoockmark.href == "#")
@@ -175,20 +175,10 @@ class ReaderData {
         return true;
     }
     
-    #isValidNewUrl(url) {
-        let urlPieces = dissectUrl(url, this.#prefixMask);
-        if (urlPieces === undefined)
-            return false;
-        if (urlPieces.tail === "") {
-            console.log("New URL must differ from prefix")
-            return false;
-        }
-        return true;
-    }
-    
     editReader(readerObjectLike) {
+        // TODO: fix this
         this.#label = readerObjectLike.label;
-        this.#prefixMask = readerObjectLike.prefix_mask;
+        this.#siteRecognition.setPrefixMask(prefix_mask);
         this.#tags.update(readerObjectLike.tags);
         this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();
@@ -210,7 +200,7 @@ class ReaderData {
     }
 
     #registerManual(url) {
-        if (!this.#isValidNewUrl(url))
+        if (!this.urlIsCompatible(url))
             return undefined;
         let newBookmark = new Bookmark(url);
         if (newBookmark.href == "#")

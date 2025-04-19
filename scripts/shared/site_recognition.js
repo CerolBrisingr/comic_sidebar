@@ -21,11 +21,23 @@ class SiteRecognition {
             if (siteData.prefix === undefined) continue;
 
             // Try to build Site recognition object
-            let site = new Site(siteData)
+            let site = new Site(siteData);
             if (!site.isValid()) continue;
 
             // Successful? Push to list.
             this.#sites.push(site);
+        }
+    }
+
+    // TODO: deprecated interface
+    setPrefixMask(prefixMask) {
+        if (this.#sites.length == 0) {
+            // Try to set a new mask
+            let siteData = {prefix: prefix, lastUrl: url};
+            let site = new Site(siteData);
+            if (!site.isValid()) return;
+        } else {
+            this.#sites[0].se
         }
     }
 
@@ -108,7 +120,14 @@ class Site {
         return this.#isValid;
     }
 
+    updatePrefix(prefix) {
+        this.#prefix = String(prefix);
+    }
+
     isCompatible(url, title) {
+        if (url == this.#prefix) {
+            return false;  // Will not accept 100% match
+        }
         let doesMatch = urlFitsPrefix(url, this.#prefix);
         if (doesMatch && this.#titleToken != "") {
             doesMatch = title.includes(this.#titleToken);
