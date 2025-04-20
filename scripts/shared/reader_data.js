@@ -91,13 +91,11 @@ class ReaderData {
     }
 
     getPrefixMasks() {
-        // TODO: better implementation
-        let masks = [];
-        let siteRecog = this.#siteRecognition.returnAsObject();
-        for (let site of siteRecog.sites) {
-            masks.push(site.prefix);
-        }
-        return masks;
+        return this.#siteRecognition.getPrefixMasks();
+    }
+
+    getRecognitionInterface() {
+        return this.#siteRecognition.getInterface();
     }
     
     getPrefixMask() {
@@ -290,7 +288,7 @@ class Bookmark {
         }
     }
     
-    getLabel(fallback) {
+    getLabelWFallback(fallback) {
         if (this.#label === undefined)
             return fallback;
         return this.#label;

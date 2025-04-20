@@ -40,6 +40,15 @@ class SiteRecognition {
             this.#sites.push(site);
     }
 
+    // TODO: evaluate future use of this interface
+    getPrefixMasks() {
+        let masks = [];
+        for (let site of this.#sites) {
+            masks.push(site.getPrefix());
+        }
+        return masks;
+    }
+
     // TODO: deprecated interface
     setPrefixMask(prefixMask) {
         if (this.#sites.length == 0) {
@@ -81,6 +90,21 @@ class SiteRecognition {
         return false;
     }
 
+    getInterface() {
+        return new SiteRecognitionInterface(this);
+    }
+
+    getUrlRemainder(url, title) {
+        for (let site of this.#sites) {
+            if (!site.isCompatible(url, title)) continue;
+            let urlPieces = dissectUrl(url, site.getPrefix());
+            if (urlPieces === undefined) continue;
+            return urlPieces.tail;
+        }
+        // Fallback for links that no longer match any (still) listed sites
+        return url;
+    }
+
     isValid() {
         return this.#sites.length > 0;
     }
@@ -93,6 +117,18 @@ class SiteRecognition {
         return {
             sites: detectors
         }
+    }
+}
+
+class SiteRecognitionInterface {
+    #siteRecognition;
+
+    constructor(siteRecognition) {
+        this.#siteRecognition = siteRecognition;
+    }
+
+    getUrlRemainder(url, title = "") {
+        return this.#siteRecognition.getUrlRemainder(url, title);
     }
 }
 
@@ -129,6 +165,10 @@ class Site {
 
     isValid() {
         return this.#isValid;
+    }
+
+    getPrefix() {
+        return this.#prefix;
     }
 
     updatePrefix(prefix) {
