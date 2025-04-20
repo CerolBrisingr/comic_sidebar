@@ -66,21 +66,28 @@ describe("ReaderData tags", function() {
 function compareReader(readerData, object) {
     expect(readerData).not.toBeUndefined();
     expect(readerData.getLabel()).toBe(object.label);
-    // TODO: update tests
-    expect(readerData.getPrefixMask()).toBe(object.prefix_mask);
+    // TODO: update tests and probably most lines with sites[0]
+    expect(readerData.getPrefixMask()).toBe(object.site_recognition.sites[0].prefix);
     expect(readerData.getMostRecentAutomaticUrl()).toBe(object.automatic[0].href);
 }
 
 function compareReaderObject(readerObject, object) {
     expect(readerObject).not.toBeUndefined();
     expect(readerObject.label).toBe(object.label);
-    expect(readerObject.prefix_mask).toBe(object.prefix_mask);
+    expect(readerObject.site_recognition.sites[0].prefix).toEqual(object.site_recognition.sites[0].prefix);
     expect(readerObject.automatic).toEqual(object.automatic);
 }
 
 function readerObjectStub() {
     return {
-        prefix_mask: "http://www.somecomic.com",
+        site_recognition: {
+            sites: [
+                {
+                    prefix: "http://www.somecomic.com",
+                    lastUrl: "http://www.somecomic.com"
+                }
+            ]
+        },
         label: "Some Comic",
         automatic: [
             {href: "http://www.somecomic.com/123/"}

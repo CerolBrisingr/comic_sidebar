@@ -1,12 +1,12 @@
-import { dissectUrl, urlFitsPrefix } from "./url.js"    // TODO: remove from here
-import { SiteDetection } from "./site_detection.js";
+import { dissectUrl } from "./url.js"    // TODO: remove from here
+import { SiteRecognition } from "./site_recognition.js";
 import { ReaderSchedule } from "./reader_schedule.js";
 import { TagData } from "./tag_data.js";
 
 class ReaderData {
     #label;
     #latestInteraction = 0;
-    #prefixMask;
+    #siteRecognition;
     #automatic;
     #manual = [];
     #parentInterface;
@@ -20,20 +20,25 @@ class ReaderData {
 
     static buildForEditorFromData(data) {
         // Build readerData without connected behavior and from basic assumptions
+        let siteRecognition = SiteRecognition.buildFromUrl(data.url);
         let urlPieces = dissectUrl(data.url);
-        let readerObject = {time: data.time, prefix_mask: urlPieces.base_url, label: urlPieces.host, manual: [], automatic: []};
+        let readerObject = {time: data.time, site_recognition: siteRecognition.returnAsObject(), label: urlPieces.host, manual: [], automatic: []};
         readerObject.automatic.push({href: data.url});
-        return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
+        return ReaderData.buildForEditor(readerObject);
     }
     
     constructor(data, parentInterface) {
         // Import object from storage
         this.#parentInterface = parentInterface;
         this.#registerInteraction(data.time);
-        if (data.hasOwnProperty("base_url"))
+        if (data.hasOwnProperty("base_url"))        // Deprecated notion
             data.prefix_mask = String(data.base_url);
-        if (data.hasOwnProperty("prefix_mask"))
-            this.#prefixMask = String(data.prefix_mask);
+        if (data.hasOwnProperty("prefix_mask")) { // Deprecated notion
+            let prefix = String(data.prefix_mask);
+            this.#siteRecognition = SiteRecognition.buildFromPrefix(prefix);
+        }
+        if (data.hasOwnProperty("site_recognition"))
+            this.#siteRecognition = new SiteRecognition(data.site_recognition);
         if (data.hasOwnProperty("label"))
             this.#label = String(data.label);
         this.#tags = new TagData(data.tags);
@@ -86,17 +91,23 @@ class ReaderData {
     }
 
     getPrefixMasks() {
-        // TODO: update prefix handling to use aliases
-        return [this.#prefixMask];
+        // TODO: better implementation
+        let masks = [];
+        let siteRecog = this.#siteRecognition.returnAsObject();
+        for (let site of siteRecog.sites) {
+            masks.push(site.prefix);
+        }
+        return masks;
     }
     
     getPrefixMask() {
         // TODO: remove when done
-        return this.#prefixMask;
+        let masks = this.getPrefixMasks();
+        return masks[0];
     }
 
     setPrefixMask(prefixMask) {
-        this.#prefixMask = prefixMask;
+        this.#siteRecognition.setPrefixMask(prefixMask);
     }
     
     getPinnedBookmarks() {
@@ -112,13 +123,14 @@ class ReaderData {
     }
     
     isValid() {
-        return ((this.#prefixMask !== undefined) && (this.#label !== undefined));
+        return ((this.#siteRecognition.isValid() !== undefined) 
+                 && (this.#label !== undefined));
     }
     
     urlIsCompatible(url_string) {
         if (!(typeof url_string === "string"))
             return false;
-        return urlFitsPrefix(url_string, this.#prefixMask);
+        return this.#siteRecognition.siteIsCompatible(url_string);
     }
 
     addAutomatic(data) {
@@ -140,7 +152,7 @@ class ReaderData {
     }
     
     #registerAutomatic(url) {
-        if (!this.#isValidNewUrl(url))
+        if (!this.urlIsCompatible(url))
             return false;
         let newBoockmark = new Bookmark(url);
         if (newBoockmark.href == "#")
@@ -163,20 +175,9 @@ class ReaderData {
         return true;
     }
     
-    #isValidNewUrl(url) {
-        let urlPieces = dissectUrl(url, this.#prefixMask);
-        if (urlPieces === undefined)
-            return false;
-        if (urlPieces.tail === "") {
-            console.log("New URL must differ from prefix")
-            return false;
-        }
-        return true;
-    }
-    
     editReader(readerObjectLike) {
         this.#label = readerObjectLike.label;
-        this.#prefixMask = readerObjectLike.prefix_mask;
+        this.#siteRecognition.update(readerObjectLike.site_recognition);
         this.#tags.update(readerObjectLike.tags);
         this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();
@@ -198,7 +199,7 @@ class ReaderData {
     }
 
     #registerManual(url) {
-        if (!this.#isValidNewUrl(url))
+        if (!this.urlIsCompatible(url))
             return undefined;
         let newBookmark = new Bookmark(url);
         if (newBookmark.href == "#")
@@ -252,7 +253,7 @@ class ReaderData {
         let thisAsObject = {
             time: this.#latestInteraction,
             label:this.#label,
-            prefix_mask:this.#prefixMask,
+            site_recognition:this.#siteRecognition.returnAsObject(),
             schedule:this.#schedule.returnAsObject(),
             tags:this.getTags(),
             automatic: [],

@@ -1,37 +1,60 @@
 import { dissectUrl, urlFitsPrefix } from "./url.js"
 
-class SiteDetection {
+class SiteRecognition {
     #sites = [];
 
     static buildFromUrl(url) {
         let urlPieces = dissectUrl(url);
-        return SiteDetection.buildFromPrefix(urlPieces.base_url, url);
+        return SiteRecognition.buildFromPrefix(urlPieces.base_url, url);
     }
 
     static buildFromPrefix(prefix, url = "") {
         let siteData = [{prefix: prefix, lastUrl: url}];
-        return new SiteDetection({sites: siteData});
+        return new SiteRecognition({sites: siteData});
     }
 
     constructor(data) {
-        if (!data.hasOwnProperty('sites')) return;
-        for (let siteData of data.sites) {
+        this.update(data);
+    }
+
+    update(objectLike) {
+        if (!objectLike.hasOwnProperty('sites')) return false;
+        if (!Array.isArray(objectLike.sites)) return false;
+        this.#sites.length = 0;
+        for (let siteData of objectLike.sites) {
+            this.#pushSiteIfValid(siteData);
+        }
+        return this.#sites.length > 0;
+    }
+
+    #pushSiteIfValid(siteData) {
             // Minimum viable input
-            if (!siteData.hasOwnProperty('prefix')) continue;
-            if (siteData.prefix === undefined) continue;
+            if (!siteData.hasOwnProperty('prefix')) return;
+            if (siteData.prefix === undefined) return;
 
             // Try to build Site recognition object
-            let site = new Site(siteData)
-            if (!site.isValid()) continue;
+            let site = new Site(siteData);
+            if (!site.isValid()) return;
 
             // Successful? Push to list.
             this.#sites.push(site);
+    }
+
+    // TODO: deprecated interface
+    setPrefixMask(prefixMask) {
+        if (this.#sites.length == 0) {
+            // Try to set a new mask
+            let siteData = {prefix: prefixMask, lastUrl: prefixMask};
+            let site = new Site(siteData);
+            if (!site.isValid()) return;
+        } else {
+            this.#sites[0].updatePrefix(prefixMask);
         }
     }
 
     overlapsWith(other) {
         // Don't accept it if it's not even the correct class!
-        if (!(other instanceof SiteDetection)) return true;
+        if (!(other instanceof SiteRecognition)) return true;
         // Can't collide with yourself
         if (other == this) return false;
 
@@ -86,20 +109,20 @@ class Site {
         // Not setting valid flag if prefix is not within expectations
         if (!data.hasOwnProperty('prefix')) return;
         if (data.prefix === undefined || data.prefix.len == 0) return;
-        this.#prefix = data.prefix;
+        this.#prefix = String(data.prefix);
 
         if (data.hasOwnProperty('titleToken')) {
-            this.#titleToken = data.titleToken;
+            this.#titleToken = String(data.titleToken);
         }
 
         if (data.hasOwnProperty('lastUrl')) {
-            this.#lastUrl = data.lastUrl;
+            this.#lastUrl = String(data.lastUrl);
         } else {
-            this.#lastUrl = this.#prefix;
+            this.#lastUrl = String(this.#prefix);
         }
 
         if (data.hasOwnProperty('lastTitle')) {
-            this.#lastTitle = data.lastTitle;
+            this.#lastTitle = String(data.lastTitle);
         }
         this.#isValid = true;
     }
@@ -108,7 +131,14 @@ class Site {
         return this.#isValid;
     }
 
+    updatePrefix(prefix) {
+        this.#prefix = String(prefix);
+    }
+
     isCompatible(url, title) {
+        if (url == this.#prefix) {
+            return false;  // Will not accept 100% match
+        }
         let doesMatch = urlFitsPrefix(url, this.#prefix);
         if (doesMatch && this.#titleToken != "") {
             doesMatch = title.includes(this.#titleToken);
@@ -137,4 +167,4 @@ class Site {
     }
 }
 
-export {SiteDetection}
+export {SiteRecognition}
