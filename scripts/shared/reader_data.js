@@ -176,9 +176,9 @@ class ReaderData {
     }
     
     editReader(readerObjectLike) {
-        // TODO: fix this
+        // TODO: fix this like possibly every instance of sites[0]
         this.#label = readerObjectLike.label;
-        this.#siteRecognition.setPrefixMask(prefix_mask);
+        this.#siteRecognition.setPrefixMask(readerObjectLike.site_recognition.sites[0].prefix);
         this.#tags.update(readerObjectLike.tags);
         this.#schedule.updateSchedule(readerObjectLike.schedule);
         this.#parentInterface.saveProgress();

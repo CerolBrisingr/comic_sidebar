@@ -33,11 +33,11 @@ class SiteRecognition {
     setPrefixMask(prefixMask) {
         if (this.#sites.length == 0) {
             // Try to set a new mask
-            let siteData = {prefix: prefix, lastUrl: url};
+            let siteData = {prefix: prefixMask, lastUrl: prefixMask};
             let site = new Site(siteData);
             if (!site.isValid()) return;
         } else {
-            this.#sites[0].se
+            this.#sites[0].updatePrefix(prefixMask);
         }
     }
 
