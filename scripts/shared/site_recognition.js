@@ -14,19 +14,30 @@ class SiteRecognition {
     }
 
     constructor(data) {
-        if (!data.hasOwnProperty('sites')) return;
-        for (let siteData of data.sites) {
+        this.update(data);
+    }
+
+    update(objectLike) {
+        if (!objectLike.hasOwnProperty('sites')) return false;
+        if (!Array.isArray(objectLike.sites)) return false;
+        this.#sites.length = 0;
+        for (let siteData of objectLike.sites) {
+            this.#pushSiteIfValid(siteData);
+        }
+        return this.#sites.length > 0;
+    }
+
+    #pushSiteIfValid(siteData) {
             // Minimum viable input
-            if (!siteData.hasOwnProperty('prefix')) continue;
-            if (siteData.prefix === undefined) continue;
+            if (!siteData.hasOwnProperty('prefix')) return;
+            if (siteData.prefix === undefined) return;
 
             // Try to build Site recognition object
             let site = new Site(siteData);
-            if (!site.isValid()) continue;
+            if (!site.isValid()) return;
 
             // Successful? Push to list.
             this.#sites.push(site);
-        }
     }
 
     // TODO: deprecated interface

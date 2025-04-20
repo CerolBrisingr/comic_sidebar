@@ -64,10 +64,9 @@ describe("ReaderData tags", function() {
 });
 
 function compareReader(readerData, object) {
-    let retObject = readerData.returnAsObject();
     expect(readerData).not.toBeUndefined();
     expect(readerData.getLabel()).toBe(object.label);
-    // TODO: update tests
+    // TODO: update tests and probably most lines with sites[0]
     expect(readerData.getPrefixMask()).toBe(object.site_recognition.sites[0].prefix);
     expect(readerData.getMostRecentAutomaticUrl()).toBe(object.automatic[0].href);
 }
