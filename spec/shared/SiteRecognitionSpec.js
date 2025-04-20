@@ -19,23 +19,24 @@ describe('Single Site', function() {
     });
 
     it('can be built via prefix', function() {
-        let siteRecognition = SiteRecognition.buildFromPrefix("http://www.some.site/123");
+        let siteRecognition = SiteRecognition.buildFromPrefix("http://www.some.site/12");
         expect(siteRecognition.isValid()).toBe(true);
         expect(siteRecognition.siteIsCompatible("http://www.some.site/123")).toBe(true);
         expect(siteRecognition.siteIsCompatible("http://www.some.site")).toBe(false);
     });
 
     it('can be built from dictionary', function() {
-        let site = {prefix: "http://www.some.site/123", titleToken: ""};
+        let site = {prefix: "http://www.some.site/12", titleToken: ""};
         let data = {sites: [site]};
         let siteRecognition = new SiteRecognition(data);
         expect(siteRecognition.isValid()).toBe(true);
         expect(siteRecognition.siteIsCompatible("http://www.some.site/123")).toBe(true);
+        expect(siteRecognition.siteIsCompatible("http://www.some.site/12")).toBe(false);
         expect(siteRecognition.siteIsCompatible("http://www.some.site")).toBe(false);
     });
 
     it('can test title when built from dictionary', function() {
-        let site = {prefix: "http://www.some.site/123", titleToken: "test"};
+        let site = {prefix: "http://www.some.site/12", titleToken: "test"};
         let data = {sites: [site]};
         let siteRecognition = new SiteRecognition(data);
         expect(siteRecognition.isValid()).toBe(true);
@@ -76,8 +77,8 @@ describe('Single Site', function() {
 describe('Two sites', function() {
 
     it('can trigger on 2 keywords individually', function() {
-        let site1 = {prefix: "http://www.some.site/123", titleToken: "test"};
-        let site2 = {prefix: "http://www.some.site/123", titleToken: "tset"};
+        let site1 = {prefix: "http://www.some.site/12", titleToken: "test"};
+        let site2 = {prefix: "http://www.some.site/12", titleToken: "tset"};
         let data = {sites: [site1, site2]};
         let siteRecognition = new SiteRecognition(data);
         expect(siteRecognition.isValid()).toBe(true);
@@ -89,8 +90,8 @@ describe('Two sites', function() {
     });
 
     it('don\'t crosstalk', function() {
-        let site1 = {prefix: "http://www.some.site/123", titleToken: "test"};
-        let site2 = {prefix: "http://www.some.site/321", titleToken: "tset"};
+        let site1 = {prefix: "http://www.some.site/12", titleToken: "test"};
+        let site2 = {prefix: "http://www.some.site/32", titleToken: "tset"};
         let data = {sites: [site1, site2]};
         let siteRecognition = new SiteRecognition(data);
         expect(siteRecognition.isValid()).toBe(true);
