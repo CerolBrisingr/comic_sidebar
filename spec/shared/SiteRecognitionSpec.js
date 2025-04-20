@@ -72,6 +72,21 @@ describe('Single Site', function() {
         expect(siteRecognition3.overlapsWith(siteRecognition2)).toBe(false);
 
     });
+
+    it('can update via fitting object', function() {
+        let site = {prefix: "http://www.some.site/123", titleToken: "test"};
+        let data = {sites: [site]};
+        let siteRecognition = new SiteRecognition(data);
+
+        site.titleToken = "tes";
+        site.prefix = "http://www.some.site/";
+        siteRecognition.update(data);
+
+        let extractedObject = siteRecognition.returnAsObject();
+        expect(extractedObject.sites.length).toBe(1);
+        expect(extractedObject.sites[0].prefix).toEqual("http://www.some.site/");
+        expect(extractedObject.sites[0].titleToken).toEqual("tes");
+    });
 });
 
 describe('Two sites', function() {
