@@ -30,9 +30,8 @@ function compareLabels(a, b) {
 }
 
 function compareUrls(a, b) {
-    // TODO: Limit comparison to primary URL?
-    a = a.getPrefixMask();
-    b = b.getPrefixMask();
+    a = a.getPrefixMask(0);
+    b = b.getPrefixMask(0);
     return compareLower(a,b);
 }
 

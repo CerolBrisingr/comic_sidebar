@@ -53,10 +53,9 @@ class ReaderVisuals {
     updateReaderUrls(readerData) {
         this.#bookmarkContainer.replaceChildren();
         this.#manualBookmarkLines.length = 0;
-        // TODO: work with multiple alias URLs, prefix list would still work
-        let prefix = readerData.getPrefixMask();
-        this.#addBookmarks(prefix, readerData.getAutomaticBookmarks(), "auto");
-        this.#addBookmarks(prefix, readerData.getPinnedBookmarks(), "manual");
+        let siteRecognition = readerData.getRecognitionInterface();
+        this.#addBookmarks(siteRecognition, readerData.getAutomaticBookmarks(), "auto");
+        this.#addBookmarks(siteRecognition, readerData.getPinnedBookmarks(), "manual");
         this.#updateBaseLink(readerData);
     }
     
@@ -70,14 +69,14 @@ class ReaderVisuals {
         this.#readerLine.setLink(lastAutomatic[0].href);
     }
     
-    #addBookmarks(prefix, bookmarkList, strMeta) {
+    #addBookmarks(recognitionInterface, bookmarkList, strMeta) {
         for (let bookmark of bookmarkList) {
             let bookmarkLine;
             if (strMeta === "manual") {
-                bookmarkLine = new ManualBookmarkLine(this.#managerInterface, bookmark, prefix);
+                bookmarkLine = new ManualBookmarkLine(this.#managerInterface, bookmark, recognitionInterface);
                 this.#manualBookmarkLines.push(bookmarkLine);
             } else {
-                bookmarkLine = new AutoBookmarkLine(this.#managerInterface, bookmark, prefix);
+                bookmarkLine = new AutoBookmarkLine(this.#managerInterface, bookmark, recognitionInterface);
             }
             bookmarkLine.appendTo(this.#bookmarkContainer);
         }

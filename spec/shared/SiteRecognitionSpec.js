@@ -9,7 +9,7 @@ describe('Single Site', function() {
 
         let extractedObject = siteRecognition.returnAsObject();
         expect(extractedObject.sites.length).toBe(1);
-        expect(extractedObject.sites[0].lastUrl).toEqual("http://www.some.site/123");
+        expect(getLastUrl(extractedObject)).toEqual("http://www.some.site/123");
 
         expect(siteRecognition.overlapsWith(siteRecognition)).toBe(false);
         expect(siteRecognition.overlapsWith(2)).toBe(true);
@@ -46,9 +46,9 @@ describe('Single Site', function() {
         expect(siteRecognition.siteIsCompatible("http://www.some.site/1234", "..test..")).toBe(true);
 
         let extractedObject = siteRecognition.returnAsObject();
-        expect(extractedObject.sites[0].titleToken).toEqual("test");
-        expect(extractedObject.sites[0].lastUrl).toEqual("http://www.some.site/1234");
-        expect(extractedObject.sites[0].lastTitle).toEqual("..test..");
+        expect(getTitleToken(extractedObject)).toEqual("test");
+        expect(getLastUrl(extractedObject)).toEqual("http://www.some.site/1234");
+        expect(getLastTitle(extractedObject)).toEqual("..test..");
     });
 
     it('can check for overlaps', function() {
@@ -60,7 +60,7 @@ describe('Single Site', function() {
         site.titleToken = "tes";
         let siteRecognition2 = new SiteRecognition(data);
         let extractedObject2 = siteRecognition2.returnAsObject();
-        expect(extractedObject2.sites[0].titleToken).toEqual("tes");
+        expect(getTitleToken(extractedObject2)).toEqual("tes");
         expect(siteRecognition.overlapsWith(siteRecognition2)).toBe(true);
         expect(siteRecognition2.overlapsWith(siteRecognition)).toBe(true);
 
@@ -84,8 +84,8 @@ describe('Single Site', function() {
 
         let extractedObject = siteRecognition.returnAsObject();
         expect(extractedObject.sites.length).toBe(1);
-        expect(extractedObject.sites[0].prefix).toEqual("http://www.some.site/");
-        expect(extractedObject.sites[0].titleToken).toEqual("tes");
+        expect(getPrefix(extractedObject)).toEqual("http://www.some.site/");
+        expect(getTitleToken(extractedObject)).toEqual("tes");
     });
 });
 
@@ -119,3 +119,19 @@ describe('Two sites', function() {
         expect(siteRecognition.siteIsCompatible("http://www.some.site/1234", "..test..")).toBe(true);
     });
 });
+
+function getPrefix(objectLike, siteId = 0) {
+    return objectLike.sites[siteId].prefix;
+}
+
+function getTitleToken(objectLike, siteId = 0) {
+    return objectLike.sites[siteId].titleToken;
+}
+
+function getLastUrl(objectLike, siteId = 0) {
+    return objectLike.sites[siteId].lastUrl;
+}
+
+function getLastTitle(objectLike, siteId = 0) {
+    return objectLike.sites[siteId].lastTitle;
+}
