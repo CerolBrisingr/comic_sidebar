@@ -1,4 +1,5 @@
 import { PrefixSelector } from "./prefix_selector.js"
+import { SiteRecognitionEditor } from "./site_recognition_editor.js";
 import { ReaderData } from "../shared/reader_data.js";
 import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
@@ -10,6 +11,7 @@ import { HideableHint } from "../shared/hideable_hint.js";
 class Editor {
     #prefixInfo;
     #prefixEdit;
+    #siteRecognitionEditor;
     
     #reader;
     #preview;
@@ -30,7 +32,8 @@ class Editor {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditorFromData(data);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
-        this.#setUpPrefixHandling(data.url);
+        this.#setUpSiteRecognitionEditor();
+        //this.#setUpPrefixHandling(data.url);
         const imageAdjuster = new ImageAdjuster();
         const favIcon = await imageAdjuster.apply(data.favIcon);
         this.#setUpHints();
@@ -45,7 +48,8 @@ class Editor {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditor(readerObjectLike);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
-        this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
+        this.#setUpSiteRecognitionEditor();
+        //this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
         this.#setUpHints();
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
@@ -113,6 +117,14 @@ class Editor {
         readerObjectLike.favIcon = this.#preview.getFavIcon();
         readerObjectLike.url = this.#reader.getMostRecentAutomaticUrl();
         this.#fcnFinalize(readerObjectLike);
+    }
+
+    #setUpSiteRecognitionEditor(siteRecognition) {
+        this.#siteRecognitionEditor = new SiteRecognitionEditor(
+            document.getElementById("site_identificatiors"),
+            siteRecognition,
+            () => {this.#preview.updateReaderUrls(this.#reader);}
+        );
     }
 
     #setUpPrefixHandling(url) {

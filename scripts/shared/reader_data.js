@@ -94,6 +94,10 @@ class ReaderData {
         return this.#siteRecognition.getPrefixMasks();
     }
 
+    getRecognitionObject() {
+        return this.#siteRecognition;
+    }
+
     getRecognitionInterface() {
         return this.#siteRecognition.getInterface();
     }
