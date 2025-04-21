@@ -98,7 +98,9 @@ class SiteRecognition {
         for (let site of this.#sites) {
             if (!site.isCompatible(url, title)) continue;
             let urlPieces = dissectUrl(url, site.getPrefix());
-            if (urlPieces === undefined) continue;
+            if (urlPieces === undefined) continue;      // Failure, find another or use full URL
+            if (urlPieces.tail == "") continue;         // Don't want an empty label
+            if (urlPieces.tail == "/") continue;        // Don't want that either
             return urlPieces.tail;
         }
         // Fallback for links that no longer match any (still) listed sites
