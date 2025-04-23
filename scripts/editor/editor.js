@@ -119,10 +119,10 @@ class Editor {
         this.#fcnFinalize(readerObjectLike);
     }
 
-    #setUpSiteRecognitionEditor(siteRecognition) {
+    #setUpSiteRecognitionEditor() {
         this.#siteRecognitionEditor = new SiteRecognitionEditor(
-            document.getElementById("site_identificatiors"),
-            siteRecognition,
+            document.getElementById("site_identificators"),
+            this.#reader.getRecognitionObject(),
             () => {this.#preview.updateReaderUrls(this.#reader);}
         );
     }

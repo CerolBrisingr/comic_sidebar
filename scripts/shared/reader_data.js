@@ -1,4 +1,4 @@
-import { dissectUrl } from "./url.js"    // TODO: remove from here
+import { dissectUrl } from "./url.js"
 import { SiteRecognition } from "./site_recognition.js";
 import { ReaderSchedule } from "./reader_schedule.js";
 import { TagData } from "./tag_data.js";

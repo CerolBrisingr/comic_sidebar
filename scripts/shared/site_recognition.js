@@ -61,6 +61,12 @@ class SiteRecognition {
         }
     }
 
+    // It is not guaranteed that the returned sites will not be replaced
+    // by SiteRecognition.
+    getSites() {
+        return this.#sites;
+    }
+
     overlapsWith(other) {
         // Don't accept it if it's not even the correct class!
         if (!(other instanceof SiteRecognition)) return true;
@@ -177,6 +183,21 @@ class Site {
         this.#prefix = String(prefix);
     }
 
+    getTitleToken() {
+        return this.#titleToken;
+    }
+
+    updateTitleToken(titleToken) {
+        this.#titleToken = String(titleToken);
+    }
+
+    getLastUrl() {
+        return this.#lastUrl;
+    }
+
+    getLastTitle() {
+        return this.#lastTitle;
+    }
     isCompatible(url, title) {
         if (url == this.#prefix) {
             return false;  // Will not accept 100% match
