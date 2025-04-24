@@ -62,8 +62,13 @@ class SiteEditor {
         this.#controls = new PrefixSelector(
             this.#site.getLastUrl(), 
             this.#site.getPrefix(), 
-            this.#updateTrigger,
+            (prefix) => {this.#receiveNewPrefix(prefix)},
             ui);
+    }
+
+    #receiveNewPrefix(prefix) {
+        this.#site.updatePrefix(prefix);
+        this.#updateTrigger();
     }
 }
 
