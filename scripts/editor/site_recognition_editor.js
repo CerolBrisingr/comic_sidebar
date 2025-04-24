@@ -27,7 +27,6 @@ class SiteEditor {
     #site
     #frame
     #updateTrigger
-    #controls
 
     constructor(parent, site, updateTrigger) {
         this.#site = site;
@@ -59,7 +58,7 @@ class SiteEditor {
             trail: HTML.addSpan(group, "-tail-", "prefix_trail"),
             prefixLine: this.#frame
         }
-        this.#controls = new PrefixSelector(
+        new PrefixSelector(
             this.#site.getLastUrl(), 
             this.#site.getPrefix(), 
             (prefix) => {this.#receiveNewPrefix(prefix)},
