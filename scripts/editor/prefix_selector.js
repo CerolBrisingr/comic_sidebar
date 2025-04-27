@@ -1,7 +1,5 @@
 import { dissectUrl } from "../shared/url.js";
 
-// TODO: refactor once transition is complete
-
 class PrefixSelector {
     #main;
     #edge;
@@ -15,7 +13,7 @@ class PrefixSelector {
 
     #mouseDown = false;
 
-    constructor(url, prefix_mask, fcnUpdate, ui = undefined) {
+    constructor(url, prefix_mask, fcnUpdate, ui) {
         this.#url = url;
         this.#fcnUpdate = fcnUpdate;
         this.#collectUi(ui);
@@ -24,17 +22,10 @@ class PrefixSelector {
     }
 
     #collectUi(ui) {
-        if (ui === undefined) {
-            this.#main = document.getElementById("prefix_main");
-            this.#edge = document.getElementById("prefix_edge");
-            this.#trail = document.getElementById("prefix_trail");
-            this.#prefixLine = document.getElementById("prefix_line");
-        } else {
-            this.#main = ui.main;
-            this.#edge = ui.edge;
-            this.#trail = ui.trail;
-            this.#prefixLine = ui.prefixLine;
-        }
+        this.#main = ui.main;
+        this.#edge = ui.edge;
+        this.#trail = ui.trail;
+        this.#prefixLine = ui.prefixLine;
     }
 
     #setUpSpans(prefix_mask) {

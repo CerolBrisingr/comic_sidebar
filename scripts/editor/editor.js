@@ -1,4 +1,3 @@
-import { PrefixSelector } from "./prefix_selector.js"
 import { SiteRecognitionEditor } from "./site_recognition_editor.js";
 import { ReaderData } from "../shared/reader_data.js";
 import { ReaderVisuals } from "../sidebar/reader_visuals.js";
@@ -8,15 +7,9 @@ import { ScheduleEditor } from "./schedule_editor.js";
 import { TagEditorEditor } from "../shared/tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
 
-class Editor {
-    #prefixInfo;
-    #prefixEdit;
-    #siteRecognitionEditor;
-    
+class Editor {    
     #reader;
     #preview;
-    #scheduler;
-    #tagEditor;
     #fcnFinalize;
 
     #cancel;
@@ -71,17 +64,17 @@ class Editor {
     }
 
     #setUpHints() {
-        const prefixHint = new HideableHint("prefix");
-        const previewHint = new HideableHint("preview");
-        const scheduleHint = new HideableHint("schedule");
+        new HideableHint("prefix");
+        new HideableHint("preview");
+        new HideableHint("schedule");
     }
 
     #setUpScheduleEditor() {
-        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
+        new ScheduleEditor(this.#reader.getSchedule());
     }
 
     #setUpTagEditor(knownTags) {
-        this.#tagEditor = new TagEditorEditor(this.#reader, knownTags);
+        new TagEditorEditor(this.#reader, knownTags);
     }
 
     #collectExitButtons() {
@@ -120,25 +113,11 @@ class Editor {
     }
 
     #setUpSiteRecognitionEditor() {
-        this.#siteRecognitionEditor = new SiteRecognitionEditor(
+        new SiteRecognitionEditor(
             document.getElementById("site_identificators"),
             this.#reader.getRecognitionObject(),
             () => {this.#preview.updateReaderUrls(this.#reader);}
         );
-    }
-
-    #setUpPrefixHandling(url) {
-        this.#prefixInfo = document.getElementById("prefix_output");
-        // TODO: One selector for each alias URL
-        this.#prefixEdit = new PrefixSelector(url, this.#reader.getPrefixMask(), (prefix) => {
-            this.#prefixUpdate(prefix);
-        });
-    }
-
-    #prefixUpdate(prefix) {
-        this.#reader.setPrefixMask(prefix);
-        this.#preview.updateReaderUrls(this.#reader);
-        this.#prefixInfo.innerText = prefix;
     }
 
     #setUpPreview(favIcon) {
