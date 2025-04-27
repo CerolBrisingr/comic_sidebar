@@ -345,7 +345,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     setFavIconFromKey(key, value) {
-        let managerList = this._readerStorage.getHostListFromKey(key);
+        let managerList = this._readerStorage.getCargoListForHost(key);
         for (const manager of managerList) {
             manager.updateFavIcon(value);
         }

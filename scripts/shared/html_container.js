@@ -1,14 +1,17 @@
 import { dissectUrl } from "./url.js";
 
 class HtmlContainer {
-    #data = new Map();
+    #hostMap = new Map();
     
     constructor() {}
 
     saveObject(object) {
+        // Bonus: get getPrefixMasks() out of here
         let urlList = object.getPrefixMasks();
+        let copyId = 1;
         for (let url of urlList) {
-            this.#storeObjectUsingUrl(object, url);
+            this.#storeObjectUsingUrl(object, url, copyId);
+            copyId += 1;
         }
     }
 
@@ -19,7 +22,7 @@ class HtmlContainer {
         return [];
     }
 
-    #storeObjectUsingUrl(object, url) {
+    #storeObjectUsingUrl(object, url, copyId) {
         let host = getHost(url);
         if (host === undefined) {
             return false;
@@ -27,20 +30,20 @@ class HtmlContainer {
         if (this.#findObject(host, url) !== undefined) {
             return false;
         }
-        if (this.#data.has(host)) {
-            let array = this.#data.get(host);
-            array.push(object);
+        if (this.#hostMap.has(host)) {
+            let array = this.#hostMap.get(host);
+            array.push(new StorageContainer(object, copyId));
         } else {
-            this.#data.set(host, [object]);
+            this.#hostMap.set(host, [new StorageContainer(object, copyId)]);
         }
     }
 
     keys() {
-        return Array.from(this.#data.keys());
+        return Array.from(this.#hostMap.keys());
     }
     
     clearData() {
-        this.#data.clear();
+        this.#hostMap.clear();
     }
 
     removeObject(urlList) {
@@ -56,19 +59,19 @@ class HtmlContainer {
             console.log('Could not find valid host for given input');
             return;
         }
-        let list = this.#data.get(host);
+        let list = this.#hostMap.get(host);
         if (list === undefined) {
             console.log('Object selected for removal was not found');
             return;
         }
         for (let [index, object] of list.entries()) {
-            if (object.urlIsCompatible(url)) {
+            if (object.respondsToIdentification(url)) {
                 list.splice(index, 1);
                 break;
             }
         }
         if (list.length === 0) {
-            this.#data.delete(host);
+            this.#hostMap.delete(host);
         }
     }
     
@@ -80,39 +83,73 @@ class HtmlContainer {
         return this.#findObject(host, url);
     }
 
-    getHostListFromUrl(url) {
+    getCargoListForUrl(url) {
         let host = getHost(url);
         if (host === undefined) {
             return [];
         }
-        return this.getHostListFromKey(host);
+        return this.getCargoListForHost(host);
     }
 
-    getHostListFromKey(host) {
-        if (!this.#data.has(host)) {
+    getCargoListForHost(host) {
+        const containerList = this.#getContainerListForHost(host);
+        // Turn containers into cargo list
+        let output = [];
+        for (let container of containerList) {
+            output.push(container.getCargo());
+        }
+        return output;
+    }
+
+    #getContainerListForHost(host) {
+        if (!this.#hostMap.has(host)) {
             return [];
         }
-        return this.#data.get(host);
+        return this.#hostMap.get(host);
     }
     
     #findObject(host, url) {
-        for (let object of this.getHostListFromKey(host)) {
-            if (object.urlIsCompatible(url))
-                return object;
+        for (let container of this.#getContainerListForHost(host)) {
+            if (container.respondsToIdentification(url))
+                return container.getCargo();
         }
         return undefined;
     }
     
     getList() {
         // Returns stored objects as list
-        let objectSet = new Set();
-        for (let listedObjects of this.#data.values())
-            for (let object of listedObjects) {
-                objectSet.add(object);
+        let allObjects = [];
+        for (let containerListForOneKey of this.#hostMap.values())
+            for (let container of containerListForOneKey) {
+                if (container.isFirst()) {
+                    allObjects.push(container.getCargo());
+                }
             }
-        return Array.from(objectSet);
+        return allObjects;
     }
     
+}
+
+class StorageContainer {
+    #cargo;
+    #copyId;    // If it's > 1, it's an alias
+
+    constructor(cargo, copyId) {
+        this.#cargo = cargo;
+        this.#copyId = copyId;
+    }
+
+    respondsToIdentification(identification) {
+        return this.#cargo.urlIsCompatible(identification);
+    }
+
+    isFirst() {
+        return this.#copyId < 2;
+    }
+
+    getCargo() {
+        return this.#cargo;
+    }
 }
 
 function getHost(url) {

@@ -34,8 +34,8 @@ describe("HtmlContainer", function() {
 
         storage.saveObject(object);
         expect(storage.getObject(url)).toBe(object);
-        expect(storage.getHostListFromUrl(url)).toEqual([object]);
-        expect(storage.getHostListFromKey("www.test.com")).toEqual([object]);
+        expect(storage.getCargoListForUrl(url)).toEqual([object]);
+        expect(storage.getCargoListForHost("www.test.com")).toEqual([object]);
         expect(storage.keys()).toEqual(["www.test.com"]); 
         expect(storage.getList()).toEqual([object]);
     });
@@ -57,12 +57,12 @@ describe("HtmlContainer", function() {
         expect(storage.getObject(url2)).toBe(object2);
         expect(storage.getObject(url3)).toBe(object3);
 
-        expect(storage.getHostListFromUrl(url1)).toEqual([object1, object2]);
-        expect(storage.getHostListFromUrl(url2)).toEqual([object1, object2]);
-        expect(storage.getHostListFromUrl(url3)).toEqual([object3]);
+        expect(storage.getCargoListForUrl(url1)).toEqual([object1, object2]);
+        expect(storage.getCargoListForUrl(url2)).toEqual([object1, object2]);
+        expect(storage.getCargoListForUrl(url3)).toEqual([object3]);
 
-        expect(storage.getHostListFromKey("www.test.com")).toEqual([object1, object2]);
-        expect(storage.getHostListFromKey("www.test2.com")).toEqual([object3]);
+        expect(storage.getCargoListForHost("www.test.com")).toEqual([object1, object2]);
+        expect(storage.getCargoListForHost("www.test2.com")).toEqual([object3]);
 
         expect(storage.keys()).toEqual(["www.test.com", "www.test2.com"]); 
         expect(storage.getList()).toEqual([object1, object2, object3]);
@@ -83,8 +83,8 @@ describe("HtmlContainer", function() {
         storage.saveObject(object);
         expect(storage.getObject(url1)).toBe(object);
         expect(storage.getObject(url2)).toBe(object);
-        expect(storage.getHostListFromUrl(url1)).toEqual([object]);
-        expect(storage.getHostListFromKey("www.test.com")).toEqual([object]);
+        expect(storage.getCargoListForUrl(url1)).toEqual([object]);
+        expect(storage.getCargoListForHost("www.test.com")).toEqual([object]);
         expect(storage.keys()).toEqual(["www.test.com", "www.test2.com"]); 
         expect(storage.getList()).toEqual([object]);
     });
