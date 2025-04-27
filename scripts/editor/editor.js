@@ -1,4 +1,4 @@
-import { PrefixSelector } from "./prefix_selector.js"
+import { SiteRecognitionEditor } from "./site_recognition_editor.js";
 import { ReaderData } from "../shared/reader_data.js";
 import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
@@ -7,14 +7,9 @@ import { ScheduleEditor } from "./schedule_editor.js";
 import { TagEditorEditor } from "../shared/tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
 
-class Editor {
-    #prefixInfo;
-    #prefixEdit;
-    
+class Editor {    
     #reader;
     #preview;
-    #scheduler;
-    #tagEditor;
     #fcnFinalize;
 
     #cancel;
@@ -30,7 +25,8 @@ class Editor {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditorFromData(data);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
-        this.#setUpPrefixHandling(data.url);
+        this.#setUpSiteRecognitionEditor();
+        //this.#setUpPrefixHandling(data.url);
         const imageAdjuster = new ImageAdjuster();
         const favIcon = await imageAdjuster.apply(data.favIcon);
         this.#setUpHints();
@@ -45,7 +41,8 @@ class Editor {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditor(readerObjectLike);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
-        this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
+        this.#setUpSiteRecognitionEditor();
+        //this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
         this.#setUpHints();
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
@@ -67,17 +64,17 @@ class Editor {
     }
 
     #setUpHints() {
-        const prefixHint = new HideableHint("prefix");
-        const previewHint = new HideableHint("preview");
-        const scheduleHint = new HideableHint("schedule");
+        new HideableHint("prefix");
+        new HideableHint("preview");
+        new HideableHint("schedule");
     }
 
     #setUpScheduleEditor() {
-        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
+        new ScheduleEditor(this.#reader.getSchedule());
     }
 
     #setUpTagEditor(knownTags) {
-        this.#tagEditor = new TagEditorEditor(this.#reader, knownTags);
+        new TagEditorEditor(this.#reader, knownTags);
     }
 
     #collectExitButtons() {
@@ -115,18 +112,12 @@ class Editor {
         this.#fcnFinalize(readerObjectLike);
     }
 
-    #setUpPrefixHandling(url) {
-        this.#prefixInfo = document.getElementById("prefix_output");
-        // TODO: One selector for each alias URL
-        this.#prefixEdit = new PrefixSelector(url, this.#reader.getPrefixMask(), (prefix) => {
-            this.#prefixUpdate(prefix);
-        });
-    }
-
-    #prefixUpdate(prefix) {
-        this.#reader.setPrefixMask(prefix);
-        this.#preview.updateReaderUrls(this.#reader);
-        this.#prefixInfo.innerText = prefix;
+    #setUpSiteRecognitionEditor() {
+        new SiteRecognitionEditor(
+            document.getElementById("site_identificators"),
+            this.#reader.getRecognitionObject(),
+            () => {this.#preview.updateReaderUrls(this.#reader);}
+        );
     }
 
     #setUpPreview(favIcon) {

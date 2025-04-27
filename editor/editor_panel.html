@@ -24,7 +24,7 @@
             placeholder="some.comic">
         <br />
         <div class="divider"></div>
-        <label for="prefix_line"><b>Select the address that all pages share:</b></label>
+        <label for="prefix_line"><b>How can we identify pages for this entry?</b></label>
         <div id="prefix_hint" class="hint">
             <b>This mask is used to match a page you visit with the reader you are about to create.</b>
             <div class="hint_grid">
@@ -51,22 +51,7 @@
             </div>
             <button class="hint_dismiss" id="prefix_hint_dismiss">Dismiss Hint</button>
         </div>
-        <div class="spans" id="prefix_line" tabindex="0">
-            <img class="field_type_icon" src="../icons/edit.svg"/>
-            &nbsp;
-            <div>
-                <span class="prefix_main" id="prefix_main">https://some.comic/comics</span><span class="prefix_edge" id="prefix_edge">/</span><span class="prefix_trail" id="prefix_trail">4192</span>
-            </div>
-        </div>
-        <div class="divider"></div>
-        <label for="prefix_showcase"><b>This reader will track all pages with addresses that start like:</b></label>
-        <div class="spans" id="prefix_showcase">
-            <img class="field_type_icon" src="../icons/information.svg"/>
-            &nbsp;
-            <div>
-                <span class="prefix_output" id="prefix_output">https://some.comic/comics/</span><span class="append_stars">***</span>
-            </div>
-        </div>
+        <div class="site_identificator_container" id="site_identificators"></div>
         <label for="reader_tags"><b>Add tags so you can filter for them:</b></label>        
         <div class="tag_container" id="reader_tags">
             <div id="tag_add_ui" class="tag_add_ui">
