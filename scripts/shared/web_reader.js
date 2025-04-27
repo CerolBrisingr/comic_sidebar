@@ -175,6 +175,15 @@ class WebReaderBackground extends WebReader {
         await this.#favIconController.initialize(this._readerStorage.keys());
     }
 
+    canReaderBeUpdatedWith(readerData, newReaderData) {
+        const conflicts = this._readerStorage.findConflictsWith(newReaderData);
+        if (conflicts.length == 0)
+            return true;
+        if (conflicts.length == 1 && conflicts.includes(readerData))
+            return true;
+        return false;
+    }
+
     async updateBookmark(data, doClean = true) {
         let wasValid = this._currentReader.isValid();
         let bookmarkIsNew = super.updateBookmark(data);
@@ -393,6 +402,10 @@ class WebReaderInterface {
     
     removeReader(prefixMask) {
         this.#webReader.removeReader(prefixMask);
+    }
+
+    canWeUpdateReaderWith(readerData, newReaderData) {
+        return this.#webReader.canReaderBeUpdatedWith(readerData, newReaderData);
     }
     
     relistViewerDisplay() {

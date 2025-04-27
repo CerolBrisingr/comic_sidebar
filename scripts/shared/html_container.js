@@ -12,6 +12,12 @@ class HtmlContainer {
         }
     }
 
+    findConflictsWith(newReaderData) {
+        // TODO: find implementation
+        // Bonus: implement without deep knowledge, 
+        //        keep implementation information out of this
+    }
+
     #storeObjectUsingUrl(object, url) {
         let host = getHost(url);
         if (host === undefined) {

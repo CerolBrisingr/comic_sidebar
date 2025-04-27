@@ -158,6 +158,11 @@ class SidebarReaderManager extends BasicReaderManager{
     prepareReaderEdit() {
         this._readerSync.sendEditRequest(this.#favIcon);
     }
+
+    canBeUpdatedWith(readerObjectLike) {
+        const tempReader = new ReaderData(readerObjectLike);
+        return this.parentInterface.canWeUpdateReaderWith(this._readerData, tempReader);
+    }
     
     editReader(readerObjectLike) {
         // TODO: verify continued compatibility with exising readers first
@@ -240,6 +245,10 @@ class ReaderManagerDummy {
         return false;
     }
     
+    canWeUpdateReaderWith() {
+        return false;
+    }
+
     prepareReaderEdit() {}
     
     pinBookmark(bookmark) {
