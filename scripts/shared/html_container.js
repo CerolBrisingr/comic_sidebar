@@ -16,6 +16,7 @@ class HtmlContainer {
         // TODO: find implementation
         // Bonus: implement without deep knowledge, 
         //        keep implementation information out of this
+        return [];
     }
 
     #storeObjectUsingUrl(object, url) {
