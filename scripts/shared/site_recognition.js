@@ -135,6 +135,13 @@ class SiteRecognitionInterface {
         this.#siteRecognition = siteRecognition;
     }
 
+    canCoexistWith(otherSiteRecognitionInterface) {
+        if (!(otherSiteRecognitionInterface instanceof SiteRecognitionInterface)) {
+            return false;
+        }
+        return !this.#siteRecognition.overlapsWith(otherSiteRecognitionInterface.#siteRecognition);
+    }
+
     getUrlRemainder(url, title = "") {
         return this.#siteRecognition.getUrlRemainder(url, title);
     }

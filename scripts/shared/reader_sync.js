@@ -100,8 +100,11 @@ class ReaderSyncCore extends ReaderSync {
             this.#deleteRequestHandler(readerObjectLike.deleteMe);
             return;
         }
-        // TODO: verify edit with WebReader interface in Core
-        //       This is solely important for the webpage recognition mechanism
+        if (!this.#readerManager.canBeUpdatedWith(readerObjectLike)) {
+            console.log("Conflict detected, will not update ");
+            // TODO: notify editor of failure
+            return;
+        }
         this.#readerManager.editReader(readerObjectLike);
         this.port.sendMessage({editCommand: readerObjectLike});
     }
