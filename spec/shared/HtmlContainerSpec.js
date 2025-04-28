@@ -32,7 +32,7 @@ describe("HtmlContainer", function() {
         let url = "http://www.test.com/123";
         let object = new MinimalObject(url);
 
-        storage.saveObject(object);
+        storage.saveObject(object, object.getPrefixMasks());
         expect(storage.getObject(url)).toBe(object);
         expect(storage.getCargoListForUrl(url)).toEqual([object]);
         expect(storage.getCargoListForHost("www.test.com")).toEqual([object]);
@@ -49,9 +49,9 @@ describe("HtmlContainer", function() {
         let object2 = new MinimalObject(url2);
         let object3 = new MinimalObject(url3);
 
-        storage.saveObject(object1);
-        storage.saveObject(object2);
-        storage.saveObject(object3);
+        storage.saveObject(object1, object1.getPrefixMasks());
+        storage.saveObject(object2, object2.getPrefixMasks());
+        storage.saveObject(object3, object3.getPrefixMasks());
         
         expect(storage.getObject(url1)).toBe(object1);
         expect(storage.getObject(url2)).toBe(object2);
@@ -80,7 +80,7 @@ describe("HtmlContainer", function() {
         let url2 = "http://www.test2.com/456";
         let object = new MinimalObject([url1, url2]);
 
-        storage.saveObject(object);
+        storage.saveObject(object, object.getPrefixMasks());
         expect(storage.getObject(url1)).toBe(object);
         expect(storage.getObject(url2)).toBe(object);
         expect(storage.getCargoListForUrl(url1)).toEqual([object]);

@@ -114,6 +114,19 @@ class CoreReaderManager extends BasicReaderManager {
         this._readerSync = ReaderSync.makeCore(intId, this);
     }
 
+    managesThis(readerData) {
+        return readerData === this._readerData;
+    }
+
+    canBeUpdatedWith(readerObjectLike) {
+        const tempReader = new ReaderData(readerObjectLike);
+        return this._parentInterface.canWeUpdateReaderWith(this._readerData, tempReader);
+    }
+
+    getRecognitionInterface() {
+        return this._readerData.getRecognitionInterface();
+    }
+
     saveProgress() {
         this._parentInterface.saveProgress();
     }
@@ -158,14 +171,8 @@ class SidebarReaderManager extends BasicReaderManager{
     prepareReaderEdit() {
         this._readerSync.sendEditRequest(this.#favIcon);
     }
-
-    canBeUpdatedWith(readerObjectLike) {
-        const tempReader = new ReaderData(readerObjectLike);
-        return this.parentInterface.canWeUpdateReaderWith(this._readerData, tempReader);
-    }
     
     editReader(readerObjectLike) {
-        // TODO: verify continued compatibility with exising readers first
         super.editReader(readerObjectLike);
         this.#schedule.updateRuleset(this._readerData.getSchedule());
         this.#updateReaderVisuals();

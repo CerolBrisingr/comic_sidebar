@@ -5,21 +5,12 @@ class HtmlContainer {
     
     constructor() {}
 
-    saveObject(object) {
-        // Bonus: get getPrefixMasks() out of here
-        let urlList = object.getPrefixMasks();
+    saveObject(object, urlList) {
         let copyId = 1;
         for (let url of urlList) {
             this.#storeObjectUsingUrl(object, url, copyId);
             copyId += 1;
         }
-    }
-
-    findConflictsWith(newReaderData) {
-        // TODO: find implementation
-        // Bonus: implement without deep knowledge, 
-        //        keep implementation information out of this
-        return [];
     }
 
     #storeObjectUsingUrl(object, url, copyId) {
@@ -47,8 +38,13 @@ class HtmlContainer {
     }
 
     removeObject(urlList) {
-        // TODO: remove [] once it's actually a list
-        for (let url of [urlList]) {
+        // urlList can be single URL whitout list
+        if (!Array.isArray(urlList)) {
+            this.#removeObjectUsing(urlList);
+            return;
+        }
+        // otherwise treat each list member individually
+        for (let url of urlList) {
             this.#removeObjectUsing(url);
         }
     }
@@ -131,8 +127,10 @@ class HtmlContainer {
 }
 
 class StorageContainer {
+    // Encapsulates each cargo element
+    // Allows to keep track of copy counts
     #cargo;
-    #copyId;    // If it's > 1, it's an alias
+    #copyId;    // If it's > 1, it's an alias object
 
     constructor(cargo, copyId) {
         this.#cargo = cargo;
@@ -140,6 +138,8 @@ class StorageContainer {
     }
 
     respondsToIdentification(identification) {
+        // TODO: establish this call during init
+        //       -> get rid of implementation knowledge
         return this.#cargo.urlIsCompatible(identification);
     }
 

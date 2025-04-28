@@ -88,7 +88,7 @@ class WebReader {
             let newObject = this._createReaderClass(readerObject, index);
             if (!newObject.isValid())
                 continue;
-            this._readerStorage.saveObject(newObject);
+            this._readerStorage.saveObject(newObject, newObject.getPrefixMasks());
         }
         this._savingSuspended = false;
         this.saveProgress();
@@ -123,7 +123,7 @@ class WebReader {
             console.log("Failed to build comic entry");
             return -1;
         }
-        this._readerStorage.saveObject(newManager);
+        this._readerStorage.saveObject(newManager, newManager.getPrefixMasks());
         await this._registerFavIcon(readerObjectLike);
         await this.updateBookmark(readerObjectLike, false); // This also updates storage
         this.relistViewers();
@@ -176,12 +176,28 @@ class WebReaderBackground extends WebReader {
     }
 
     canReaderBeUpdatedWith(readerData, newReaderData) {
-        const conflicts = this._readerStorage.findConflictsWith(newReaderData);
-        if (conflicts.length == 0)
-            return true;
-        if (conflicts.length == 1 && conflicts.includes(readerData))
-            return true;
-        return false;
+        // A prefixMask always contains at least the host url
+        const prefixList = newReaderData.getPrefixMasks();
+        for (const prefix of prefixList) {
+            const candidates = this._readerStorage.getCargoListForUrl(prefix);
+            if (!this.#testEditWithCandidates(candidates, readerData, newReaderData))
+                return false;
+        }
+        return true;
+    }
+
+    #testEditWithCandidates(candidates, readerData, newReaderData) {
+        const newSiteRecognition = newReaderData.getRecognitionInterface();
+        for (const candidate of candidates) {
+            // Edited version will replace the version to edit
+            if (candidate.managesThis(readerData)) continue;
+
+            // Bilaterally test for conflicts with unrelated element
+            const siteRecognition = candidate.getRecognitionInterface();
+            if (!siteRecognition.canCoexistWith(newSiteRecognition)) return false;
+            if (!newSiteRecognition.canCoexistWith(siteRecognition)) return false;
+        }
+        return true;
     }
 
     async updateBookmark(data, doClean = true) {
