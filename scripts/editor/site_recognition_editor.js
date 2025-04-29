@@ -1,5 +1,6 @@
 import { PrefixSelector } from "./prefix_selector.js";
 import { UrlListener } from "../shared/url_listener.js";
+import { TabSelector } from "./tab_selector.js";
 
 class SiteRecognitionEditor {
 
@@ -21,21 +22,18 @@ class SiteRecognitionEditor {
                 this.#parentDiv,
                 site, 
                 this.#uiUpdateTrigger));
-        }
+        };
     }
 
     #buildExtensionFunctionality(addSiteButton) {
-        // TODO: Possibly best in its own module
-        // Early assessment opens a few necessary steps:
-        // * Sort by last use
-        // * Add search bar, some users have an excessive amount of tabs
-        // * Add scroll bar, same reason
-        addSiteButton.onclick = async function() {
-            const tabs = await UrlListener.listAllTabs();
-            for (const tab of tabs) {
-                tab.print();
-            }
-        };
+        const fktAddSite = (tab) => {
+            this.#addSite(tab)
+        }
+        new TabSelector(addSiteButton, fktAddSite);
+    }
+
+    #addSite(tab) {
+        console.log(tab);
     }
 
     #setUpLabel(parent) {
