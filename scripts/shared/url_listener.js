@@ -129,7 +129,7 @@ class Tab {
         this.#lastAccessed = browserTab.lastAccessed;
         this.#url = browserTab.url;
         this.#title = browserTab.title;
-        this.favIconUrl = browserTab.favIconUrl;
+        this.#favIconUrl = browserTab.favIconUrl;
     }
 
     print() {
