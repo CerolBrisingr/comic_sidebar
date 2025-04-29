@@ -1,4 +1,5 @@
 import { PrefixSelector } from "./prefix_selector.js";
+import { UrlListener } from "../shared/url_listener.js";
 
 class SiteRecognitionEditor {
 
@@ -6,10 +7,11 @@ class SiteRecognitionEditor {
     #uiUpdateTrigger;
     #siteEditors = [];
 
-    constructor(parentDiv, siteRecognition, uiUpdateTrigger) {
+    constructor(parentDiv, addSiteButton, siteRecognition, uiUpdateTrigger) {
         this.#parentDiv = parentDiv;
         this.#uiUpdateTrigger = uiUpdateTrigger;
         this.#buildInterface(siteRecognition);
+        this.#buildExtensionFunctionality(addSiteButton);
     }
 
     #buildInterface(siteRecognition) {
@@ -20,6 +22,20 @@ class SiteRecognitionEditor {
                 site, 
                 this.#uiUpdateTrigger));
         }
+    }
+
+    #buildExtensionFunctionality(addSiteButton) {
+        // TODO: Possibly best in its own module
+        // Early assessment opens a few necessary steps:
+        // * Sort by last use
+        // * Add search bar, some users have an excessive amount of tabs
+        // * Add scroll bar, same reason
+        addSiteButton.onclick = async function() {
+            const tabs = await UrlListener.listAllTabs();
+            for (const tab of tabs) {
+                tab.print();
+            }
+        };
     }
 
     #setUpLabel(parent) {
