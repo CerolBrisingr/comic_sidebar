@@ -114,6 +114,7 @@ class Editor {
         new SiteRecognitionEditor(
             document.getElementById("site_identificators"),
             document.getElementById("add_site_identification"),
+            document.getElementById("add_site_identification_dropdown"),
             this.#reader.getRecognitionObject(),
             () => {this.#preview.updateReaderUrls(this.#reader);}
         );

@@ -1,5 +1,5 @@
 import { PrefixSelector } from "./prefix_selector.js";
-import { UrlListener } from "../shared/url_listener.js";
+import { HTML } from "../shared/html.js"
 import { TabSelector } from "./tab_selector.js";
 
 class SiteRecognitionEditor {
@@ -8,11 +8,11 @@ class SiteRecognitionEditor {
     #uiUpdateTrigger;
     #siteEditors = [];
 
-    constructor(parentDiv, addSiteButton, siteRecognition, uiUpdateTrigger) {
+    constructor(parentDiv, addSiteButton, addSiteDropdown, siteRecognition, uiUpdateTrigger) {
         this.#parentDiv = parentDiv;
         this.#uiUpdateTrigger = uiUpdateTrigger;
         this.#buildInterface(siteRecognition);
-        this.#buildExtensionFunctionality(addSiteButton);
+        this.#buildExtensionFunctionality(addSiteButton, addSiteDropdown);
     }
 
     #buildInterface(siteRecognition) {
@@ -25,15 +25,16 @@ class SiteRecognitionEditor {
         };
     }
 
-    #buildExtensionFunctionality(addSiteButton) {
+    #buildExtensionFunctionality(addSiteButton, addSiteDropdown) {
         const fktAddSite = (tab) => {
             this.#addSite(tab)
         }
-        new TabSelector(addSiteButton, fktAddSite);
+        new TabSelector(addSiteButton, addSiteDropdown, fktAddSite);
     }
 
     #addSite(tab) {
-        console.log(tab);
+        console.log("Received tab:");
+        tab.print();
     }
 
     #setUpLabel(parent) {
@@ -120,38 +121,6 @@ class SiteEditor {
         this.#site.updatePrefix(prefix);
         this.#prefixEval.innerText = prefix;
         this.#updateTrigger();
-    }
-}
-
-// TODO: make this it's own module
-class HTML {
-    static insertElement(parent, strType) {
-        let element = document.createElement(strType);
-        parent.appendChild(element);
-        return element;
-    }
-
-    static addCssProperty(element, strName) {
-        element.classList.add(strName);
-    }
-
-    static addSpan(parent, strText, strClass = undefined) {
-        let span = HTML.insertElement(parent, "span");
-        if (strClass !== undefined) {
-            HTML.addCssProperty(span, strClass);
-        }
-        span.innerText = strText;
-        return span;
-    }
-
-    static addSpacer(parent) {
-        return HTML.addText(parent, '\u00A0');
-    }
-
-    static addText(parent, strText) {
-        const text = document.createTextNode(strText);
-        parent.appendChild(text);
-        return text;
     }
 }
 
