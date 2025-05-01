@@ -1,40 +1,49 @@
 import { PrefixSelector } from "./prefix_selector.js";
 import { HTML } from "../shared/html.js"
 import { TabSelector } from "./tab_selector.js";
+import { SiteRecognition } from "../shared/site_recognition.js";
 
 class SiteRecognitionEditor {
 
     #parentDiv;
+    #siteRecognition;
     #uiUpdateTrigger;
     #siteEditors = [];
 
     constructor(parentDiv, addSiteButton, addSiteDropdown, siteRecognition, uiUpdateTrigger) {
         this.#parentDiv = parentDiv;
         this.#uiUpdateTrigger = uiUpdateTrigger;
+        this.#siteRecognition = siteRecognition;
         this.#buildInterface(siteRecognition);
         this.#buildExtensionFunctionality(addSiteButton, addSiteDropdown);
     }
 
     #buildInterface(siteRecognition) {
         for (let site of siteRecognition.getSites()) {
-            this.#setUpLabel(this.#parentDiv);
-            this.#siteEditors.push(new SiteEditor(
-                this.#parentDiv,
-                site, 
-                this.#uiUpdateTrigger));
+            this.#addSite(site);
         };
+    }
+
+    #addSite(site) {
+        this.#setUpLabel(this.#parentDiv);
+        this.#siteEditors.push(new SiteEditor(
+            this.#parentDiv,
+            site, 
+            this.#uiUpdateTrigger));
     }
 
     #buildExtensionFunctionality(addSiteButton, addSiteDropdown) {
         const fktAddSite = (tab) => {
-            this.#addSite(tab)
+            this.#createSiteForTab(tab)
         }
         new TabSelector(addSiteButton, addSiteDropdown, fktAddSite);
     }
 
-    #addSite(tab) {
-        console.log("Received tab:");
-        tab.print();
+    #createSiteForTab(tab) {
+        const site = this.#siteRecognition.createSiteFromTab(tab);
+        if (site === undefined)
+            return;
+        this.#addSite(site);
     }
 
     #setUpLabel(parent) {

@@ -66,6 +66,25 @@ class SiteRecognition {
     getSites() {
         return this.#sites;
     }
+    
+    createSiteFromTab(tab) {
+        // TODO: evaluate where to put this
+        let urlPieces = dissectUrl(tab.getUrl());
+        if (urlPieces === undefined)
+            return;
+        const data = {
+            prefix: urlPieces.base_url,
+            lastUrl: tab.getUrl(),
+            lastTitle: tab.getTitle()
+        }
+        this.createSite(data);
+    }
+
+    createSite(data) {
+        const site = new Site(data);
+        this.#sites.push(site);
+        return site;
+    }
 
     overlapsWith(other) {
         // Don't accept it if it's not even the correct class!
