@@ -77,7 +77,8 @@ class SiteRecognition {
             lastUrl: tab.getUrl(),
             lastTitle: tab.getTitle()
         }
-        this.createSite(data);
+        const site = this.createSite(data);
+        return site;
     }
 
     createSite(data) {

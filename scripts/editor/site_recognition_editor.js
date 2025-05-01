@@ -1,7 +1,6 @@
 import { PrefixSelector } from "./prefix_selector.js";
 import { HTML } from "../shared/html.js"
 import { TabSelector } from "./tab_selector.js";
-import { SiteRecognition } from "../shared/site_recognition.js";
 
 class SiteRecognitionEditor {
 
