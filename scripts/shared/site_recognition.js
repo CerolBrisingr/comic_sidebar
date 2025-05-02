@@ -226,6 +226,7 @@ class Site {
         return this.#lastTitle;
     }
     isCompatible(url, title) {
+        // TODO: FIX: this new condition clashes with delete workflow
         if (url == this.#prefix) {
             return false;  // Will not accept 100% match
         }

@@ -130,10 +130,12 @@ class WebReader {
         return this._latestId;
     }
     
-    removeReader(prefixMask) {
-        if (this._currentReader.urlIsCompatible(prefixMask))
-            this._updateCurrentReader(new ReaderClassDummy());
-        this._readerStorage.removeObject(prefixMask);
+    removeReader(prefixMasks) {
+        for (let prefixMask of prefixMasks) {
+            if (this._currentReader.urlIsCompatible(prefixMask))
+                this._updateCurrentReader(new ReaderClassDummy());
+        }
+        this._readerStorage.removeObject(prefixMasks);
         this.saveProgress();
     }
 
@@ -416,8 +418,8 @@ class WebReaderInterface {
         this.#webReader.saveProgress();
     }
     
-    removeReader(prefixMask) {
-        this.#webReader.removeReader(prefixMask);
+    removeReader(prefixMasks) {
+        this.#webReader.removeReader(prefixMasks);
     }
 
     canWeUpdateReaderWith(readerData, newReaderData) {

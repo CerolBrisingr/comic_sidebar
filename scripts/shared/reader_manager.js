@@ -90,9 +90,7 @@ class BasicReaderManager {
     
     deleteMe() {
         this._readerSync.disconnect();
-        // TODO: removeReader must handle all aliases (probably hand over readerData)
-        //       prefix list would work as well
-        this._parentInterface.removeReader(this._readerData.getPrefixMask());
+        this._parentInterface.removeReader(this._readerData.getPrefixMasks());
     }
 
     isValid() {
