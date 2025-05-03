@@ -132,7 +132,7 @@ class WebReader {
     
     removeReader(prefixMasks) {
         for (let prefixMask of prefixMasks) {
-            if (this._currentReader.urlIsCompatible(prefixMask))
+            if (this._currentReader.urlIsCompatible(prefixMask, true))
                 this._updateCurrentReader(new ReaderClassDummy());
         }
         this._readerStorage.removeObject(prefixMasks);
@@ -363,7 +363,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     setFavIconFromKey(key, value) {
-        let managerList = this._readerStorage.getCargoListForHost(key);
+        let managerList = this._readerStorage.getPrimaryCargoListForHost(key);
         for (const manager of managerList) {
             manager.updateFavIcon(value);
         }
@@ -446,7 +446,7 @@ class ReaderClassDummy {
         return "Dummy";
     }
     
-    urlIsCompatible(url) {
+    urlIsCompatible(url, allowPrefix) {
         return false;
     }
 

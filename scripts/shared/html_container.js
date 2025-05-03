@@ -102,6 +102,18 @@ class HtmlContainer {
         return output;
     }
 
+    getPrimaryCargoListForHost(host) {
+        const containerList = this.#getContainerListForHost(host);
+        let output = [];
+        for (let container of containerList) {
+            if (container.isFirst()) {
+                output.push(container.getCargo());
+            }
+        }
+        this.#logState("get primary cargo list");
+        return output;
+    }
+
     #getContainerListForHost(host) {
         if (!this.#hostMap.has(host)) {
             return [];

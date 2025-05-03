@@ -7,9 +7,9 @@ class FavIcons {
     }
 
     async initialize(originUrlList) {
-        await this._readStorage();
-        this._removeUnneededEntries(originUrlList);
-        this._createMissingEntries(originUrlList);
+        await this.#readStorage();
+        this.#removeUnneededEntries(originUrlList);
+        this.#createMissingEntries(originUrlList);
     }
 
     entries() {
@@ -58,21 +58,21 @@ class FavIcons {
         return true;
     }
 
-    _createMissingEntries(originUrlList) {
+    #createMissingEntries(originUrlList) {
         for (const url of originUrlList) {
             if (!this._data.has(url))
                 this._data.set(url, this._defaultEntry);
         }
     }
 
-    _removeUnneededEntries(originUrlList) {
+    #removeUnneededEntries(originUrlList) {
         for (const key of this._data.keys()) {
             if (!originUrlList.includes(key))
                 this._data.delete(key);
         }
     }
 
-    async _readStorage() {
+    async #readStorage() {
         const favIconData = await browser.storage.local.get("favIconData");
         if (!favIconData.hasOwnProperty("favIconData")) {
             this._data = new Map();
