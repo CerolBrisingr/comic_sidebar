@@ -106,10 +106,10 @@ class SiteRecognition {
         return false;
     }
 
-    siteIsCompatible(url, title = "") {
+    siteIsCompatible(url, title = "", allowPrefix = false) {
         if (title === undefined) title = "";
         for (let site of this.#sites) {
-            if (site.isCompatible(url, title)) {
+            if (site.isCompatible(url, title, allowPrefix)) {
                 return true;
             }
         }
@@ -225,9 +225,8 @@ class Site {
     getLastTitle() {
         return this.#lastTitle;
     }
-    isCompatible(url, title) {
-        // TODO: FIX: this new condition clashes with delete workflow
-        if (url == this.#prefix) {
+    isCompatible(url, title, allowPrefix) {
+        if (!allowPrefix && url == this.#prefix) {
             return false;  // Will not accept 100% match
         }
         let doesMatch = urlFitsPrefix(url, this.#prefix);

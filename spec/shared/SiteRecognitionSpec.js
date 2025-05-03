@@ -25,6 +25,15 @@ describe('Single Site', function() {
         expect(siteRecognition.siteIsCompatible("http://www.some.site")).toBe(false);
     });
 
+    it('can chose to allow pure prefix', function() {
+        let siteRecognition = SiteRecognition.buildFromPrefix("http://www.some.site/12");
+        expect(siteRecognition.isValid()).toBe(true);
+        expect(siteRecognition.siteIsCompatible("http://www.some.site/12")).toBe(false);
+        expect(siteRecognition.siteIsCompatible("http://www.some.site/12", "", false)).toBe(false);
+        expect(siteRecognition.siteIsCompatible("http://www.some.site/12", "", true)).toBe(true);
+
+    });
+
     it('can be built from dictionary', function() {
         let site = {prefix: "http://www.some.site/12", titleToken: ""};
         let data = {sites: [site]};

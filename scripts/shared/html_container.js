@@ -65,7 +65,7 @@ class HtmlContainer {
             return;
         }
         for (let [index, object] of list.entries()) {
-            if (object.respondsToIdentification(url)) {
+            if (object.respondsToIdentification(url, true)) {
                 list.splice(index, 1);
                 break;
             }
@@ -164,10 +164,11 @@ class StorageContainer {
         this.#copyId = copyId;
     }
 
-    respondsToIdentification(identification) {
+    respondsToIdentification(identification, allowPrefix = false) {
         // TODO: establish this call during init
         //       -> get rid of implementation knowledge
-        return this.#cargo.urlIsCompatible(identification);
+        //       -> get rid of "allowPrefix"
+        return this.#cargo.urlIsCompatible(identification, allowPrefix);
     }
 
     isFirst() {

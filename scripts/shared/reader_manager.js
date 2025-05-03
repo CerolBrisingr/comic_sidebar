@@ -42,8 +42,8 @@ class BasicReaderManager {
         return this._readerData.getLatestInputTime();
     }
     
-    urlIsCompatible(url) {
-        return this._readerData.urlIsCompatible(url);
+    urlIsCompatible(url, allowPrefix = false) {
+        return this._readerData.urlIsCompatible(url, allowPrefix);
     }
     
     getMostRecentAutomaticUrl() {

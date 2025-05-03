@@ -129,10 +129,10 @@ class ReaderData {
                  && (this.#label !== undefined));
     }
     
-    urlIsCompatible(url_string) {
+    urlIsCompatible(url_string, allowPrefix = false) {
         if (!(typeof url_string === "string"))
             return false;
-        return this.#siteRecognition.siteIsCompatible(url_string);
+        return this.#siteRecognition.siteIsCompatible(url_string, "", allowPrefix);
     }
 
     addAutomatic(data) {
