@@ -2,7 +2,7 @@ import { dissectUrl } from "./url.js";
 
 class HtmlContainer {
     #hostMap = new Map();
-    #debug = true;
+    #debug = false;
     
     constructor() {}
 
