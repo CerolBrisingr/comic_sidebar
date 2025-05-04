@@ -33,6 +33,10 @@ class HTML {
             parent.removeChild(parent.lastChild);
         }
     }
+
+    static removeElement(parent, element) {
+        parent.removeChild(element);
+    }
 }
 
 export { HTML }

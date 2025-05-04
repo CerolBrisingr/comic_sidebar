@@ -12,6 +12,8 @@ class Editor {
     #preview;
     #fcnFinalize;
 
+    #siteRecognitionEditor;
+
     #cancel;
     #finalizer;
     #startDeleteBtn;
@@ -88,6 +90,10 @@ class Editor {
         this.#confirmDeleteBtn = new HideShowButton(confirmDelete, fcnConfirmDelte, false);
     }
 
+    #fetchErrorMessage() {
+        return this.#siteRecognitionEditor.fetchErrorMessage();
+    }
+
     #triggerDelete() {
         if (this.#startDeleteBtn.getLabel() === "Delete") {
             this.#setDeleteSectionVisibility("armed");
@@ -103,6 +109,12 @@ class Editor {
     }
 
     #finalize() {
+        const errorMessage = this.#fetchErrorMessage();
+        if (errorMessage !== undefined) {
+            // TODO: Show in text box below buttons
+            console.log(errorMessage);
+            return;
+        }
         // Successful confiuration. Send data
         let readerObjectLike = this.#reader.returnAsObject();
         readerObjectLike.favIcon = this.#preview.getFavIcon();
@@ -111,7 +123,7 @@ class Editor {
     }
 
     #setUpSiteRecognitionEditor() {
-        new SiteRecognitionEditor(
+        this.#siteRecognitionEditor = new SiteRecognitionEditor(
             document.getElementById("site_identificators"),
             document.getElementById("add_site_identification"),
             document.getElementById("add_site_identification_dropdown"),

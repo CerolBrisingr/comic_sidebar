@@ -17,6 +17,30 @@ class SiteRecognitionEditor {
         this.#buildExtensionFunctionality(addSiteButton, addSiteDropdown);
     }
 
+    fetchErrorMessage() {
+        const sites = this.#siteRecognition.getSites();
+        if (sites.length == 0) {
+            return "Missing a reader recognition block";
+        }
+        // Test all pairs against each other
+        for (let id1 = 0; id1 < sites.length - 1; id1++) {
+            for (let id2 = 1; id2 < sites.length; id2++) {
+                if (id1 == id2) continue;
+                if (sites[id1].overlapsWith(sites[id2])) {
+                    return this.#buildOverlapErrorMessage(id1, id2);
+                }
+                if (sites[id2].overlapsWith(sites[id1])) {
+                    return this.#buildOverlapErrorMessage(id2, id1);
+                }
+            }
+        }
+        return undefined;
+    }
+
+    #buildOverlapErrorMessage(id1, id2) {
+        return `Site recognition module ${id1 +1} overlaps with module ${id2 + 1}`;
+    }
+
     #buildInterface(siteRecognition) {
         for (let site of siteRecognition.getSites()) {
             this.#addSite(site);
@@ -25,10 +49,23 @@ class SiteRecognitionEditor {
 
     #addSite(site) {
         this.#setUpLabel(this.#parentDiv);
+        const fktRemoveMe = (siteEditorToRemove) => {
+            this.#removeSiteEditor(siteEditorToRemove);
+        }
         this.#siteEditors.push(new SiteEditor(
             this.#parentDiv,
             site, 
-            this.#uiUpdateTrigger));
+            this.#uiUpdateTrigger,
+            fktRemoveMe
+        ));
+    }
+
+    #removeSiteEditor(siteEditorToRemove) {        
+        const index = this.#siteEditors.indexOf(siteEditorToRemove);
+        if (index > -1) {                       // only splice array when item is found
+            this.#siteEditors.splice(index, 1); // remove one element
+        }
+        this.#siteRecognition.removeSite(siteEditorToRemove.getSite());
     }
 
     #buildExtensionFunctionality(addSiteButton, addSiteDropdown) {
@@ -54,16 +91,22 @@ class SiteRecognitionEditor {
 }
 
 class SiteEditor {
+    #parent;
     #site;
     #frame;
     #prefixControl;
-    #updateTrigger;
+
+    #fktUpdate;
+    #fktDelete;
 
     #prefixEval;
 
-    constructor(parent, site, updateTrigger) {
+    constructor(parent, site, fktUpdate, fktDelete) {
+        this.#parent = parent;
         this.#site = site;
-        this.#updateTrigger = updateTrigger;
+        this.#fktUpdate = fktUpdate;
+        this.#fktDelete = fktDelete;
+
         this.#setUpFrame(parent);
 
         this.#introduceEvaluation(this.#frame);
@@ -73,9 +116,15 @@ class SiteEditor {
         this.#finalizeControls();
     }
 
+    getSite() {
+        return this.#site;
+    }
+
     #setUpFrame(parent) {
         this.#frame = HTML.insertElement(parent, "div");
         HTML.addCssProperty(this.#frame, "config_container");
+
+        this.#setUpRemoval();
 
         this.#prefixControl = HTML.insertElement(this.#frame, "div");
         HTML.addCssProperty(this.#prefixControl, "spans");
@@ -83,6 +132,20 @@ class SiteEditor {
 
         const icon = this.#createIcon(this.#prefixControl);
         icon.src = "../../icons/edit.svg";
+    }
+
+    #setUpRemoval() {
+        const button = HTML.insertElement(this.#frame, "button");
+        HTML.addCssProperty(button, "selector_delete_btn");
+        button.innerText = "remove";
+        button.onclick = () => {
+            this.#removeMe();
+        }
+    }
+
+    #removeMe() {
+        this.#fktDelete(this);
+        HTML.removeElement(this.#parent, this.#frame);
     }
 
     #createIcon(parent) {
@@ -128,7 +191,7 @@ class SiteEditor {
     #receiveNewPrefix(prefix) {
         this.#site.updatePrefix(prefix);
         this.#prefixEval.innerText = prefix;
-        this.#updateTrigger();
+        this.#fktUpdate();
     }
 }
 
