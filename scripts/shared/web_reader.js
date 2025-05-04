@@ -130,10 +130,12 @@ class WebReader {
         return this._latestId;
     }
     
-    removeReader(prefixMask) {
-        if (this._currentReader.urlIsCompatible(prefixMask))
-            this._updateCurrentReader(new ReaderClassDummy());
-        this._readerStorage.removeObject(prefixMask);
+    removeReader(prefixMasks) {
+        for (let prefixMask of prefixMasks) {
+            if (this._currentReader.urlIsCompatible(prefixMask, true))
+                this._updateCurrentReader(new ReaderClassDummy());
+        }
+        this._readerStorage.removeObject(prefixMasks);
         this.saveProgress();
     }
 
@@ -361,7 +363,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     setFavIconFromKey(key, value) {
-        let managerList = this._readerStorage.getCargoListForHost(key);
+        let managerList = this._readerStorage.getPrimaryCargoListForHost(key);
         for (const manager of managerList) {
             manager.updateFavIcon(value);
         }
@@ -416,8 +418,8 @@ class WebReaderInterface {
         this.#webReader.saveProgress();
     }
     
-    removeReader(prefixMask) {
-        this.#webReader.removeReader(prefixMask);
+    removeReader(prefixMasks) {
+        this.#webReader.removeReader(prefixMasks);
     }
 
     canWeUpdateReaderWith(readerData, newReaderData) {
@@ -444,7 +446,7 @@ class ReaderClassDummy {
         return "Dummy";
     }
     
-    urlIsCompatible(url) {
+    urlIsCompatible(url, allowPrefix) {
         return false;
     }
 

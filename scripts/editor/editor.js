@@ -26,7 +26,6 @@ class Editor {
         this.#reader = ReaderData.buildForEditorFromData(data);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
         this.#setUpSiteRecognitionEditor();
-        //this.#setUpPrefixHandling(data.url);
         const imageAdjuster = new ImageAdjuster();
         const favIcon = await imageAdjuster.apply(data.favIcon);
         this.#setUpHints();
@@ -42,7 +41,6 @@ class Editor {
         this.#reader = ReaderData.buildForEditor(readerObjectLike);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
         this.#setUpSiteRecognitionEditor();
-        //this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
         this.#setUpHints();
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
@@ -115,6 +113,8 @@ class Editor {
     #setUpSiteRecognitionEditor() {
         new SiteRecognitionEditor(
             document.getElementById("site_identificators"),
+            document.getElementById("add_site_identification"),
+            document.getElementById("add_site_identification_dropdown"),
             this.#reader.getRecognitionObject(),
             () => {this.#preview.updateReaderUrls(this.#reader);}
         );

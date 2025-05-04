@@ -2,6 +2,7 @@ import { dissectUrl } from "./url.js";
 
 class HtmlContainer {
     #hostMap = new Map();
+    #debug = false;
     
     constructor() {}
 
@@ -11,6 +12,7 @@ class HtmlContainer {
             this.#storeObjectUsingUrl(object, url, copyId);
             copyId += 1;
         }
+        this.#logState("save object");
     }
 
     #storeObjectUsingUrl(object, url, copyId) {
@@ -35,6 +37,7 @@ class HtmlContainer {
     
     clearData() {
         this.#hostMap.clear();
+        this.#logState("clear data");
     }
 
     removeObject(urlList) {
@@ -47,6 +50,7 @@ class HtmlContainer {
         for (let url of urlList) {
             this.#removeObjectUsing(url);
         }
+        this.#logState("remove object");
     }
     
     #removeObjectUsing(url) {
@@ -61,7 +65,7 @@ class HtmlContainer {
             return;
         }
         for (let [index, object] of list.entries()) {
-            if (object.respondsToIdentification(url)) {
+            if (object.respondsToIdentification(url, true)) {
                 list.splice(index, 1);
                 break;
             }
@@ -94,6 +98,19 @@ class HtmlContainer {
         for (let container of containerList) {
             output.push(container.getCargo());
         }
+        this.#logState("get cargo list");
+        return output;
+    }
+
+    getPrimaryCargoListForHost(host) {
+        const containerList = this.#getContainerListForHost(host);
+        let output = [];
+        for (let container of containerList) {
+            if (container.isFirst()) {
+                output.push(container.getCargo());
+            }
+        }
+        this.#logState("get primary cargo list");
         return output;
     }
 
@@ -110,6 +127,28 @@ class HtmlContainer {
                 return container.getCargo();
         }
         return undefined;
+    }
+
+    #logState(origin) {
+        if (!this.#debug) return;
+        console.log(`Debugging storage via "${origin}"`);
+        // Returns stored objects as list
+        console.log(`Number of base urls in storage: ${this.#hostMap.size}`);
+        for (let [host, containerListForOneKey] of this.#hostMap) {
+            console.log(`   ${containerListForOneKey.length} elements for "${host}"`);
+            for (let container of containerListForOneKey) {
+                if (container.isFirst()) {
+                    console.log("    1 Primary Key");
+                } else {
+                    console.log("    1 Secondary Key");
+                }
+            }
+        }
+        return;
+    }
+
+    setDebugLogging(state) {
+        this.#debug = Boolean(state);
     }
     
     getList() {
@@ -137,10 +176,11 @@ class StorageContainer {
         this.#copyId = copyId;
     }
 
-    respondsToIdentification(identification) {
+    respondsToIdentification(identification, allowPrefix = false) {
         // TODO: establish this call during init
         //       -> get rid of implementation knowledge
-        return this.#cargo.urlIsCompatible(identification);
+        //       -> get rid of "allowPrefix"
+        return this.#cargo.urlIsCompatible(identification, allowPrefix);
     }
 
     isFirst() {

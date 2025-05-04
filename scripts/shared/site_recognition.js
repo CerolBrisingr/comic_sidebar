@@ -66,6 +66,26 @@ class SiteRecognition {
     getSites() {
         return this.#sites;
     }
+    
+    createSiteFromTab(tab) {
+        // TODO: evaluate where to put this
+        let urlPieces = dissectUrl(tab.getUrl());
+        if (urlPieces === undefined)
+            return;
+        const data = {
+            prefix: urlPieces.base_url,
+            lastUrl: tab.getUrl(),
+            lastTitle: tab.getTitle()
+        }
+        const site = this.createSite(data);
+        return site;
+    }
+
+    createSite(data) {
+        const site = new Site(data);
+        this.#sites.push(site);
+        return site;
+    }
 
     overlapsWith(other) {
         // Don't accept it if it's not even the correct class!
@@ -86,10 +106,10 @@ class SiteRecognition {
         return false;
     }
 
-    siteIsCompatible(url, title = "") {
+    siteIsCompatible(url, title = "", allowPrefix = false) {
         if (title === undefined) title = "";
         for (let site of this.#sites) {
-            if (site.isCompatible(url, title)) {
+            if (site.isCompatible(url, title, allowPrefix)) {
                 return true;
             }
         }
@@ -205,8 +225,8 @@ class Site {
     getLastTitle() {
         return this.#lastTitle;
     }
-    isCompatible(url, title) {
-        if (url == this.#prefix) {
+    isCompatible(url, title, allowPrefix) {
+        if (!allowPrefix && url == this.#prefix) {
             return false;  // Will not accept 100% match
         }
         let doesMatch = urlFitsPrefix(url, this.#prefix);
