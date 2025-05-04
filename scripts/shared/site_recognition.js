@@ -28,16 +28,16 @@ class SiteRecognition {
     }
 
     #pushSiteIfValid(siteData) {
-            // Minimum viable input
-            if (!siteData.hasOwnProperty('prefix')) return;
-            if (siteData.prefix === undefined) return;
+        // Minimum viable input
+        if (!siteData.hasOwnProperty('prefix')) return;
+        if (siteData.prefix === undefined) return;
 
-            // Try to build Site recognition object
-            let site = new Site(siteData);
-            if (!site.isValid()) return;
+        // Try to build Site recognition object
+        let site = new Site(siteData);
+        if (!site.isValid()) return;
 
-            // Successful? Push to list.
-            this.#sites.push(site);
+        // Successful? Push to list.
+        this.#sites.push(site);
     }
 
     // TODO: evaluate future use of this interface
@@ -85,6 +85,13 @@ class SiteRecognition {
         const site = new Site(data);
         this.#sites.push(site);
         return site;
+    }
+
+    removeSite(siteToRemove) {
+        const index = this.#sites.indexOf(siteToRemove);
+        if (index > -1) {                   // only splice array when item is found
+            this.#sites.splice(index, 1);   // remove one element
+        }
     }
 
     overlapsWith(other) {
