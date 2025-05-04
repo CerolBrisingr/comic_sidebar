@@ -40,7 +40,6 @@ class SiteRecognition {
         this.#sites.push(site);
     }
 
-    // TODO: evaluate future use of this interface
     getPrefixMasks() {
         let masks = [];
         for (let site of this.#sites) {
@@ -49,33 +48,21 @@ class SiteRecognition {
         return masks;
     }
 
-    // TODO: deprecated interface
-    setPrefixMask(prefixMask) {
-        if (this.#sites.length == 0) {
-            // Try to set a new mask
-            let siteData = {prefix: prefixMask, lastUrl: prefixMask};
-            let site = new Site(siteData);
-            if (!site.isValid()) return;
-        } else {
-            this.#sites[0].updatePrefix(prefixMask);
-        }
-    }
-
     // It is not guaranteed that the returned sites will not be replaced
     // by SiteRecognition.
     getSites() {
         return this.#sites;
     }
     
-    createSiteFromTab(tab) {
-        // TODO: evaluate where to put this
-        let urlPieces = dissectUrl(tab.getUrl());
+    createSiteFromTab(tabData) {
+        // Dissect tab information to build new site module
+        let urlPieces = dissectUrl(tabData.url);
         if (urlPieces === undefined)
             return;
         const data = {
             prefix: urlPieces.base_url,
-            lastUrl: tab.getUrl(),
-            lastTitle: tab.getTitle()
+            lastUrl: tabData.url,
+            lastTitle: tabData.title
         }
         const site = this.createSite(data);
         return site;

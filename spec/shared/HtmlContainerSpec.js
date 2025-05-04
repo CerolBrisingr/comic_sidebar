@@ -36,7 +36,7 @@ describe("HtmlContainer", function() {
         expect(storage.getObject(url)).toBe(object);
         expect(storage.getCargoListForUrl(url)).toEqual([object]);
         expect(storage.getCargoListForHost("www.test.com")).toEqual([object]);
-        expect(storage.keys()).toEqual(["www.test.com"]); 
+        expect(storage.keys()).toEqual(["www.test.com"]);
         expect(storage.getList()).toEqual([object]);
     });
 

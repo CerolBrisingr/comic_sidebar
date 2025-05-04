@@ -76,7 +76,7 @@ class SiteRecognitionEditor {
     }
 
     #createSiteForTab(tab) {
-        const site = this.#siteRecognition.createSiteFromTab(tab);
+        const site = this.#siteRecognition.createSiteFromTab(tab.returnAsObject());
         if (site === undefined)
             return;
         this.#addSite(site);

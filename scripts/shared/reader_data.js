@@ -102,16 +102,6 @@ class ReaderData {
         return this.#siteRecognition.getInterface();
     }
     
-    getPrefixMask() {
-        // TODO: remove when done
-        let masks = this.getPrefixMasks();
-        return masks[0];
-    }
-
-    setPrefixMask(prefixMask) {
-        this.#siteRecognition.setPrefixMask(prefixMask);
-    }
-    
     getPinnedBookmarks() {
         return this.#manual;
     }

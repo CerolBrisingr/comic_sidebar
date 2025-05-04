@@ -32,11 +32,6 @@ class BasicReaderManager {
     getPrefixMasks() {
         return this._readerData.getPrefixMasks();
     }
-    
-    getPrefixMask() {
-        // TODO: remove when done
-        return this._readerData.getPrefixMask();
-    }
 
     getLatestInputTime() {
         return this._readerData.getLatestInputTime();

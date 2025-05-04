@@ -29,7 +29,6 @@ describe("ReaderData", function() {
         readerData = ReaderData.buildForEditor(object);
         readerData.addTag("test");
         readerData.setLabel("Updated");
-        readerData.setPrefixMask("http://www.somecomic.com/");
         readerObject = readerData.returnAsObject();
         let newReaderData = ReaderData.buildForEditor(object);
         newReaderData.editReader(readerObject);
@@ -66,14 +65,12 @@ describe("ReaderData tags", function() {
 function compareReader(readerData, object) {
     expect(readerData).not.toBeUndefined();
     expect(readerData.getLabel()).toBe(object.label);
-    expect(readerData.getPrefixMask()).toBe(getPrefix(object));
     expect(readerData.getMostRecentAutomaticUrl()).toBe(object.automatic[0].href);
 }
 
 function compareReaderObject(readerObject, object) {
     expect(readerObject).not.toBeUndefined();
     expect(readerObject.label).toBe(object.label);
-    expect(getPrefix(readerObject)).toEqual(getPrefix(object));
     expect(readerObject.automatic).toEqual(object.automatic);
 }
 
@@ -95,10 +92,6 @@ function readerObjectStub() {
             {href: "http://www.somecomic.com/173", label: "test"}
         ]
     }
-}
-
-function getPrefix(objectLike, siteId = 0) {
-    return objectLike.site_recognition.sites[siteId].prefix;
 }
 
 export {readerObjectStub}
