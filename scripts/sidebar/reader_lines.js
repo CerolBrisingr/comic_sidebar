@@ -1,4 +1,5 @@
 import { openUrlInMyTab } from "../shared/url.js";
+import { HTML } from "../shared/html.js";
 
 class ReaderLine {
     #managerInterface;
@@ -78,6 +79,7 @@ class ReaderLine {
     expand () {
         this.#bookmarkContainer.classList.remove('no_draw');
         this.#expandButton.setIcon("../../icons/chevron_down.svg");
+        HTML.scrollIntoView(this.#bookmarkContainer);
     }
 
     collapse () {
