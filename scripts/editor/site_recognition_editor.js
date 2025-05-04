@@ -20,7 +20,7 @@ class SiteRecognitionEditor {
     fetchErrorMessage() {
         const sites = this.#siteRecognition.getSites();
         if (sites.length == 0) {
-            return "Missing a reader recognition block";
+            return "Missing a site recognition module. Import a tab and create one!";
         }
         // Test all pairs against each other
         for (let id1 = 0; id1 < sites.length - 1; id1++) {

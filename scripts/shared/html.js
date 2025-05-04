@@ -1,4 +1,9 @@
 class HTML {
+
+    static findElementById(id) {
+        return document.getElementById(id);
+    }
+
     static insertElement(parent, strType) {
         let element = document.createElement(strType);
         parent.appendChild(element);
@@ -36,6 +41,10 @@ class HTML {
 
     static removeElement(parent, element) {
         parent.removeChild(element);
+    }
+
+    static scrollIntoView(element) {
+        element.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 }
 

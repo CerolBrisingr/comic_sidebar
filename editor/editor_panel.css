@@ -61,10 +61,19 @@ input:focus {
     color: lightgray;
 }
 
-.config_container {
+.config_container,
+.error_message_box {
     border: 1px solid black;
     border-radius: 6px;
     padding: 18px;
+}
+
+.error_message_box {
+    border-color: red;
+}
+
+.error_message {
+    margin-left: 2em;
 }
 
 .div_label {

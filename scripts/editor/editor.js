@@ -6,6 +6,7 @@ import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 import { ScheduleEditor } from "./schedule_editor.js";
 import { TagEditorEditor } from "../shared/tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
+import { HTML } from "../shared/html.js";
 
 class Editor {    
     #reader;
@@ -13,6 +14,7 @@ class Editor {
     #fcnFinalize;
 
     #siteRecognitionEditor;
+    #errorView;
 
     #cancel;
     #finalizer;
@@ -36,6 +38,7 @@ class Editor {
         this.#setUpScheduleEditor();
         this.#setUpTagEditor(data.knownTags);
         this.#setUpCreationExit();
+        this.#setUpErrorView();
     }
 
     updateReaderEntry(readerObjectLike, fcnFinalize) {
@@ -49,6 +52,21 @@ class Editor {
         this.#setUpScheduleEditor();
         this.#setUpTagEditor(readerObjectLike.knownTags);
         this.#setUpUpdateExit();
+        this.#setUpErrorView();
+    }
+
+    #setUpErrorView() {
+        this.#errorView = {
+            frame: HTML.findElementById("error_message_frame"),
+            message: HTML.findElementById("error_message")
+        }
+        this.#errorView.frame.style.display = "none";
+    }
+
+    #showError(errorMessage) {
+        this.#errorView.frame.style.display = "block";
+        this.#errorView.message.innerText = errorMessage;
+        HTML.scrollIntoView(this.#errorView.frame);
     }
 
     #setUpCreationExit() {
@@ -111,8 +129,7 @@ class Editor {
     #finalize() {
         const errorMessage = this.#fetchErrorMessage();
         if (errorMessage !== undefined) {
-            // TODO: Show in text box below buttons
-            console.log(errorMessage);
+            this.#showError(errorMessage);
             return;
         }
         // Successful confiuration. Send data
