@@ -103,6 +103,7 @@ class ReaderSyncCore extends ReaderSync {
         if (!this.#readerManager.canBeUpdatedWith(readerObjectLike)) {
             console.log("Conflict detected, will not update ");
             // TODO: notify editor of failure
+            //       Rework communication first
             return;
         }
         this.#readerManager.editReader(readerObjectLike);
