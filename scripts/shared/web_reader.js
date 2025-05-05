@@ -18,8 +18,18 @@ class WebReader {
     constructor() {
         this._currentReader = new ReaderClassDummy();
         this._savingSuspended = false;
-        this._readerStorage = new HtmlContainer();
+        this._readerStorage = this.#buildStorage();
         this._latestId = 0;
+    }
+
+    #buildStorage() {
+        const fktIdentifyExtension = (entry, identification) => {
+            return entry.urlIsCompatible(identification, false);
+        };
+        const fktIdentifyObject = (entry, identification) => {
+            return entry.urlIsCompatible(identification, true);
+        };
+        return new HtmlContainer(fktIdentifyExtension, fktIdentifyObject);
     }
     
     async importBackup(file, fktDone) {
