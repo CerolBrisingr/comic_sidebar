@@ -2,9 +2,30 @@ import { dissectUrl } from "./url.js";
 
 class HtmlContainer {
     #hostMap = new Map();
+    #validAssociation = true;
+    #validIdentification = true;
     #debug = false;
     
-    constructor() {}
+    constructor(fktIdentifyExtension, fktIdentifyObject = undefined) {
+        this.#validAssociation = this.updateExtensionIdentifkation(fktIdentifyExtension);
+        if (fktIdentifyObject === undefined) {
+            this.#validIdentification = this.updateRemovalIdentification(fktIdentifyExtension);
+        } else {
+            this.#validIdentification = this.updateRemovalIdentification(fktIdentifyObject);
+        }
+    }
+
+    updateExtensionIdentifkation(fktIdentifyExtension = undefined) {
+        return StorageContainer.updateAssociateIdentification(fktIdentifyExtension);
+    }
+
+    updateRemovalIdentification(fktIdentifyObject = undefined) {
+        return StorageContainer.updateCargoIdentification(fktIdentifyObject);
+    }
+
+    isValid() {
+        return this.#validAssociation && this.#validIdentification;
+    }
 
     saveObject(object, urlList) {
         let copyId = 1;
@@ -65,7 +86,7 @@ class HtmlContainer {
             return;
         }
         for (let [index, object] of list.entries()) {
-            if (object.respondsToIdentification(url, true)) {
+            if (object.identifyForRemoval(url)) {
                 list.splice(index, 1);
                 break;
             }
@@ -123,7 +144,7 @@ class HtmlContainer {
     
     #findObject(host, url) {
         for (let container of this.#getContainerListForHost(host)) {
-            if (container.respondsToIdentification(url))
+            if (container.identifyAssociated(url))
                 return container.getCargo();
         }
         return undefined;
@@ -170,17 +191,38 @@ class StorageContainer {
     // Allows to keep track of copy counts
     #cargo;
     #copyId;    // If it's > 1, it's an alias object
+    static #fktIndentifyAssociated = undefined;
+    static #fktIdentifyCargo = undefined;
 
     constructor(cargo, copyId) {
         this.#cargo = cargo;
         this.#copyId = copyId;
     }
 
-    respondsToIdentification(identification, allowPrefix = false) {
-        // TODO: establish this call during init
-        //       -> get rid of implementation knowledge
-        //       -> get rid of "allowPrefix"
-        return this.#cargo.urlIsCompatible(identification, allowPrefix);
+    static updateAssociateIdentification(fktIdentifyAssociated) {
+        StorageContainer.#fktIndentifyAssociated = parseFunction(fktIdentifyAssociated);
+        return StorageContainer.#fktIndentifyAssociated !== undefined;
+    }
+
+    static updateCargoIdentification(fktIdentifyCargo) {
+        StorageContainer.#fktIdentifyCargo = parseFunction(fktIdentifyCargo);
+        return StorageContainer.#fktIdentifyCargo !== undefined;
+    }
+
+    identifyForRemoval(identification) {
+        if (StorageContainer.#fktIdentifyCargo === undefined) {
+            throw new Error("HtmlStorage is missing identification for stored elements!")
+        } else {
+            return StorageContainer.#fktIdentifyCargo(this.#cargo, identification);
+        }
+    }
+
+    identifyAssociated(identification) {
+        if (StorageContainer.#fktIndentifyAssociated === undefined) {
+            throw new Error("HtmlStorage is missing identification for associated links!");
+        } else {
+            return StorageContainer.#fktIndentifyAssociated(this.#cargo, identification);
+        }
     }
 
     isFirst() {
@@ -190,6 +232,12 @@ class StorageContainer {
     getCargo() {
         return this.#cargo;
     }
+}
+
+function parseFunction(fktHandle) {
+    if (fktHandle === undefined) return undefined;
+    if (typeof fktHandle !== "function") return undefined;
+    return fktHandle;
 }
 
 function getHost(url) {
