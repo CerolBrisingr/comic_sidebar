@@ -8,29 +8,32 @@ describe("MinimalObject", function() {
 
         object = new MinimalObject("test1");
         expect(object.urls).toEqual(["test1"]);
-        expect(object.urlIsCompatible("test1")).toBe(true);
-        expect(object.urlIsCompatible("test")).toBe(false);
+        expect(object.urlFits("test1")).toBe(true);
+        expect(object.urlFits("test")).toBe(false);
 
         object = new MinimalObject(["test", "test2"]);
         expect(object.urls).toEqual(["test", "test2"]);
-        expect(object.urlIsCompatible("test")).toBe(true);
-        expect(object.urlIsCompatible("test2")).toBe(true);
+        expect(object.urlFits("test")).toBe(true);
+        expect(object.urlFits("test2")).toBe(true);
     });
 
 });
 
 describe("HtmlContainer", function() {
 
-    it('needs a default constructor', function() {
+    it('default constructor must not return valid object', function() {
         let storage = new HtmlContainer();
+        expect(storage.isValid()).toBe(false);
         expect(storage.keys()).toEqual([]);
         expect(storage.getList()).toEqual([]);
     });
 
     it('works with a single element', function() {
-        let storage = new HtmlContainer();
+        let storage = new HtmlContainer(fktIdentify);
         let url = "http://www.test.com/123";
         let object = new MinimalObject(url);
+
+        expect(storage.isValid()).toBe(true);
 
         storage.saveObject(object, object.getPrefixMasks());
         expect(storage.getObject(url)).toBe(object);
@@ -41,7 +44,7 @@ describe("HtmlContainer", function() {
     });
 
     it('works with 3 elements, 2 sharing the host url', function() {
-        let storage = new HtmlContainer();
+        let storage = new HtmlContainer(fktIdentify);
         let url1 = "http://www.test.com/123";
         let url2 = "http://www.test.com/456";
         let url3 = "http://www.test2.com/123";
@@ -75,7 +78,7 @@ describe("HtmlContainer", function() {
     });
 
     it('works with aliased object', function() {
-        let storage = new HtmlContainer();
+        let storage = new HtmlContainer(fktIdentify);
         let url1 = "http://www.test.com/123";
         let url2 = "http://www.test2.com/456";
         let object = new MinimalObject([url1, url2]);
@@ -90,6 +93,10 @@ describe("HtmlContainer", function() {
     });
 
 });
+
+function fktIdentify(entry, identification) {
+    return entry.urlFits(identification);
+}
 
 class MinimalObject {
     urls = [];
@@ -106,7 +113,7 @@ class MinimalObject {
         return this.urls;
     }
 
-    urlIsCompatible(url) {
+    urlFits(url) {
         return this.urls.includes(url);
     }
 }
