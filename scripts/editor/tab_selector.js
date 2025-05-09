@@ -1,7 +1,7 @@
 import { UrlListener } from "../shared/url_listener.js"
 import { HTML } from "../shared/html.js";
 
-EXCEPTION_TAG = "add_site_interactive_part";
+const EXCEPTION_TAG = "add_site_interactive_part";
 
 class TabSelector {
     #dropdown;
@@ -57,9 +57,12 @@ class TabSelector {
         // dropdown menu. Those elements must invoke this onblur
         // event themselves. 
         // Example: sort modifier, search bar
-        if (evt.relatedTarget.classList.contains(EXCEPTION_TAG)) {
+        if (evt.relatedTarget == null) {
             return; }
-        this.#closeDropdown();
+        if (!evt.relatedTarget.classList.contains(EXCEPTION_TAG)) {
+            rethis.#closeDropdown(); }
+        return;
+        
     }
 
     #closeDropdown() {

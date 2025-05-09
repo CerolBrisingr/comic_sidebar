@@ -61,6 +61,11 @@ input:focus {
     color: lightgray;
 }
 
+.dropdown_button {
+    /*float: right;*/
+    margin-top: 0.5ex;
+}
+
 .config_container,
 .error_message_box {
     border: 1px solid black;

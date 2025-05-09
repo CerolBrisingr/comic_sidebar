@@ -48,9 +48,9 @@ class SiteRecognitionEditor {
     }
 
     #addSite(site) {
-        this.#setUpLabel(this.#parentDiv);
+        const label = this.#setUpLabel(this.#parentDiv);
         const fktRemoveMe = (siteEditorToRemove) => {
-            this.#removeSiteEditor(siteEditorToRemove);
+            this.#removeSiteEditor(siteEditorToRemove, label);
         }
         this.#siteEditors.push(new SiteEditor(
             this.#parentDiv,
@@ -60,12 +60,13 @@ class SiteRecognitionEditor {
         ));
     }
 
-    #removeSiteEditor(siteEditorToRemove) {        
+    #removeSiteEditor(siteEditorToRemove, labelToRemove) {        
         const index = this.#siteEditors.indexOf(siteEditorToRemove);
         if (index > -1) {                       // only splice array when item is found
             this.#siteEditors.splice(index, 1); // remove one element
         }
         this.#siteRecognition.removeSite(siteEditorToRemove.getSite());
+        HTML.removeElement(this.#parentDiv, labelToRemove);
     }
 
     #buildExtensionFunctionality(addSiteButton, addSiteDropdown) {
@@ -86,6 +87,7 @@ class SiteRecognitionEditor {
         const label = HTML.insertElement(parent, "label");
         HTML.addCssProperty(label, "div_label");
         HTML.addText(label, "I recognize myself due to..");
+        return label;
     }
 
 }
