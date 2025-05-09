@@ -1,34 +1,71 @@
 import { UrlListener } from "../shared/url_listener.js"
 import { HTML } from "../shared/html.js";
 
+EXCEPTION_TAG = "add_site_interactive_part";
+
 class TabSelector {
+    #dropdown;
+    #isOpen = false;
 
     constructor(addSiteButton, addSiteDropdown, fktFinalize) {
-        this.#setUpButton(addSiteButton, addSiteDropdown, fktFinalize);
+        this.#setUpDropdown(addSiteDropdown);
+        this.#setUpButton(addSiteButton, fktFinalize);
     }
 
-    #buildFinalizeFkt(addSiteDropdown, fktFinalize) {
+    #setUpDropdown(addSiteDropdown) {
+        this.#dropdown = addSiteDropdown;
+    }
+
+    #buildFinalizeFkt(fktFinalize) {
         return (tab) => {
-            addSiteDropdown.style.display = "none";
+            this.#closeDropdown();
             fktFinalize(tab);
         }
     }
 
-    #setUpButton(addSiteButton, addSiteDropdown, fktFinalize) {
+    #setUpButton(addSiteButton, fktFinalize) {
         // TODO:
         // Early assessment opens a few necessary steps:
         // * Sort by last use
         // * Add search bar, some users have an excessive amount of tabs
         // * Set maximum length with scroll bar, same reason
-        fktFinalize = this.#buildFinalizeFkt(addSiteDropdown, fktFinalize);
+        fktFinalize = this.#buildFinalizeFkt(fktFinalize);
         addSiteButton.onclick = async () => {
-            HTML.removeChildElements(addSiteDropdown);
-            const tabs = await UrlListener.listAllTabs();
-            for (const tab of tabs) {
-                new TabOption(tab, addSiteDropdown, fktFinalize);
+            if (this.#isOpen) {
+                this.#closeDropdown();
+            } else {
+                this.#openDropdown(fktFinalize);
             }
-            addSiteDropdown.style.display = "flex";
         };
+        HTML.addCssProperty(addSiteButton, EXCEPTION_TAG);
+        addSiteButton.onblur = (evt) => {this.#onBlur(evt)};
+    }
+
+    async #openDropdown(fktFinalize) {
+        this.#isOpen = true;
+        const tabs = await UrlListener.listAllTabs();
+        for (const tab of tabs) {
+            new TabOption(tab, this.#dropdown, fktFinalize);
+        }
+        this.#dropdown.style.display = "flex";
+    }
+
+    #onBlur(evt) {
+        // TODO: Set as onblur event on all exceptions as well
+
+        // Certain elements can take focus without closing the 
+        // dropdown menu. Those elements must invoke this onblur
+        // event themselves. 
+        // Example: sort modifier, search bar
+        if (evt.relatedTarget.classList.contains(EXCEPTION_TAG)) {
+            return; }
+        this.#closeDropdown();
+    }
+
+    #closeDropdown() {
+        this.#isOpen = false;
+        this.#dropdown.style.display = "none";
+        HTML.removeChildElements(this.#dropdown);
     }
 }
 
