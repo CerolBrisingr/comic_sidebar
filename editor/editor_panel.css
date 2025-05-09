@@ -61,8 +61,12 @@ input:focus {
     color: lightgray;
 }
 
+.dropdown_container {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .dropdown_button {
-    /*float: right;*/
     margin-top: 0.5ex;
 }
 
