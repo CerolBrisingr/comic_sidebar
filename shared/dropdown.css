@@ -27,7 +27,8 @@
     border-color: lightgray;
 }
 
-.dropdown_option_box_spacy {
+.dropdown_option_box_spacy
+{
     top: 100%;
 }
 
@@ -36,6 +37,7 @@
 }
 
 .dropdown_option {
+    z-index: 21;
     cursor: pointer;
     display: flex;
     text-align: left;
@@ -45,6 +47,7 @@
 }
 
 .dropdown_label {
+    z-index: 22;
     margin-top: 0.3vh;
     margin-bottom: 0.3vh;
     margin-left: 0.3em;
