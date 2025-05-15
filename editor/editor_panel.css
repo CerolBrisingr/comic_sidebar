@@ -61,15 +61,6 @@ input:focus {
     color: lightgray;
 }
 
-.dropdown_container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.dropdown_button {
-    margin-top: 0.5ex;
-}
-
 .config_container,
 .error_message_box {
     border: 1px solid black;
@@ -83,6 +74,10 @@ input:focus {
 
 .error_message {
     margin-left: 2em;
+}
+
+.error_message_frame {
+    display: none;
 }
 
 .div_label {

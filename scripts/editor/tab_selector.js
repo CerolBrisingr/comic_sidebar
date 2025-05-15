@@ -4,16 +4,18 @@ import { HTML } from "../shared/html.js";
 const EXCEPTION_TAG = "add_site_interactive_part";
 
 class TabSelector {
+    #button;
     #dropdown;
     #isOpen = false;
 
-    constructor(addSiteButton, addSiteDropdown, fktFinalize) {
-        this.#setUpDropdown(addSiteDropdown);
-        this.#setUpButton(addSiteButton, fktFinalize);
+    constructor(addSiteDropdown, fktFinalize) {
+        this.#importUi(addSiteDropdown);
+        this.#setUpButton(fktFinalize);
     }
 
-    #setUpDropdown(addSiteDropdown) {
-        this.#dropdown = addSiteDropdown;
+    #importUi(addSiteDropdown) {
+        this.#button = addSiteDropdown.button;
+        this.#dropdown = addSiteDropdown.dropdown;
     }
 
     #buildFinalizeFkt(fktFinalize) {
@@ -23,22 +25,22 @@ class TabSelector {
         }
     }
 
-    #setUpButton(addSiteButton, fktFinalize) {
+    #setUpButton(fktFinalize) {
         // TODO:
         // Early assessment opens a few necessary steps:
         // * Sort by last use
         // * Add search bar, some users have an excessive amount of tabs
         // * Set maximum length with scroll bar, same reason
         fktFinalize = this.#buildFinalizeFkt(fktFinalize);
-        addSiteButton.onclick = async () => {
+        this.#button.onclick = async () => {
             if (this.#isOpen) {
                 this.#closeDropdown();
             } else {
                 this.#openDropdown(fktFinalize);
             }
         };
-        HTML.addCssProperty(addSiteButton, EXCEPTION_TAG);
-        addSiteButton.onblur = (evt) => {this.#onBlur(evt)};
+        HTML.addCssProperty(this.#button, EXCEPTION_TAG);
+        this.#button.onblur = (evt) => {this.#onBlur(evt)};
     }
 
     async #openDropdown(fktFinalize) {
@@ -60,7 +62,7 @@ class TabSelector {
         if (evt.relatedTarget == null) {
             return; }
         if (!evt.relatedTarget.classList.contains(EXCEPTION_TAG)) {
-            rethis.#closeDropdown(); }
+            this.#closeDropdown(); }
         return;
         
     }

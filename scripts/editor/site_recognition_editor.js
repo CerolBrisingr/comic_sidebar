@@ -9,12 +9,12 @@ class SiteRecognitionEditor {
     #uiUpdateTrigger;
     #siteEditors = [];
 
-    constructor(parentDiv, addSiteButton, addSiteDropdown, siteRecognition, uiUpdateTrigger) {
+    constructor(parentDiv, addSiteDropdown, siteRecognition, uiUpdateTrigger) {
         this.#parentDiv = parentDiv;
         this.#uiUpdateTrigger = uiUpdateTrigger;
         this.#siteRecognition = siteRecognition;
         this.#buildInterface(siteRecognition);
-        this.#buildExtensionFunctionality(addSiteButton, addSiteDropdown);
+        this.#buildExtensionFunctionality(addSiteDropdown);
     }
 
     fetchErrorMessage() {
@@ -69,11 +69,11 @@ class SiteRecognitionEditor {
         HTML.removeElement(this.#parentDiv, labelToRemove);
     }
 
-    #buildExtensionFunctionality(addSiteButton, addSiteDropdown) {
+    #buildExtensionFunctionality(addSiteDropdown) {
         const fktAddSite = (tab) => {
             this.#createSiteForTab(tab)
         }
-        new TabSelector(addSiteButton, addSiteDropdown, fktAddSite);
+        new TabSelector(addSiteDropdown, fktAddSite);
     }
 
     #createSiteForTab(tab) {

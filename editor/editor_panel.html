@@ -52,17 +52,17 @@
             <button class="hint_dismiss" id="prefix_hint_dismiss">Dismiss Hint</button>
         </div>
         <div class="site_identificator_container" id="site_identificators"></div>
-        <div id="site_identificator_extension" class="dropdown_container">
-            <button id="add_site_identification" class="dropdown_button">Add more</button>
-            <div id="add_site_identification_dropdown" class="dropdown_option_box"></div>
+        <div id="site_identificator_extension" class="dropdown_wrapper_spacy">
+            <button id="add_site_identification" class="dropdown_button_w_margin">Add more</button>
+            <div id="add_site_identification_dropdown" class="dropdown_option_box_spacy"></div>
         </div>
         <label for="reader_tags"><b>Add tags so you can filter for them:</b></label>        
         <div class="tag_container" id="reader_tags">
-            <div id="tag_add_ui" class="tag_add_ui">
+            <div id="tag_add_ui" class="tag_add_ui dropdown_wrapper_spacy">
                 <button class="tag_add_button" id="tag_add_button">
                     <img class="sized" class="tag_add_image" src="../icons/plus.svg" />
                 </button>
-                <div id="dropdown_option_box" class="dropdown_option_box">
+                <div id="dropdown_option_box" class="dropdown_option_box_spacy">
                     <button class="dropdown_option" id="start_dropdown_creator">
                         <div class="dropdown_label">Create new Tag</div>
                     </button>
@@ -237,7 +237,7 @@
     <button id="start_delete" style="float: right">Delete</button>
     <button id="confirm_delete" style="float: right">Yes</button>
     
-    <div id="error_message_frame">
+    <div id="error_message_frame" class="error_message_frame">
         <div class="divider"></div>
         <label class="div_label" for="error_message_container">
             <img class="field_type_icon" src="../icons/information.svg"/>

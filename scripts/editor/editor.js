@@ -140,10 +140,13 @@ class Editor {
     }
 
     #setUpSiteRecognitionEditor() {
+        const addTabDropdown = {
+            button: document.getElementById("add_site_identification"),
+            dropdown: document.getElementById("add_site_identification_dropdown")
+        }
         this.#siteRecognitionEditor = new SiteRecognitionEditor(
             document.getElementById("site_identificators"),
-            document.getElementById("add_site_identification"),
-            document.getElementById("add_site_identification_dropdown"),
+            addTabDropdown,
             this.#reader.getRecognitionObject(),
             () => {this.#preview.updateReaderUrls(this.#reader);}
         );

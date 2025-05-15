@@ -1,5 +1,21 @@
 
-.dropdown_option_box {
+.dropdown_wrapper {
+    display: inline-block;
+}
+
+.dropdown_wrapper_spacy {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dropdown_button_w_margin {
+    margin-top: 0.5ex;
+}
+
+.dropdown_option_box_crammed,
+.dropdown_option_box_spacy
+ {
     display: none;
     position: absolute;
     right: 0;
@@ -9,6 +25,10 @@
     border-radius: 0.3em;
     border-width: 2px;
     border-color: lightgray;
+}
+
+.dropdown_option_box_spacy {
+    top: 100%;
 }
 
 .dropdown_icon {
