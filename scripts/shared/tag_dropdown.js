@@ -12,12 +12,12 @@ class TagDropdown {
     constructor(usedTagsManager, fktCreateTag) {
         this._usedTagsManager = usedTagsManager;
         this._fktCreateTag = fktCreateTag;
-        this._setUpUi();
-        this._setUpOptionsBox();
+        this.#setUpUi();
+        this.#setUpOptionsBox();
         this._setUpDropdownButton();
     }
 
-    _setUpUi() {
+    #setUpUi() {
         this._ui = document.getElementById("tag_add_ui");
     }
 
@@ -34,7 +34,7 @@ class TagDropdown {
         this._openDropdown.onblur = (evt) => {this._onblur(evt)};
     }
 
-    _setUpOptionsBox() {
+    #setUpOptionsBox() {
         this._optionsBox = document.getElementById("dropdown_option_box");
     }
 
