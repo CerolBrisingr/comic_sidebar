@@ -85,10 +85,11 @@ class TabOption {
     }
 
     #buildOption(dropdown) {
-        const field = HTML.insertElement(dropdown, "div");
-        HTML.addCssProperty(field, "dropdown_option");
-        HTML.addSpan(field, this.#tab.getTitle());
-        field.onclick = () => {
+        const button = HTML.insertElement(dropdown, "button");
+        HTML.addCssProperty(button, "dropdown_option");
+        HTML.addCssProperty(button, EXCEPTION_TAG); // blur kills dropdown too early otherwise
+        HTML.addText(button, this.#tab.getTitle());
+        button.onclick = () => {
             this.#finalize();
         }
     }
