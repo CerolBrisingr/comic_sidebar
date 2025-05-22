@@ -76,6 +76,10 @@ input:focus {
     margin-left: 2em;
 }
 
+.error_message_frame {
+    display: none;
+}
+
 .div_label {
     position: relative;
     top: 1ex;
@@ -95,6 +99,24 @@ input:focus {
 
 .label_box {
     width: 300px;
+}
+
+.selector_div_label {
+    background-color: white;
+    padding: 0 5px;
+}
+
+.selector_label {
+    display:flex;
+    position: relative;
+    top: 1ex;
+    z-index: 1;
+    padding: 0 1em 0 1.5em;
+}
+
+.selector_label_spacer {
+    display: inline-flex;
+    flex-grow: 1;
 }
 
 .hint {

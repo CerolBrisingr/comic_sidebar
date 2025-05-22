@@ -9,12 +9,12 @@ class SiteRecognitionEditor {
     #uiUpdateTrigger;
     #siteEditors = [];
 
-    constructor(parentDiv, addSiteButton, addSiteDropdown, siteRecognition, uiUpdateTrigger) {
+    constructor(parentDiv, addSiteDropdown, siteRecognition, uiUpdateTrigger) {
         this.#parentDiv = parentDiv;
         this.#uiUpdateTrigger = uiUpdateTrigger;
         this.#siteRecognition = siteRecognition;
         this.#buildInterface(siteRecognition);
-        this.#buildExtensionFunctionality(addSiteButton, addSiteDropdown);
+        this.#buildExtensionFunctionality(addSiteDropdown);
     }
 
     fetchErrorMessage() {
@@ -48,7 +48,6 @@ class SiteRecognitionEditor {
     }
 
     #addSite(site) {
-        this.#setUpLabel(this.#parentDiv);
         const fktRemoveMe = (siteEditorToRemove) => {
             this.#removeSiteEditor(siteEditorToRemove);
         }
@@ -68,11 +67,11 @@ class SiteRecognitionEditor {
         this.#siteRecognition.removeSite(siteEditorToRemove.getSite());
     }
 
-    #buildExtensionFunctionality(addSiteButton, addSiteDropdown) {
+    #buildExtensionFunctionality(addSiteDropdown) {
         const fktAddSite = (tab) => {
             this.#createSiteForTab(tab)
         }
-        new TabSelector(addSiteButton, addSiteDropdown, fktAddSite);
+        new TabSelector(addSiteDropdown, fktAddSite);
     }
 
     #createSiteForTab(tab) {
@@ -82,12 +81,6 @@ class SiteRecognitionEditor {
         this.#addSite(site);
     }
 
-    #setUpLabel(parent) {
-        const label = HTML.insertElement(parent, "label");
-        HTML.addCssProperty(label, "div_label");
-        HTML.addText(label, "I recognize myself due to..");
-    }
-
 }
 
 class SiteEditor {
@@ -95,6 +88,7 @@ class SiteEditor {
     #site;
     #frame;
     #prefixControl;
+    #label;
 
     #fktUpdate;
     #fktDelete;
@@ -107,6 +101,7 @@ class SiteEditor {
         this.#fktUpdate = fktUpdate;
         this.#fktDelete = fktDelete;
 
+        this.#setUpLabel(parent);
         this.#setUpFrame(parent);
 
         this.#introduceEvaluation(this.#frame);
@@ -120,11 +115,18 @@ class SiteEditor {
         return this.#site;
     }
 
+    #setUpLabel(parent) {
+        this.#label = HTML.insertElement(parent, "label");
+        HTML.addCssProperty(this.#label, "selector_label");
+        const labelText = HTML.insertElement(this.#label, "div");
+        HTML.addCssProperty(labelText, "selector_div_label");
+        HTML.addText(labelText, "Site recognition set");
+        this.#setUpRemoval(this.#label);
+    }
+
     #setUpFrame(parent) {
         this.#frame = HTML.insertElement(parent, "div");
         HTML.addCssProperty(this.#frame, "config_container");
-
-        this.#setUpRemoval();
 
         this.#prefixControl = HTML.insertElement(this.#frame, "div");
         HTML.addCssProperty(this.#prefixControl, "spans");
@@ -134,8 +136,10 @@ class SiteEditor {
         icon.src = "../../icons/edit.svg";
     }
 
-    #setUpRemoval() {
-        const button = HTML.insertElement(this.#frame, "button");
+    #setUpRemoval(parent) {
+        const spacer = HTML.insertElement(parent, "div");
+        HTML.addCssProperty(spacer, "selector_label_spacer");
+        const button = HTML.insertElement(parent, "button");
         HTML.addCssProperty(button, "selector_delete_btn");
         button.innerText = "remove";
         button.onclick = () => {
@@ -146,6 +150,7 @@ class SiteEditor {
     #removeMe() {
         this.#fktDelete(this);
         HTML.removeElement(this.#parent, this.#frame);
+        HTML.removeElement(this.#parent, this.#label);
     }
 
     #createIcon(parent) {
