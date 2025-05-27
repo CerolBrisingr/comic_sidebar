@@ -2,6 +2,9 @@ import {SubscriberPort} from "../sidebar/subscriber_port.js"
 import {ListeningPort} from "../background/listening_port.js"
 import { ReaderEditorControl } from "../editor/reader_editor_control.js";
 
+// Direct communication between the instance of a reader in 
+// the background script and it's representations within each sidebar
+
 class ReaderSync {
     intId;
     port;
@@ -95,6 +98,12 @@ class ReaderSyncCore extends ReaderSync {
     #handleReaderEdit(readerObjectLike) {
         if (readerObjectLike.hasOwnProperty("deleteMe")) {
             this.#deleteRequestHandler(readerObjectLike.deleteMe);
+            return;
+        }
+        if (!this.#readerManager.canBeUpdatedWith(readerObjectLike)) {
+            console.log("Conflict detected, will not update ");
+            // TODO: notify editor of failure
+            //       Rework communication first
             return;
         }
         this.#readerManager.editReader(readerObjectLike);

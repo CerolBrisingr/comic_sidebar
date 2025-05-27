@@ -1,6 +1,6 @@
-import {WebReaderSidebar} from "../shared/web_reader.js"
-import {SubscriberPort} from "./subscriber_port.js"
-import {UrlListener} from "../shared/url_listener.js"
+import { WebReaderSidebar } from "../shared/web_reader.js"
+import { SubscriberPort } from "./subscriber_port.js"
+import { UrlListener } from "../shared/url_listener.js"
 import { ShowAllInterface } from "../shared/scheduler.js"
 import { CanvasIcon } from "./canvas_icon.js"
 import { TrackingState } from "../shared/tracking_state.js"
@@ -167,7 +167,7 @@ function receiveMessage(message) {
         return;
     }
     if (message.hasOwnProperty("addPage")) {
-        webReader.registerPage(message.addPage);
+        webReader.registerReader(message.addPage);
         return;
     }
     console.log("Don't know how to act on this message:");

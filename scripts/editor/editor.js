@@ -1,4 +1,4 @@
-import { PrefixSelector } from "./prefix_selector.js"
+import { SiteRecognitionEditor } from "./site_recognition_editor.js";
 import { ReaderData } from "../shared/reader_data.js";
 import { ReaderVisuals } from "../sidebar/reader_visuals.js";
 import { OpenUrlCtrl } from "../shared/url.js";
@@ -6,16 +6,15 @@ import { ImageAdjuster } from "../shared/fav_icon_manager.js";
 import { ScheduleEditor } from "./schedule_editor.js";
 import { TagEditorEditor } from "../shared/tag_editor.js";
 import { HideableHint } from "../shared/hideable_hint.js";
+import { HTML } from "../shared/html.js";
 
-class Editor {
-    #prefixInfo;
-    #prefixEdit;
-    
+class Editor {    
     #reader;
     #preview;
-    #scheduler;
-    #tagEditor;
     #fcnFinalize;
+
+    #siteRecognitionEditor;
+    #errorView;
 
     #cancel;
     #finalizer;
@@ -30,7 +29,7 @@ class Editor {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditorFromData(data);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
-        this.#setUpPrefixHandling(data.url);
+        this.#setUpSiteRecognitionEditor();
         const imageAdjuster = new ImageAdjuster();
         const favIcon = await imageAdjuster.apply(data.favIcon);
         this.#setUpHints();
@@ -39,19 +38,35 @@ class Editor {
         this.#setUpScheduleEditor();
         this.#setUpTagEditor(data.knownTags);
         this.#setUpCreationExit();
+        this.#setUpErrorView();
     }
 
     updateReaderEntry(readerObjectLike, fcnFinalize) {
         this.#fcnFinalize = fcnFinalize;
         this.#reader = ReaderData.buildForEditor(readerObjectLike);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
-        this.#setUpPrefixHandling(this.#reader.getMostRecentAutomaticUrl());
+        this.#setUpSiteRecognitionEditor();
         this.#setUpHints();
         this.#setUpPreview(readerObjectLike.favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
         this.#setUpTagEditor(readerObjectLike.knownTags);
         this.#setUpUpdateExit();
+        this.#setUpErrorView();
+    }
+
+    #setUpErrorView() {
+        this.#errorView = {
+            frame: HTML.findElementById("error_message_frame"),
+            message: HTML.findElementById("error_message")
+        }
+        this.#errorView.frame.style.display = "none";
+    }
+
+    #showError(errorMessage) {
+        this.#errorView.frame.style.display = "block";
+        this.#errorView.message.innerText = errorMessage;
+        HTML.scrollIntoView(this.#errorView.frame);
     }
 
     #setUpCreationExit() {
@@ -67,30 +82,34 @@ class Editor {
     }
 
     #setUpHints() {
-        const prefixHint = new HideableHint("prefix");
-        const previewHint = new HideableHint("preview");
-        const scheduleHint = new HideableHint("schedule");
+        new HideableHint("prefix");
+        new HideableHint("preview");
+        new HideableHint("schedule");
     }
 
     #setUpScheduleEditor() {
-        this.#scheduler = new ScheduleEditor(this.#reader.getSchedule());
+        new ScheduleEditor(this.#reader.getSchedule());
     }
 
     #setUpTagEditor(knownTags) {
-        this.#tagEditor = new TagEditorEditor(this.#reader, knownTags);
+        new TagEditorEditor(this.#reader, knownTags);
     }
 
     #collectExitButtons() {
-        this.#cancel = document.getElementById("cancel");
+        this.#cancel = HTML.findElementById("cancel");
         this.#cancel.onclick = () => {window.close();};
-        this.#finalizer = document.getElementById("finalize");
+        this.#finalizer = HTML.findElementById("finalize");
         this.#finalizer.onclick = () => {this.#finalize();};
-        let startDelete = document.getElementById("start_delete");
+        let startDelete = HTML.findElementById("start_delete");
         let fcnStartDelete = () => {this.#triggerDelete();};
         this.#startDeleteBtn = new HideShowButton(startDelete, fcnStartDelete, false);
-        let confirmDelete = document.getElementById("confirm_delete");
+        let confirmDelete = HTML.findElementById("confirm_delete");
         let fcnConfirmDelte = () => {this.#confirmDelete();};
         this.#confirmDeleteBtn = new HideShowButton(confirmDelete, fcnConfirmDelte, false);
+    }
+
+    #fetchErrorMessage() {
+        return this.#siteRecognitionEditor.fetchErrorMessage();
     }
 
     #triggerDelete() {
@@ -108,6 +127,11 @@ class Editor {
     }
 
     #finalize() {
+        const errorMessage = this.#fetchErrorMessage();
+        if (errorMessage !== undefined) {
+            this.#showError(errorMessage);
+            return;
+        }
         // Successful confiuration. Send data
         let readerObjectLike = this.#reader.returnAsObject();
         readerObjectLike.favIcon = this.#preview.getFavIcon();
@@ -115,21 +139,21 @@ class Editor {
         this.#fcnFinalize(readerObjectLike);
     }
 
-    #setUpPrefixHandling(url) {
-        this.#prefixInfo = document.getElementById("prefix_output");
-        this.#prefixEdit = new PrefixSelector(url, this.#reader.getPrefixMask(), (prefix) => {
-            this.#prefixUpdate(prefix);
-        });
-    }
-
-    #prefixUpdate(prefix) {
-        this.#reader.setPrefixMask(prefix);
-        this.#preview.updateReaderUrls(this.#reader);
-        this.#prefixInfo.innerText = prefix;
+    #setUpSiteRecognitionEditor() {
+        const addTabDropdown = {
+            button: HTML.findElementById("add_site_identification"),
+            dropdown: HTML.findElementById("add_site_identification_dropdown")
+        }
+        this.#siteRecognitionEditor = new SiteRecognitionEditor(
+            HTML.findElementById("site_identificators"),
+            addTabDropdown,
+            this.#reader.getRecognitionObject(),
+            () => {this.#preview.updateReaderUrls(this.#reader);}
+        );
     }
 
     #setUpPreview(favIcon) {
-        const container = document.getElementById("preview_container");
+        const container = HTML.findElementById("preview_container");
         container.appendChild(this.#preview.getListing());
         OpenUrlCtrl.setOpenUrls(false);
         this.#preview.updateFavIcon(favIcon);
@@ -137,7 +161,7 @@ class Editor {
     }
 
     #setUpLabelInput() {
-        const labelInput = document.getElementById("label_box");
+        const labelInput = HTML.findElementById("label_box");
         labelInput.placeholder = this.#reader.getLabel();
         labelInput.addEventListener("input", () => {
             let text = labelInput.value.trim();

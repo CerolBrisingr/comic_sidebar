@@ -4,6 +4,7 @@ class PrefixSelector {
     #main;
     #edge;
     #trail;
+    #prefixLine;
     
     #url;
     #fcnUpdate;
@@ -12,11 +13,19 @@ class PrefixSelector {
 
     #mouseDown = false;
 
-    constructor(url, prefix_mask, fcnUpdate) {
+    constructor(url, prefix_mask, fcnUpdate, ui) {
         this.#url = url;
         this.#fcnUpdate = fcnUpdate;
+        this.#collectUi(ui);
         this.#setUpSpans(prefix_mask);
         this.#setUpInteractions();
+    }
+
+    #collectUi(ui) {
+        this.#main = ui.main;
+        this.#edge = ui.edge;
+        this.#trail = ui.trail;
+        this.#prefixLine = ui.prefixLine;
     }
 
     #setUpSpans(prefix_mask) {
@@ -25,10 +34,6 @@ class PrefixSelector {
             return;
         this.#iSplit = prefix_mask.length - 1;
         this.#minIndex = urlPieces.base_url.length - 1;
-        
-        this.#main = document.getElementById("prefix_main");
-        this.#edge = document.getElementById("prefix_edge");
-        this.#trail = document.getElementById("prefix_trail");
         
         this.#updateLine();
         this.#sendUpdate();
@@ -42,15 +47,14 @@ class PrefixSelector {
             this.#catchPosition(evt);
         }
 
-        const line = document.getElementById("prefix_line");
-        line.addEventListener("mousedown", (evt) => {
+        this.#prefixLine.addEventListener("mousedown", (evt) => {
             // Start tracking only when dragging on prefix selection elements
             if (!this.#checkBounds(evt))
                 return;
             fctMouseMove(evt);
             document.addEventListener("mousemove", fctMouseMove);
             this.#mouseDown = true;
-            line.focus();
+            this.#prefixLine.focus();
         });
         document.addEventListener("mouseup", () => {
             // Stop tracking whereever the mouse is let loose
@@ -58,14 +62,14 @@ class PrefixSelector {
             document.removeEventListener("mousemove", fctMouseMove);
             if (this.#mouseDown) {
                 // Only change focus if there is actually an event going on
-                line.focus();
+                this.#prefixLine.focus();
                 this.#mouseDown = false;
             }
         });
-        line.addEventListener("focus", () => {
+        this.#prefixLine.addEventListener("focus", () => {
             document.addEventListener('keydown', fctKeyAction);
         });
-        line.addEventListener("blur", () => {
+        this.#prefixLine.addEventListener("blur", () => {
             document.removeEventListener('keydown', fctKeyAction);
         });
     }

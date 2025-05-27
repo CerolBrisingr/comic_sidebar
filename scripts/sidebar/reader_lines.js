@@ -1,4 +1,5 @@
-import { openUrlInMyTab, dissectUrl } from "../shared/url.js";
+import { openUrlInMyTab } from "../shared/url.js";
+import { HTML } from "../shared/html.js";
 
 class ReaderLine {
     #managerInterface;
@@ -78,6 +79,7 @@ class ReaderLine {
     expand () {
         this.#bookmarkContainer.classList.remove('no_draw');
         this.#expandButton.setIcon("../../icons/chevron_down.svg");
+        HTML.scrollIntoView(this.#bookmarkContainer);
     }
 
     collapse () {
@@ -102,11 +104,11 @@ class AutoBookmarkLine {
     #bookmark;
     #managerInterface;
 
-    constructor(managerInterface, bookmark, prefix) {
+    constructor(managerInterface, bookmark, recognitionInterface) {
         this.#managerInterface = managerInterface;
         this.#bookmark = bookmark;
         this.#buildFrame();
-        this.#addLink(bookmark.href, prefix);
+        this.#addLink(bookmark.href, recognitionInterface);
         this.#addPinButton();
     }
 
@@ -115,8 +117,8 @@ class AutoBookmarkLine {
         this.#frame.classList.add("auto_bookmark");
     }
 
-    #addLink(href, prefix) {
-        this.#link = IconLink.getAutoBookmark(href, getBookmarkLabel(href, prefix));
+    #addLink(href, recognitionInterface) {
+        this.#link = IconLink.getAutoBookmark(href, getBookmarkLabel(href, recognitionInterface));
         this.#link.appendTo(this.#frame);
     }
 
@@ -140,12 +142,12 @@ class ManualBookmarkLine {
     #bookmark;
     #unPinButton;
 
-    constructor(managerInterface, bookmark, prefix) {
+    constructor(managerInterface, bookmark, recognitionInterface) {
         this.#managerInterface = managerInterface;
         this.#bookmark = bookmark;
         this.#buildFrame();
 
-        this.#addEditLabel(prefix);
+        this.#addEditLabel(recognitionInterface);
         this.#addUnPinButton();
     }
 
@@ -154,8 +156,8 @@ class ManualBookmarkLine {
         this.#frame.classList.add("manual_bookmark");
     }
 
-    #addEditLabel(prefix) {
-        this.#editLabel = new EditableLabel(this.#managerInterface, this.#bookmark, prefix);
+    #addEditLabel(recognitionInterface) {
+        this.#editLabel = new EditableLabel(this.#managerInterface, this.#bookmark, recognitionInterface);
         this.#editLabel.appendTo(this.#frame);
     }
 
@@ -187,7 +189,7 @@ class ManualBookmarkLine {
 class EditableLabel {
     #managerInterface;
     #bookmark;
-    #prefix;
+    #recognitionInterface;
 
     #container;
     #container_link;
@@ -196,9 +198,9 @@ class EditableLabel {
     #editButton;
     #input;
 
-    constructor(managerInterface, bookmark, prefix) {
+    constructor(managerInterface, bookmark, recognitionInterface) {
         this.#bookmark = bookmark;
-        this.#prefix = prefix;
+        this.#recognitionInterface = recognitionInterface;
         this.#managerInterface = managerInterface;
         this.#buildContainers();
         this.#addLink();
@@ -256,7 +258,7 @@ class EditableLabel {
         this.#editButton.setIcon("../../icons/edit_squiggle.svg");
         this.#container_link.classList.add("no_draw");
         this.#container_edit.classList.remove("no_draw");
-        this.#input.value = this.#bookmark.getLabel("< Edit Label Here >");
+        this.#input.value = this.#bookmark.getLabelWFallback("< Edit Label Here >");
     }
 
     #showLabel() {
@@ -290,8 +292,8 @@ class EditableLabel {
     }
 
     #extractLabel() {
-        let linkPieces = dissectUrl(this.#bookmark.href, this.#prefix, true);
-        return this.#bookmark.getLabel(cleanEnd(linkPieces));
+        let urlRemainder = this.#recognitionInterface.getUrlRemainder(this.#bookmark.href);
+        return this.#bookmark.getLabelWFallback(cleanLabel(urlRemainder));
     }
 
     updateLabel(newValue) {
@@ -439,9 +441,9 @@ class IconButton {
     }
 }
 
-function getBookmarkLabel(href, prefix) {
-    let urlPieces = dissectUrl(href, prefix);
-    return cleanEnd(urlPieces);
+function getBookmarkLabel(href, recognitionInterface) {
+    let urlRemainder = recognitionInterface.getUrlRemainder(href);
+    return cleanLabel(urlRemainder);
 }
 
 function buildLine() {
@@ -450,13 +452,16 @@ function buildLine() {
     return line;
 }
 
-function cleanEnd(urlPieces) {
-    if (urlPieces === undefined)
-        return "will no longer be tracked";
-    let string = urlPieces.tail;
-    if (string.slice(-1) === "/")
-        return string.slice(0, -1);
-    return string;
+function cleanLabel(urlRemainder) {
+    if (urlRemainder === undefined)
+        return "cannot resolve anymore";
+    // remove "/" from start of label
+    if (urlRemainder[0] == "/")
+        urlRemainder = urlRemainder.slice(1);
+    // remove "/" from end of label
+    if (urlRemainder.slice(-1) === "/")
+        urlRemainder = urlRemainder.slice(0, -1);
+    return urlRemainder;
 }
 
 export {ReaderLine, AutoBookmarkLine, ManualBookmarkLine}

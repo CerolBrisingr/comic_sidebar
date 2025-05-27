@@ -6,6 +6,17 @@ class UrlListener {
     #fktWindowChanged;
     #lastUrl = "";
     #hasFavIcon = false;
+
+    static async listAllTabs() {
+        const tabs = await browser.tabs.query({});
+        let output = [];
+        for (const tab of tabs) {
+            if (tab.url.startsWith("moz-extension://")) continue;
+            if (tab.url.startsWith("about:")) continue;
+            output.push(new Tab(tab));
+        }
+        return output;
+    }
     
     static async findLatestTabUrl() {
         let tabs = await browser.tabs.query({currentWindow: true});
@@ -103,6 +114,49 @@ class UrlListener {
         if (!tab.active) // This tab will fire again when finally viewed
             return;
         this.#fireOnlyOnce(tab.url, tab.favIconUrl, tab.title);
+    }
+}
+
+class Tab {
+    #lastAccessed;
+    #url;
+    #title;
+    #favIconUrl;
+
+    // Constructor should be able to work with it's own "returnAsObject()"
+    // to allow easy serialization and deserialization
+    constructor(browserTab) {
+        this.#lastAccessed = browserTab.lastAccessed;
+        this.#url = browserTab.url;
+        this.#title = browserTab.title;
+        this.#favIconUrl = browserTab.favIconUrl;
+    }
+
+    print() {
+        console.log(this.#url);
+        console.log(this.#title);
+        console.log("");
+    }
+
+    getUrl() {
+        return this.#url;
+    }
+
+    getTitle() {
+        return this.#title;
+    }
+
+    getFavIconUrl() {
+        return this.#favIconUrl;
+    }
+
+    returnAsObject() {
+        return {
+            lastAccessed: this.#lastAccessed,
+            url: this.#url,
+            title: this.#title,
+            favIcon: this.#favIconUrl
+        }
     }
 }
 
