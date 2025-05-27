@@ -96,14 +96,14 @@ class Editor {
     }
 
     #collectExitButtons() {
-        this.#cancel = document.getElementById("cancel");
+        this.#cancel = HTML.findElementById("cancel");
         this.#cancel.onclick = () => {window.close();};
-        this.#finalizer = document.getElementById("finalize");
+        this.#finalizer = HTML.findElementById("finalize");
         this.#finalizer.onclick = () => {this.#finalize();};
-        let startDelete = document.getElementById("start_delete");
+        let startDelete = HTML.findElementById("start_delete");
         let fcnStartDelete = () => {this.#triggerDelete();};
         this.#startDeleteBtn = new HideShowButton(startDelete, fcnStartDelete, false);
-        let confirmDelete = document.getElementById("confirm_delete");
+        let confirmDelete = HTML.findElementById("confirm_delete");
         let fcnConfirmDelte = () => {this.#confirmDelete();};
         this.#confirmDeleteBtn = new HideShowButton(confirmDelete, fcnConfirmDelte, false);
     }
@@ -141,11 +141,11 @@ class Editor {
 
     #setUpSiteRecognitionEditor() {
         const addTabDropdown = {
-            button: document.getElementById("add_site_identification"),
-            dropdown: document.getElementById("add_site_identification_dropdown")
+            button: HTML.findElementById("add_site_identification"),
+            dropdown: HTML.findElementById("add_site_identification_dropdown")
         }
         this.#siteRecognitionEditor = new SiteRecognitionEditor(
-            document.getElementById("site_identificators"),
+            HTML.findElementById("site_identificators"),
             addTabDropdown,
             this.#reader.getRecognitionObject(),
             () => {this.#preview.updateReaderUrls(this.#reader);}
@@ -153,7 +153,7 @@ class Editor {
     }
 
     #setUpPreview(favIcon) {
-        const container = document.getElementById("preview_container");
+        const container = HTML.findElementById("preview_container");
         container.appendChild(this.#preview.getListing());
         OpenUrlCtrl.setOpenUrls(false);
         this.#preview.updateFavIcon(favIcon);
@@ -161,7 +161,7 @@ class Editor {
     }
 
     #setUpLabelInput() {
-        const labelInput = document.getElementById("label_box");
+        const labelInput = HTML.findElementById("label_box");
         labelInput.placeholder = this.#reader.getLabel();
         labelInput.addEventListener("input", () => {
             let text = labelInput.value.trim();
