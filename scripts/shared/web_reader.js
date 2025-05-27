@@ -18,8 +18,18 @@ class WebReader {
     constructor() {
         this._currentReader = new ReaderClassDummy();
         this._savingSuspended = false;
-        this._readerStorage = new HtmlContainer();
+        this._readerStorage = this.#buildStorage();
         this._latestId = 0;
+    }
+
+    #buildStorage() {
+        const fktIdentifyExtension = (entry, identification) => {
+            return entry.urlIsCompatible(identification, false);
+        };
+        const fktIdentifyObject = (entry, identification) => {
+            return entry.urlIsCompatible(identification, true);
+        };
+        return new HtmlContainer(fktIdentifyExtension, fktIdentifyObject);
     }
     
     async importBackup(file, fktDone) {
@@ -88,7 +98,7 @@ class WebReader {
             let newObject = this._createReaderClass(readerObject, index);
             if (!newObject.isValid())
                 continue;
-            this._readerStorage.saveObject(newObject);
+            this._readerStorage.saveObject(newObject, newObject.getPrefixMasks());
         }
         this._savingSuspended = false;
         this.saveProgress();
@@ -110,7 +120,7 @@ class WebReader {
         }
     }
     
-    async registerPage(readerObjectLike) {
+    async registerReader(readerObjectLike) {
         let storageObject 
             = this._selectCorrespondingStorage(readerObjectLike.url);
         if (storageObject.isValid()) {
@@ -123,17 +133,19 @@ class WebReader {
             console.log("Failed to build comic entry");
             return -1;
         }
-        this._readerStorage.saveObject(newManager);
+        this._readerStorage.saveObject(newManager, newManager.getPrefixMasks());
         await this._registerFavIcon(readerObjectLike);
         await this.updateBookmark(readerObjectLike, false); // This also updates storage
         this.relistViewers();
         return this._latestId;
     }
     
-    removeReader(prefixMask) {
-        if (this._currentReader.urlIsCompatible(prefixMask))
-            this._updateCurrentReader(new ReaderClassDummy());
-        this._readerStorage.removeObject(prefixMask);
+    removeReader(prefixMasks) {
+        for (let prefixMask of prefixMasks) {
+            if (this._currentReader.urlIsCompatible(prefixMask, true))
+                this._updateCurrentReader(new ReaderClassDummy());
+        }
+        this._readerStorage.removeObject(prefixMasks);
         this.saveProgress();
     }
 
@@ -173,6 +185,31 @@ class WebReaderBackground extends WebReader {
     async _importReaderObjectList(readerObjectList) {
         super._importReaderObjectList(readerObjectList);
         await this.#favIconController.initialize(this._readerStorage.keys());
+    }
+
+    canReaderBeUpdatedWith(readerData, newReaderData) {
+        // A prefixMask always contains at least the host url
+        const prefixList = newReaderData.getPrefixMasks();
+        for (const prefix of prefixList) {
+            const candidates = this._readerStorage.getCargoListForUrl(prefix);
+            if (!this.#testEditWithCandidates(candidates, readerData, newReaderData))
+                return false;
+        }
+        return true;
+    }
+
+    #testEditWithCandidates(candidates, readerData, newReaderData) {
+        const newSiteRecognition = newReaderData.getRecognitionInterface();
+        for (const candidate of candidates) {
+            // Edited version will replace the version to edit
+            if (candidate.managesThis(readerData)) continue;
+
+            // Bilaterally test for conflicts with unrelated element
+            const siteRecognition = candidate.getRecognitionInterface();
+            if (!siteRecognition.canCoexistWith(newSiteRecognition)) return false;
+            if (!newSiteRecognition.canCoexistWith(siteRecognition)) return false;
+        }
+        return true;
     }
 
     async updateBookmark(data, doClean = true) {
@@ -336,7 +373,7 @@ class WebReaderSidebar extends WebReader {
     }
 
     setFavIconFromKey(key, value) {
-        let managerList = this._readerStorage.getHostListFromKey(key);
+        let managerList = this._readerStorage.getPrimaryCargoListForHost(key);
         for (const manager of managerList) {
             manager.updateFavIcon(value);
         }
@@ -391,8 +428,12 @@ class WebReaderInterface {
         this.#webReader.saveProgress();
     }
     
-    deleteMe(prefixMask) {
-        this.#webReader.removeReader(prefixMask);
+    removeReader(prefixMasks) {
+        this.#webReader.removeReader(prefixMasks);
+    }
+
+    canWeUpdateReaderWith(readerData, newReaderData) {
+        return this.#webReader.canReaderBeUpdatedWith(readerData, newReaderData);
     }
     
     relistViewerDisplay() {
@@ -415,7 +456,7 @@ class ReaderClassDummy {
         return "Dummy";
     }
     
-    urlIsCompatible(url) {
+    urlIsCompatible(url, allowPrefix) {
         return false;
     }
 

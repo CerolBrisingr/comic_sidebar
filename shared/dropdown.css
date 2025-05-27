@@ -1,5 +1,21 @@
 
-.dropdown_option_box {
+.dropdown_wrapper {
+    display: inline-block;
+}
+
+.dropdown_wrapper_spacy {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dropdown_button_w_margin {
+    margin-top: 0.5ex;
+}
+
+.dropdown_option_box_crammed,
+.dropdown_option_box_spacy
+ {
     display: none;
     position: absolute;
     right: 0;
@@ -11,11 +27,17 @@
     border-color: lightgray;
 }
 
+.dropdown_option_box_spacy
+{
+    top: 100%;
+}
+
 .dropdown_icon {
     visibility: hidden;
 }
 
 .dropdown_option {
+    z-index: 21;
     cursor: pointer;
     display: flex;
     text-align: left;
@@ -25,6 +47,7 @@
 }
 
 .dropdown_label {
+    z-index: 22;
     margin-top: 0.3vh;
     margin-bottom: 0.3vh;
     margin-left: 0.3em;
