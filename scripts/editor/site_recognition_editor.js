@@ -18,13 +18,15 @@ class SiteRecognitionEditor {
     }
 
     fetchErrorMessage() {
-        const sites = this.#siteRecognition.getSites();
+        const sites = this.#siteRecognition.getCurrentSites();
         if (sites.length == 0) {
             return "Missing a site recognition module. Import a tab and create one!";
         }
         // Test all pairs against each other
         for (let id1 = 0; id1 < sites.length - 1; id1++) {
+            if (!sites[id1].isValid()) continue;
             for (let id2 = 1; id2 < sites.length; id2++) {
+                if (!sites[id2].isValid()) continue;
                 if (id1 == id2) continue;
                 if (sites[id1].overlapsWith(sites[id2])) {
                     return this.#buildOverlapErrorMessage(id1, id2);
@@ -42,12 +44,13 @@ class SiteRecognitionEditor {
     }
 
     #buildInterface(siteRecognition) {
-        for (let site of siteRecognition.getSites()) {
+        for (let site of siteRecognition.getCurrentSites()) {
             this.#addSite(site);
         };
     }
 
     #addSite(site) {
+        if (!site.isValid()) return;
         const fktRemoveMe = (siteEditorToRemove) => {
             this.#removeSiteEditor(siteEditorToRemove);
         }
@@ -156,7 +159,7 @@ class SiteEditor {
     #createIcon(parent) {
         let icon = HTML.insertElement(parent, "img");
         HTML.addCssProperty(icon, "field_type_icon");
-        HTML.addSpacer(parent);
+        HTML.addSpacerText(parent);
         return icon;
     }
 

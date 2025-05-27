@@ -20,11 +20,19 @@ class SiteRecognition {
     update(objectLike) {
         if (!objectLike.hasOwnProperty('sites')) return false;
         if (!Array.isArray(objectLike.sites)) return false;
-        this.#sites.length = 0;
+        this.#clearSites();
         for (let siteData of objectLike.sites) {
             this.#pushSiteIfValid(siteData);
         }
         return this.#sites.length > 0;
+    }
+
+    #clearSites() {
+        // Invalidate former sites for anyone still holding onto them
+        for (let site of this.#sites) {
+            site.invalidate();
+        }
+        this.#sites.length = 0;
     }
 
     #pushSiteIfValid(siteData) {
@@ -50,13 +58,13 @@ class SiteRecognition {
 
     // It is not guaranteed that the returned sites will not be replaced
     // by SiteRecognition.
-    getSites() {
-        return this.#sites;
+    getCurrentSites() {
+        return [...this.#sites]; // shallow copy
     }
     
     createSiteFromTab(tabData) {
         // Dissect tab information to build new site module
-        let urlPieces = dissectUrl(tabData.url);
+        const urlPieces = dissectUrl(tabData.url);
         if (urlPieces === undefined)
             return;
         const data = {
@@ -64,8 +72,7 @@ class SiteRecognition {
             lastUrl: tabData.url,
             lastTitle: tabData.title
         }
-        const site = this.createSite(data);
-        return site;
+        return this.createSite(data);
     }
 
     createSite(data) {
@@ -194,6 +201,10 @@ class Site {
 
     isValid() {
         return this.#isValid;
+    }
+
+    invalidate() {
+        this.#isValid = false;
     }
 
     getPrefix() {

@@ -23,7 +23,7 @@ class HTML {
         return span;
     }
 
-    static addSpacer(parent) {
+    static addSpacerText(parent) {
         return HTML.addText(parent, '\u00A0');
     }
 

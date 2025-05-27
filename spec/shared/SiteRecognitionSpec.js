@@ -127,6 +127,21 @@ describe('Two sites', function() {
         expect(siteRecognition.siteIsCompatible("http://www.some.site/321", "..tset..")).toBe(true);
         expect(siteRecognition.siteIsCompatible("http://www.some.site/1234", "..test..")).toBe(true);
     });
+
+    it('should invalidate unused sites', function() {
+        let site1 = {prefix: "http://www.some.site/12", titleToken: "test"};
+        let site2 = {prefix: "http://www.some.site/32", titleToken: "tset"};
+        let data = {sites: [site1, site2]};
+        let siteRecognition = new SiteRecognition(data);
+        const currentSites = siteRecognition.getCurrentSites();
+        for (const site of currentSites) {
+            expect(site.isValid()).toBe(true);
+        }
+        siteRecognition.update(siteRecognition.returnAsObject());
+        for (const site of currentSites) {
+            expect(site.isValid()).toBe(false);
+        }
+    });
 });
 
 function getPrefix(objectLike, siteId = 0) {

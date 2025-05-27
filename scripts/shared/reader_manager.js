@@ -233,35 +233,6 @@ class SidebarReaderManager extends BasicReaderManager{
     }
 }
 
-class ReaderManagerDummy {
-    constructor() {
-    }
-    
-    isValid() {
-        return false;
-    }
-    
-    urlIsCompatible(url) {
-        return false;
-    }
-    
-    canWeUpdateReaderWith() {
-        return false;
-    }
-
-    prepareReaderEdit() {}
-    
-    pinBookmark(bookmark) {
-        return false;
-    }
-    unpinBookmark(bookmark) {
-        return false;
-    }
-    
-    expand() {}
-    collapse() {}
-}
-
 class ReaderManagerInterface {
     #readerManager
 
@@ -298,4 +269,4 @@ class ReaderSyncDummy {
     disconnect(){};
 }
 
-export {CoreReaderManager, SidebarReaderManager, ReaderManagerDummy}
+export {CoreReaderManager, SidebarReaderManager}

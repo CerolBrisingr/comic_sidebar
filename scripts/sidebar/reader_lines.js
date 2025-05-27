@@ -293,7 +293,7 @@ class EditableLabel {
 
     #extractLabel() {
         let urlRemainder = this.#recognitionInterface.getUrlRemainder(this.#bookmark.href);
-        return this.#bookmark.getLabelWFallback(cleanEnd(urlRemainder));
+        return this.#bookmark.getLabelWFallback(cleanLabel(urlRemainder));
     }
 
     updateLabel(newValue) {
@@ -443,7 +443,7 @@ class IconButton {
 
 function getBookmarkLabel(href, recognitionInterface) {
     let urlRemainder = recognitionInterface.getUrlRemainder(href);
-    return cleanEnd(urlRemainder);
+    return cleanLabel(urlRemainder);
 }
 
 function buildLine() {
@@ -452,11 +452,15 @@ function buildLine() {
     return line;
 }
 
-function cleanEnd(urlRemainder) {
+function cleanLabel(urlRemainder) {
     if (urlRemainder === undefined)
         return "cannot resolve anymore";
+    // remove "/" from start of label
+    if (urlRemainder[0] == "/")
+        urlRemainder = urlRemainder.slice(1);
+    // remove "/" from end of label
     if (urlRemainder.slice(-1) === "/")
-        return urlRemainder.slice(0, -1);
+        urlRemainder = urlRemainder.slice(0, -1);
     return urlRemainder;
 }
 
