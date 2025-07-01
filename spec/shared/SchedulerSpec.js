@@ -363,6 +363,9 @@ describe('Monthly', function() {
         lastInteraction = 1749490292518;    // 9.6.2025
         now = new Date(2025, 6, 1, 10, 0);  // 1.7.2025
         expect(scheduler.isScheduled(now, lastInteraction)).toBeFalse();
+        
+        now = new Date(2025, 6, 9, 0, 0, 1);  // 9.7.2025
+        expect(scheduler.isScheduled(now, lastInteraction)).toBeTrue();
     });
 });
 
@@ -370,8 +373,6 @@ describe('Hiatus', function() {
     let readerSchedule;
     let hiatusSchedule;
     let scheduler;
-    let lastInteraction;
-    let now;
 
     beforeEach(function() {
         readerSchedule = new ReaderSchedule();
