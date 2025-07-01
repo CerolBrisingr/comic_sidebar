@@ -3,13 +3,13 @@ import { dissectUrl, urlFitsPrefix } from "./url.js"
 class SiteRecognition {
     #sites = [];
 
-    static buildFromUrl(url) {
+    static buildFromUrl(url, title = "") {
         let urlPieces = dissectUrl(url);
-        return SiteRecognition.buildFromPrefix(urlPieces.base_url, url);
+        return SiteRecognition.buildFromPrefix(urlPieces.base_url, url, title);
     }
 
-    static buildFromPrefix(prefix, url = "") {
-        let siteData = [{prefix: prefix, lastUrl: url}];
+    static buildFromPrefix(prefix, url = "", title = "") {
+        let siteData = [{prefix: prefix, lastUrl: url, lastTitle: title}];
         return new SiteRecognition({sites: siteData});
     }
 
@@ -178,6 +178,7 @@ class Site {
     #isValid = false;
 
     constructor(data) {
+        console.log(data);
         // Not setting valid flag if prefix is not within expectations
         if (!data.hasOwnProperty('prefix')) return;
         if (data.prefix === undefined || data.prefix.len == 0) return;

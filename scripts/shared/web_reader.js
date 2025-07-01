@@ -24,10 +24,10 @@ class WebReader {
 
     #buildStorage() {
         const fktIdentifyExtension = (entry, identification) => {
-            return entry.urlIsCompatible(identification, false);
+            return entry.urlIsCompatible(identification, "", false);
         };
         const fktIdentifyObject = (entry, identification) => {
-            return entry.urlIsCompatible(identification, true);
+            return entry.urlIsCompatible(identification, "", true);
         };
         return new HtmlContainer(fktIdentifyExtension, fktIdentifyObject);
     }
@@ -72,8 +72,8 @@ class WebReader {
         return readerObject.data;
     }
     
-    _selectCorrespondingStorage(url) {
-        if (this._currentReader.urlIsCompatible(url))
+    _selectCorrespondingStorage(url, title = "") {
+        if (this._currentReader.urlIsCompatible(url, title))
             return this._currentReader;
         let object = this._readerStorage.getObject(url);
         if (object === undefined) {
@@ -142,7 +142,7 @@ class WebReader {
     
     removeReader(prefixMasks) {
         for (let prefixMask of prefixMasks) {
-            if (this._currentReader.urlIsCompatible(prefixMask, true))
+            if (this._currentReader.urlIsCompatible(prefixMask, "", true))
                 this._updateCurrentReader(new ReaderClassDummy());
         }
         this._readerStorage.removeObject(prefixMasks);
@@ -456,7 +456,7 @@ class ReaderClassDummy {
         return "Dummy";
     }
     
-    urlIsCompatible(url, allowPrefix) {
+    urlIsCompatible(url, title, allowPrefix) {
         return false;
     }
 

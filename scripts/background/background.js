@@ -58,12 +58,12 @@ async function receiveMessage(message) {
     console.log(message);
 }
 
-function handlePageAddition(data) {
-    let test = dissectUrl(data.url);
+function handlePageAddition(siteInformation) {
+    let test = dissectUrl(siteInformation.url);
     if (test === undefined) // Invalid or reserved URL, not useful
         return;
-    data.knownTags = webReader.getKnownTags();
-    ReaderEditorControl.createReaderEntry(data, handleImport);
+    siteInformation.knownTags = webReader.getKnownTags();
+    ReaderEditorControl.createReaderEntry(siteInformation, handleImport);
 }
 
 async function handleImport(readerObjectLike) {
@@ -126,11 +126,11 @@ function sendActiveState() {
     opConnection.sendMessage({activeState: isActive});
 }
 
-function updateSidebar(data) {
-    let promise = webReader.updateBookmark(data);
+function updateSidebar(siteInformation) {
+    let promise = webReader.updateBookmark(siteInformation);
     promise.then((didUpdate) => {
         if (didUpdate)
-            sbConnection.sendMessage({updateBookmark: data});
+            sbConnection.sendMessage({updateBookmark: siteInformation});
     });
 }
 

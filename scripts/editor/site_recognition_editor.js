@@ -45,6 +45,7 @@ class SiteRecognitionEditor {
 
     #buildInterface(siteRecognition) {
         for (let site of siteRecognition.getCurrentSites()) {
+            console.log(site.returnAsObject());
             this.#addSite(site);
         };
     }
@@ -109,6 +110,8 @@ class SiteEditor {
 
         this.#introduceEvaluation(this.#frame);
         this.#buildUrlEvaluation(this.#frame);
+
+        this.#buildTitleControl(this.#frame);
 
         // Needs to happen late since it has to initially set the eval elements
         this.#finalizeControls();
@@ -194,6 +197,11 @@ class SiteEditor {
         const group = HTML.insertElement(frame, "div");
         this.#prefixEval = HTML.addSpan(group, "-prefix-", "prefix_main");
         HTML.addSpan(group, "****", "prefix_trail");
+    }
+
+    #buildTitleControl(parent) {
+        const frame = HTML.insertElement(parent, "div");
+        HTML.addText(frame, this.#site.getLastTitle());
     }
 
     #receiveNewPrefix(prefix) {

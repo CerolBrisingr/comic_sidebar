@@ -18,12 +18,12 @@ class ReaderData {
         return new ReaderData(readerObject, new InterfaceDummy(), new ReaderSyncDummy());
     }
 
-    static buildForEditorFromData(data) {
+    static buildForEditorFromSiteInfo(siteInformation) {
         // Build readerData without connected behavior and from basic assumptions
-        let siteRecognition = SiteRecognition.buildFromUrl(data.url);
-        let urlPieces = dissectUrl(data.url);
-        let readerObject = {time: data.time, site_recognition: siteRecognition.returnAsObject(), label: urlPieces.host, manual: [], automatic: []};
-        readerObject.automatic.push({href: data.url});
+        let siteRecognition = SiteRecognition.buildFromUrl(siteInformation.url, siteInformation.title);
+        let urlPieces = dissectUrl(siteInformation.url);
+        let readerObject = {time: siteInformation.time, site_recognition: siteRecognition.returnAsObject(), label: urlPieces.host, manual: [], automatic: []};
+        readerObject.automatic.push({href: siteInformation.url});
         return ReaderData.buildForEditor(readerObject);
     }
     
@@ -52,8 +52,11 @@ class ReaderData {
         if (!isArray(list))
             return;
         for (let entry of list) {
+            let title = "";
+            if (entry.hasOwnProperty("title"))
+                title = String(entry.title);
             if (entry.hasOwnProperty("href"))
-                this.#registerAutomatic(String(entry.href));
+                this.#registerAutomatic(String(entry.href), title);
         }
     }
     
@@ -119,10 +122,10 @@ class ReaderData {
                  && (this.#label !== undefined));
     }
     
-    urlIsCompatible(url_string, allowPrefix = false) {
+    urlIsCompatible(url_string, title = "", allowPrefix = false) {
         if (!(typeof url_string === "string"))
             return false;
-        return this.#siteRecognition.siteIsCompatible(url_string, "", allowPrefix);
+        return this.#siteRecognition.siteIsCompatible(url_string, title, allowPrefix);
     }
 
     addAutomatic(data) {
@@ -143,8 +146,8 @@ class ReaderData {
         return false;
     }
     
-    #registerAutomatic(url) {
-        if (!this.urlIsCompatible(url))
+    #registerAutomatic(url, title = "") {
+        if (!this.urlIsCompatible(url, title))
             return false;
         let newBoockmark = new Bookmark(url);
         if (newBoockmark.href == "#")
@@ -190,8 +193,8 @@ class ReaderData {
         return newBookmark;
     }
 
-    #registerManual(url) {
-        if (!this.urlIsCompatible(url))
+    #registerManual(url, title = "") {
+        if (!this.urlIsCompatible(url, title))
             return undefined;
         let newBookmark = new Bookmark(url);
         if (newBookmark.href == "#")
@@ -269,9 +272,11 @@ function isArray(list) {
 
 class Bookmark {
     #href = "#";
+    #title = "";
     #label = undefined;
-    constructor(href) {
+    constructor(href, title) {
         this.href = href;
+        this.title = title;
     }
     
     setLabel(value) {
@@ -287,9 +292,20 @@ class Bookmark {
             return fallback;
         return this.#label;
     }
+
+    get title() {
+        return this.#title;
+    }
     
     get href() {
         return this.#href;
+    }
+
+    set title(title) {
+        if (!(typeof title === "string"))
+            this.#title = "";
+        else
+            this.#title = title;
     }
     
     set href(url) {
@@ -301,10 +317,14 @@ class Bookmark {
     
     returnAsObject() {
         if (this.#label === undefined) {
-            return {href:this.href}
+            return {
+                href:this.href,
+                title:this.#title
+            }
         } else {
             return {
                 href: this.href, 
+                title: this.#title,
                 label: this.#label 
                 };
         }

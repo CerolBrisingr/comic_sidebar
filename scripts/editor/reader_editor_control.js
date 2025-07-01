@@ -60,8 +60,8 @@ class ReaderEditorControl {
         ReaderEditorControl.port.sendMessage({[command]: data});
     }
     
-    static async createReaderEntry(data, fktFinalize) {
-        ReaderEditorControl.#startEditor("import", data, fktFinalize);
+    static async createReaderEntry(siteInformation, fktFinalize) {
+        ReaderEditorControl.#startEditor("import", siteInformation, fktFinalize);
     }
     
     static async updateReaderEntry(readerObjectLike, fktFinalize) {

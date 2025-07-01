@@ -50,7 +50,7 @@ function dissectUrl(url, prefix, fallback) {
             return;
         }
     }
-    let tail = getTail(url, prefix);
+    let tail = getUrlPrefixTail(url, prefix);
     return {host: currentUrl.host, tail: tail, base_url: currentUrl.origin};
 }
 
@@ -63,10 +63,10 @@ function urlFitsPrefix(url, prefix) {
     return url.startsWith(prefix);
 }
 
-function getTail(url, prefix) {
+function getUrlPrefixTail(url, prefix) {
     url = url.replace("http:", "https:");
     prefix = prefix.replace("http:", "https:");
     return url.slice(prefix.length);
 }
 
-export {OpenUrlCtrl, openUrlInMyTab, dissectUrl, urlFitsPrefix, getTail}
+export {OpenUrlCtrl, openUrlInMyTab, dissectUrl, urlFitsPrefix, getUrlPrefixTail}

@@ -25,18 +25,19 @@ class Editor {
         // Wait for instructions
     }
 
-    async createReaderEntry(data, fcnFinalize) {
+    async createReaderEntry(siteInformation, fcnFinalize) {
         this.#fcnFinalize = fcnFinalize;
-        this.#reader = ReaderData.buildForEditorFromData(data);
+        this.#reader = ReaderData.buildForEditorFromSiteInfo(siteInformation);
+        console.log(this.#reader.returnAsObject().site_recognition.sites[0]);
         this.#preview = ReaderVisuals.makePreview(this.#reader);
         this.#setUpSiteRecognitionEditor();
         const imageAdjuster = new ImageAdjuster();
-        const favIcon = await imageAdjuster.apply(data.favIcon);
+        const favIcon = await imageAdjuster.apply(siteInformation.favIcon);
         this.#setUpHints();
         this.#setUpPreview(favIcon);
         this.#setUpLabelInput();
         this.#setUpScheduleEditor();
-        this.#setUpTagEditor(data.knownTags);
+        this.#setUpTagEditor(siteInformation.knownTags);
         this.#setUpCreationExit();
         this.#setUpErrorView();
     }

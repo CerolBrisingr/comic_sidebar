@@ -1,4 +1,4 @@
-import { dissectUrl, urlFitsPrefix, getTail } from "../../scripts/shared/url.js";
+import { dissectUrl, urlFitsPrefix, getUrlPrefixTail } from "../../scripts/shared/url.js";
 
 describe('urlFitsPrefix()', function() {
     it('should recognize prefix url', () => {
@@ -43,7 +43,7 @@ describe('urlFitsPrefix()', function() {
     });
 });
 
-describe('getTail()', function() {
+describe('getUrlPrefixTail()', function() {
     let url;
 
     beforeEach(function() {
@@ -52,20 +52,20 @@ describe('getTail()', function() {
 
     it('should be able to get a tail via prefix', () => {
         let prefix = "https://www.test.com/";
-        let tail = getTail(url, prefix);
+        let tail = getUrlPrefixTail(url, prefix);
         expect(tail).toBe("page1/");
     });
 
     it('should be able to get a tail via prefix on http instead of https', () => {
         let prefix = "http://www.test.com/";
-        let tail = getTail(url, prefix);
+        let tail = getUrlPrefixTail(url, prefix);
         expect(tail).toBe("page1/");
     });
 
     it('should work for different protocol', () => {
         url = "ftp://www.test.com/page1/";
         let prefix = "ftp://www.test.com/";
-        let tail = getTail(url, prefix);
+        let tail = getUrlPrefixTail(url, prefix);
         expect(tail).toBe("page1/");
     });
 

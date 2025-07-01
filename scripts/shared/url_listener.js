@@ -18,7 +18,7 @@ class UrlListener {
         return output;
     }
     
-    static async findLatestTabUrl() {
+    static async findLatestTabInfo() {
         let tabs = await browser.tabs.query({currentWindow: true});
         let url = undefined;
         let favIconUrl = undefined;
@@ -32,7 +32,7 @@ class UrlListener {
                 title = tab.title;
             }
         }
-        return bundleUrl(url, favIconUrl, title);
+        return bundleSiteInformation(url, favIconUrl, title);
     }
     
     constructor(fktReactToUrl) {
@@ -56,9 +56,9 @@ class UrlListener {
         this.deactivate();
     }
 
-    #sendUrl(url, favIconUrl, title) {
+    #sendSiteInformation(url, favIconUrl, title) {
         this.#fktReactToUrl(
-            bundleUrl(url, favIconUrl, title)
+            bundleSiteInformation(url, favIconUrl, title)
         );
     }
     
@@ -70,7 +70,7 @@ class UrlListener {
         }
         this.#lastUrl = url;
         this.#hasFavIcon = favIconUrl !== undefined;
-        this.#sendUrl(url, favIconUrl, title);
+        this.#sendSiteInformation(url, favIconUrl, title);
     }
     
     #connect() {
@@ -103,7 +103,7 @@ class UrlListener {
     async retransmit() {
         if (!this.#isActive)
             return;
-        const bundle = await UrlListener.findLatestTabUrl();
+        const bundle = await UrlListener.findLatestTabInfo();
         this.#fktReactToUrl(bundle);
     }
     
@@ -160,11 +160,13 @@ class Tab {
     }
 }
 
-function bundleUrl(url, favIconUrl, title) {
-    return {url:url, 
-            time: Date.now(),
-            favIcon: favIconUrl,
-            title: title};
+function bundleSiteInformation(url, favIconUrl, title) {
+    return {
+        url:url, 
+        time: Date.now(),
+        favIcon: favIconUrl,
+        title: title
+    };
 }
 
 export {UrlListener}

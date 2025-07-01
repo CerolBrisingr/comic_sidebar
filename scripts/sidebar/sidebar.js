@@ -84,9 +84,9 @@ function requestUrlRetransmission() {
     bsConnection.sendMessage("urlRetransmissionRequest");
 }
 
-function requestReaderAddition(data) {
-    // data: latest browser tab information
-    bsConnection.sendMessage({requestReaderAddition: data});
+function requestReaderAddition(siteInformation) {
+    // siteInformation: latest browser tab information
+    bsConnection.sendMessage({requestReaderAddition: siteInformation});
 }
 
 function requestWebReader() {
@@ -121,9 +121,9 @@ function addCurrentPageAsReader() {
     // message background script to start configuration dialog
     if (webReader === undefined)
         return;
-    UrlListener.findLatestTabUrl()
-        .then((data) => {
-            requestReaderAddition(data);
+    UrlListener.findLatestTabInfo()
+        .then((siteInformation) => {
+            requestReaderAddition(siteInformation);
             }, onError);
 }
 
