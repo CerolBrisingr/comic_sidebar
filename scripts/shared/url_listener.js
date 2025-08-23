@@ -7,10 +7,6 @@ class UrlListener {
     #lastUrl = "";
     #hasFavIcon = false;
 
-    static #bundleUrl(url, favIconUrl) {
-        return {url:url, time: Date.now(), favIcon: favIconUrl};
-    }
-
     static async listAllTabs() {
         const tabs = await browser.tabs.query({});
         let output = [];
@@ -26,15 +22,17 @@ class UrlListener {
         let tabs = await browser.tabs.query({currentWindow: true});
         let url = undefined;
         let favIconUrl = undefined;
+        let title = undefined;
         let latest = 0;
         for (let tab of tabs) {
             if (tab.lastAccessed > latest) {
                 latest = tab.lastAccessed;
                 url = tab.url;
                 favIconUrl = tab.favIconUrl;
+                title = tab.title;
             }
         }
-        return UrlListener.#bundleUrl(url, favIconUrl);
+        return bundleUrl(url, favIconUrl, title);
     }
     
     constructor(fktReactToUrl) {
@@ -58,11 +56,13 @@ class UrlListener {
         this.deactivate();
     }
 
-    #sendUrl(url, favIconUrl) {
-        this.#fktReactToUrl(UrlListener.#bundleUrl(url, favIconUrl));
+    #sendUrl(url, favIconUrl, title) {
+        this.#fktReactToUrl(
+            bundleUrl(url, favIconUrl, title)
+        );
     }
     
-    #fireOnlyOnce(url, favIconUrl) {
+    #fireOnlyOnce(url, favIconUrl, title) {
         if (favIconUrl === undefined | this.#hasFavIcon) {
             // We don't need a favIcon or have no chance to get one
             if (url === this.#lastUrl)
@@ -70,7 +70,7 @@ class UrlListener {
         }
         this.#lastUrl = url;
         this.#hasFavIcon = favIconUrl !== undefined;
-        this.#sendUrl(url, favIconUrl);
+        this.#sendUrl(url, favIconUrl, title);
     }
     
     #connect() {
@@ -113,7 +113,7 @@ class UrlListener {
             return;
         if (!tab.active) // This tab will fire again when finally viewed
             return;
-        this.#fireOnlyOnce(tab.url, tab.favIconUrl);
+        this.#fireOnlyOnce(tab.url, tab.favIconUrl, tab.title);
     }
 }
 
@@ -158,6 +158,13 @@ class Tab {
             favIcon: this.#favIconUrl
         }
     }
+}
+
+function bundleUrl(url, favIconUrl, title) {
+    return {url:url, 
+            time: Date.now(),
+            favIcon: favIconUrl,
+            title: title};
 }
 
 export {UrlListener}
