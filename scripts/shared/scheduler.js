@@ -187,8 +187,8 @@ function nearestMonthlyReset(now, schedule) {
             // Last month did not have this day? 1st of this month!
             thisReset = new Date(year, month, 1);
         } else {
-            // This day last month is out. Start of the next day.
-            thisReset = new Date(year, month - 1, resetDay + 1);
+            // This day last month is out. Start of day.
+            thisReset = new Date(year, month - 1, resetDay, 0, 0, 0);
         }
         if (thisReset > latestReset)
             latestReset = thisReset;

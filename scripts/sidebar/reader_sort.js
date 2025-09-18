@@ -30,8 +30,8 @@ function compareLabels(a, b) {
 }
 
 function compareUrls(a, b) {
-    a = a.getPrefixMask();
-    b = b.getPrefixMask();
+    a = a.getPrefixMasks()[0];
+    b = b.getPrefixMasks()[0];
     return compareLower(a,b);
 }
 

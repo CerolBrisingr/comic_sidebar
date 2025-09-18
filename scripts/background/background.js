@@ -67,7 +67,7 @@ function handlePageAddition(data) {
 }
 
 async function handleImport(readerObjectLike) {
-    let readerId = await webReader.registerPage(readerObjectLike);
+    let readerId = await webReader.registerReader(readerObjectLike);
     if (readerId === -1)
         return;
     readerObjectLike.intId = readerId;

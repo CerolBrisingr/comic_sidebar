@@ -28,17 +28,17 @@ class BasicReaderManager {
     getLabel() {
         return this._readerData.getLabel();
     }
-    
-    getPrefixMask() {
-        return this._readerData.getPrefixMask();
+
+    getPrefixMasks() {
+        return this._readerData.getPrefixMasks();
     }
 
     getLatestInputTime() {
         return this._readerData.getLatestInputTime();
     }
     
-    urlIsCompatible(url) {
-        return this._readerData.urlIsCompatible(url);
+    urlIsCompatible(url, allowPrefix = false) {
+        return this._readerData.urlIsCompatible(url, allowPrefix);
     }
     
     getMostRecentAutomaticUrl() {
@@ -85,7 +85,7 @@ class BasicReaderManager {
     
     deleteMe() {
         this._readerSync.disconnect();
-        this._parentInterface.deleteMe(this._readerData.getPrefixMask());
+        this._parentInterface.removeReader(this._readerData.getPrefixMasks());
     }
 
     isValid() {
@@ -105,6 +105,19 @@ class CoreReaderManager extends BasicReaderManager {
     constructor(readerObject, parentInterface, tagLibrary, intId) {
         super(readerObject, parentInterface, tagLibrary, intId);
         this._readerSync = ReaderSync.makeCore(intId, this);
+    }
+
+    managesThis(readerData) {
+        return readerData === this._readerData;
+    }
+
+    canBeUpdatedWith(readerObjectLike) {
+        const tempReader = new ReaderData(readerObjectLike);
+        return this._parentInterface.canWeUpdateReaderWith(this._readerData, tempReader);
+    }
+
+    getRecognitionInterface() {
+        return this._readerData.getRecognitionInterface();
     }
 
     saveProgress() {
@@ -220,31 +233,6 @@ class SidebarReaderManager extends BasicReaderManager{
     }
 }
 
-class ReaderManagerDummy {
-    constructor() {
-    }
-    
-    isValid() {
-        return false;
-    }
-    
-    urlIsCompatible(url) {
-        return false;
-    }
-    
-    prepareReaderEdit() {}
-    
-    pinBookmark(bookmark) {
-        return false;
-    }
-    unpinBookmark(bookmark) {
-        return false;
-    }
-    
-    expand() {}
-    collapse() {}
-}
-
 class ReaderManagerInterface {
     #readerManager
 
@@ -272,7 +260,7 @@ class ReaderManagerInterface {
         this.#readerManager.saveProgress();
     }
     
-    deleteMe(prefixMask) {
+    removeReader(prefixMask) {
         throw new Error("ReaderData should never be in a position to call delete to SidebarReaderManager!");
     }
 }
@@ -281,4 +269,4 @@ class ReaderSyncDummy {
     disconnect(){};
 }
 
-export {CoreReaderManager, SidebarReaderManager, ReaderManagerDummy}
+export {CoreReaderManager, SidebarReaderManager}
