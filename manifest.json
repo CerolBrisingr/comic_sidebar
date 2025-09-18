@@ -7,7 +7,14 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "sb_webcomic_sidebar@whythis.format",
-      "strict_min_version": "112"
+      "strict_min_version": "112.0",
+      "data_collection_permissions": {
+        "required": [
+                    "browsingActivity",
+                    "websiteContent"
+                    ],
+        "optional": ["technicalAndInteraction"]
+      }
     }
   },
 
